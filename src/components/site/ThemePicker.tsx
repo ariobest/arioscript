@@ -14,6 +14,9 @@ export function ThemePicker() {
     setTheme(t);
     applyTheme(t, false);
     setMode(getMode());
+    const sync = () => { setTheme(getTheme()); setMode(getMode()); };
+    window.addEventListener("ario-appearance", sync);
+    return () => window.removeEventListener("ario-appearance", sync);
   }, []);
 
   useEffect(() => {
