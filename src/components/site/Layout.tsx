@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Terminal, Search, Menu, X, Heart, LogIn, LogOut, Shield, Trophy, Gamepad2, LayoutGrid, User,
    MessageCircle, Youtube, Send, Github, ExternalLink,
@@ -31,6 +31,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: state => state.location.pathname });
   const { user, profile, isStaff, signOut } = useAuth();
   const { data: settings } = useSettings();
 
@@ -157,7 +158,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         )}
       </header>
 
-      <main className="flex-1">{settings?.maintenance_mode && !isStaff && !location.pathname.startsWith("/auth") && !location.pathname.startsWith("/admin") ? <div className="mx-auto max-w-xl px-4 py-28 text-center"><h1 className="text-2xl font-bold">{settings.site_name} is under maintenance</h1><p className="mt-3 text-muted-foreground">Please check back soon.</p></div> : children}</main>
+      <main className="flex-1">{settings?.maintenance_mode && !isStaff && !pathname.startsWith("/auth") && !pathname.startsWith("/admin") ? <div className="mx-auto max-w-xl px-4 py-28 text-center"><h1 className="text-2xl font-bold">{settings.site_name} is under maintenance</h1><p className="mt-3 text-muted-foreground">Please check back soon.</p></div> : children}</main>
 
       <footer className="mt-16 border-t border-border py-10">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-5 px-4 text-center">
