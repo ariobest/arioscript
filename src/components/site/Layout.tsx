@@ -36,8 +36,8 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!settings) return;
-    if (!localStorage.getItem("ario-theme") && THEMES.some(t => t === settings.theme)) applyTheme(settings.theme as typeof THEMES[number]);
-    if (!localStorage.getItem("ario-mode")) applyMode(settings.color_mode === "light" ? "light" : "dark");
+    if (!localStorage.getItem("ario-theme") && THEMES.some(t => t === settings.theme)) applyTheme(settings.theme as typeof THEMES[number], false);
+    if (!localStorage.getItem("ario-mode")) applyMode(settings.color_mode === "light" ? "light" : "dark", false);
   }, [settings?.theme, settings?.color_mode]);
 
   useEffect(() => {

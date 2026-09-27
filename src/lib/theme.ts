@@ -19,10 +19,10 @@ export function getMode(): ColorMode {
   return localStorage.getItem(MODE_KEY) === "light" ? "light" : "dark";
 }
 
-export function applyMode(mode: ColorMode) {
+export function applyMode(mode: ColorMode, persist = true) {
   if (typeof document === "undefined") return;
   document.documentElement.setAttribute("data-mode", mode);
-  localStorage.setItem(MODE_KEY, mode);
+  if (persist) localStorage.setItem(MODE_KEY, mode);
   window.dispatchEvent(new Event("ario-appearance"));
 }
 
@@ -32,9 +32,9 @@ export function getTheme(): Theme {
   return t && (THEMES as readonly string[]).includes(t) ? t : "midnight";
 }
 
-export function applyTheme(theme: Theme) {
+export function applyTheme(theme: Theme, persist = true) {
   if (typeof document === "undefined") return;
   document.documentElement.setAttribute("data-theme", theme);
-  localStorage.setItem(KEY, theme);
+  if (persist) localStorage.setItem(KEY, theme);
   window.dispatchEvent(new Event("ario-appearance"));
 }

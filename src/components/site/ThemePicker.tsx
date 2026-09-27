@@ -12,7 +12,7 @@ export function ThemePicker() {
   useEffect(() => {
     const t = getTheme();
     setTheme(t);
-    applyTheme(t);
+    applyTheme(t, false);
     setMode(getMode());
   }, []);
 

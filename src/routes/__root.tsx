@@ -107,8 +107,8 @@ function RootComponent() {
   const [mode, setMode] = useState<ColorMode>("dark");
 
   useEffect(() => {
-    applyTheme(getTheme());
-    applyMode(getMode());
+    applyTheme(getTheme(), false);
+    applyMode(getMode(), false);
     setMode(getMode());
     const update = () => setMode(getMode());
     window.addEventListener("ario-appearance", update);
