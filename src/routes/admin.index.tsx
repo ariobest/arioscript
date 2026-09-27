@@ -37,11 +37,11 @@ export function useTimeseries(days: number) {
   });
 }
 
-function Tile({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value?: number }) {
+function Tile({ icon: Icon, label, value, pending }: { icon: React.ElementType; label: string; value?: number; pending?: boolean }) {
   return (
     <div className="glass rounded-2xl p-4">
       <Icon size={15} className="text-primary" />
-      <p className="mt-2 font-display text-xl font-bold">{compact(value ?? 0)}</p>
+      <p className="mt-2 font-display text-xl font-bold">{pending ? "—" : compact(value ?? 0)}</p>
       <p className="text-xs text-muted-foreground">{label}</p>
     </div>
   );
@@ -74,14 +74,14 @@ function Dashboard() {
 
         {stats.isError && <p className="text-sm text-destructive">Statistics could not be loaded. Please try again.</p>}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <Tile icon={Users} label="Total users" value={s['users']} />
-        <Tile icon={Wifi} label="Online now" value={s['online']} />
-        <Tile icon={Terminal} label="Scripts" value={s['scripts']} />
-        <Tile icon={Eye} label="Views" value={s['views']} />
-        <Tile icon={Download} label="Downloads" value={s['downloads']} />
-        <Tile icon={Copy} label="Copies" value={s['copies']} />
-        <Tile icon={Heart} label="Favorites" value={s['favorites']} />
-        <Tile icon={Flag} label="Open reports" value={s['reports']} />
+        <Tile icon={Users} label="Total users" value={s['users']} pending={!stats.data} />
+        <Tile icon={Wifi} label="Online now" value={s['online']} pending={!stats.data} />
+        <Tile icon={Terminal} label="Scripts" value={s['scripts']} pending={!stats.data} />
+        <Tile icon={Eye} label="Views" value={s['views']} pending={!stats.data} />
+        <Tile icon={Download} label="Downloads" value={s['downloads']} pending={!stats.data} />
+        <Tile icon={Copy} label="Copies" value={s['copies']} pending={!stats.data} />
+        <Tile icon={Heart} label="Favorites" value={s['favorites']} pending={!stats.data} />
+        <Tile icon={Flag} label="Open reports" value={s['reports']} pending={!stats.data} />
       </div>
 
       <div className="glass rounded-2xl p-5">
