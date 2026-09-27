@@ -15,6 +15,13 @@
       "when": 1790526052491,
       "tag": "0001_thumbnails_storage_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790526121985,
+      "tag": "0002_first_user_becomes_admin",
+      "breakpoints": true
     }
   ]
 }
