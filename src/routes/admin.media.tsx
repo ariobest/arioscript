@@ -10,7 +10,7 @@ import { uploadSiteImage, storedImagePath } from "@/lib/media";
 
 export const Route = createFileRoute("/admin/media")({ component: MediaManager, head: () => ({ meta: [{ title: "Media Manager — ARIO SCRIPTS" }, { name: "description", content: "Manage ARIO SCRIPTS site imagery." }, { property: "og:title", content: "Media Manager — ARIO SCRIPTS" }, { property: "og:description", content: "Manage ARIO SCRIPTS site imagery." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }) });
 
-type MediaFile = { name: string; created_at: string | null; metadata?: { size?: number } | null; url: string; bucket: string; used: string[] };
+type MediaFile = { name: string; created_at: string | null; metadata?: { size?: number } | null; url: string; bucket: string; used: string[]; references: string[] };
 
 function MediaManager() {
   const { user, isAdmin } = useAuth();
@@ -36,7 +36,8 @@ function MediaManager() {
         if (!file.id) continue;
         const { data: link } = await supabase.storage.from(bucket).createSignedUrl(file.name, 60 * 60);
         const used = Array.from(refs.entries()).filter(([url]) => storedImagePath(url, bucket) === file.name).flatMap(([, labels]) => labels);
-        all.push({ name: file.name, created_at: file.created_at, metadata: file.metadata, url: link?.signedUrl ?? "", bucket, used });
+        const references = Array.from(refs.keys()).filter(url => storedImagePath(url, bucket) === file.name);
+        all.push({ name: file.name, created_at: file.created_at, metadata: file.metadata, url: link?.signedUrl ?? "", bucket, used, references });
       }
     }
     return all;
@@ -61,19 +62,16 @@ function MediaManager() {
     setBusy(true);
     try {
       const url = await uploadSiteImage(image);
-      for (const usage of file.used) {
-        if (usage.startsWith("Script: ")) {
-          const { error } = await supabase.from("scripts").update({ image_url: url }).eq("image_url", await referencedUrl(file, usage));
-          if (error) throw error;
-        } else if (usage.startsWith("Category: ")) {
-          const { error } = await supabase.from("categories").update({ image_url: url }).eq("image_url", await referencedUrl(file, usage));
-          if (error) throw error;
-        } else if (["Logo", "Favicon", "Hero image"].includes(usage)) {
-          const column = usage === "Logo" ? "logo_url" : usage === "Favicon" ? "favicon_url" : "hero_image_url";
-          const change = column === "logo_url" ? { logo_url: url } : column === "favicon_url" ? { favicon_url: url } : { hero_image_url: url };
-          const { error } = await supabase.from("site_settings").update(change).eq("id", 1);
-          if (error) throw error;
-        }
+      for (const oldUrl of file.references) {
+        const results = await Promise.all([
+          supabase.from("scripts").update({ image_url: url }).eq("image_url", oldUrl),
+          supabase.from("categories").update({ image_url: url }).eq("image_url", oldUrl),
+          supabase.from("site_settings").update({ logo_url: url }).eq("logo_url", oldUrl),
+          supabase.from("site_settings").update({ favicon_url: url }).eq("favicon_url", oldUrl),
+          supabase.from("site_settings").update({ hero_image_url: url }).eq("hero_image_url", oldUrl),
+        ]);
+        const failed = results.find(result => result.error);
+        if (failed?.error) throw failed.error;
       }
       if (user) await adminLog({ adminId: user.id, action: "replaced image", targetType: "media", details: file.name });
       toast.success("Replacement uploaded and linked. The old image remains available for safe removal later.");
@@ -83,17 +81,6 @@ function MediaManager() {
       void qc.invalidateQueries({ queryKey: ["media-manager"] });
     } catch (e) { toast.error(e instanceof Error ? e.message : "Replace failed"); }
     finally { setBusy(false); }
-  }
-  async function referencedUrl(file: MediaFile, usage: string) {
-    if (usage.startsWith("Script: ")) {
-      const { data } = await supabase.from("scripts").select("image_url").eq("name", usage.slice(8)).limit(1).maybeSingle();
-      if (storedImagePath(data?.image_url ?? null, file.bucket) === file.name) return data?.image_url ?? "";
-    }
-    if (usage.startsWith("Category: ")) {
-      const { data } = await supabase.from("categories").select("image_url").eq("name", usage.slice(10)).limit(1).maybeSingle();
-      if (storedImagePath(data?.image_url ?? null, file.bucket) === file.name) return data?.image_url ?? "";
-    }
-    throw new Error("Image link changed. Refresh and try again.");
   }
   return <div className="space-y-5">
     <div className="flex flex-wrap items-center gap-3"><h1 className="font-display text-2xl font-bold">Media manager</h1><label className="btn btn-primary ml-auto cursor-pointer"><Upload size={15} /> {busy ? "Uploading…" : "Upload image"}<input type="file" hidden accept="image/png,image/jpeg,image/webp,image/gif" disabled={busy} onChange={e => void upload(e.target.files?.[0])} /></label></div>
