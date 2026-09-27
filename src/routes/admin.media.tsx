@@ -70,7 +70,8 @@ function MediaManager() {
           if (error) throw error;
         } else if (["Logo", "Favicon", "Hero image"].includes(usage)) {
           const column = usage === "Logo" ? "logo_url" : usage === "Favicon" ? "favicon_url" : "hero_image_url";
-          const { error } = await supabase.from("site_settings").update({ [column]: url }).eq("id", 1);
+          const change = column === "logo_url" ? { logo_url: url } : column === "favicon_url" ? { favicon_url: url } : { hero_image_url: url };
+          const { error } = await supabase.from("site_settings").update(change).eq("id", 1);
           if (error) throw error;
         }
       }
