@@ -14,11 +14,12 @@ export function sessionId(): string {
 
 export async function recordEvent(scriptId: string, type: ScriptEvent) {
   try {
-    await supabase.rpc("record_script_event", {
+    const { error } = await supabase.rpc("record_script_event", {
       _script_id: scriptId,
       _event_type: type,
       _session_id: sessionId(),
     });
+    if (error) throw error;
   } catch {
     /* analytics must never break the UI */
   }

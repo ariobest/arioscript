@@ -19,6 +19,7 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAnnouncementsRouteImport } from './routes/admin.announcements'
 import { Route as AdminBadgesRouteImport } from './routes/admin.badges'
 import { Route as AdminLogsRouteImport } from './routes/admin.logs'
+import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -79,6 +80,11 @@ const AdminBadgesRoute = AdminBadgesRouteImport.update({
 const AdminLogsRoute = AdminLogsRouteImport.update({
   id: '/logs',
   path: '/logs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMediaRoute = AdminMediaRouteImport.update({
+  id: '/media',
+  path: '/media',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
@@ -147,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/badges': typeof AdminBadgesRoute
   '/admin/logs': typeof AdminLogsRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -169,6 +176,7 @@ export interface FileRoutesByTo {
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/badges': typeof AdminBadgesRoute
   '/admin/logs': typeof AdminLogsRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/badges': typeof AdminBadgesRoute
   '/admin/logs': typeof AdminLogsRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/admin/announcements'
     | '/admin/badges'
     | '/admin/logs'
+    | '/admin/media'
     | '/admin/reports'
     | '/admin/scripts'
     | '/admin/settings'
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/admin/announcements'
     | '/admin/badges'
     | '/admin/logs'
+    | '/admin/media'
     | '/admin/reports'
     | '/admin/scripts'
     | '/admin/settings'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/admin/announcements'
     | '/admin/badges'
     | '/admin/logs'
+    | '/admin/media'
     | '/admin/reports'
     | '/admin/scripts'
     | '/admin/settings'
@@ -364,6 +376,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLogsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/media': {
+      id: '/admin/media'
+      path: '/media'
+      fullPath: '/admin/media'
+      preLoaderRoute: typeof AdminMediaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reports': {
       id: '/admin/reports'
       path: '/reports'
@@ -449,6 +468,7 @@ interface AdminRouteChildren {
   AdminAnnouncementsRoute: typeof AdminAnnouncementsRoute
   AdminBadgesRoute: typeof AdminBadgesRoute
   AdminLogsRoute: typeof AdminLogsRoute
+  AdminMediaRoute: typeof AdminMediaRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminScriptsRoute: typeof AdminScriptsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -461,6 +481,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAnnouncementsRoute: AdminAnnouncementsRoute,
   AdminBadgesRoute: AdminBadgesRoute,
   AdminLogsRoute: AdminLogsRoute,
+  AdminMediaRoute: AdminMediaRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminScriptsRoute: AdminScriptsRoute,
   AdminSettingsRoute: AdminSettingsRoute,

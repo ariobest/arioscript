@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Terminal, Search, Menu, X, Heart, LogIn, LogOut, Shield, Trophy, Gamepad2, LayoutGrid, User,
-  MessageCircle, Youtube, Send, Github,
+   MessageCircle, Youtube, Send, Github, ExternalLink,
 } from "lucide-react";
 import { ThemePicker } from "./ThemePicker";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { THEMES, applyTheme, applyMode } from "@/lib/theme";
 
 const NAV = [
   { to: "/scripts", label: "Scripts", icon: Terminal },
@@ -33,6 +34,18 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const { user, profile, isStaff, signOut } = useAuth();
   const { data: settings } = useSettings();
 
+  useEffect(() => {
+    if (!settings) return;
+    if (!localStorage.getItem("ario-theme") && THEMES.some(t => t === settings.theme)) applyTheme(settings.theme as typeof THEMES[number]);
+    if (!localStorage.getItem("ario-mode")) applyMode(settings.color_mode === "light" ? "light" : "dark");
+  }, [settings?.theme, settings?.color_mode]);
+
+  useEffect(() => {
+    if (!settings?.background_color || !/^#[0-9a-f]{6}$/i.test(settings.background_color)) return;
+    document.documentElement.style.setProperty("--background", settings.background_color);
+    return () => { document.documentElement.style.removeProperty("--background"); };
+  }, [settings?.background_color]);
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
     navigate({ to: "/scripts", search: { q: q || undefined, sort: undefined, category: undefined, game: undefined } as never });
@@ -43,8 +56,8 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-border bg-[color-mix(in_oklab,var(--background)_78%,transparent)] backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4">
           <Link to="/" className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/15 text-primary glow-ring">
-              <Terminal size={18} />
+             <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-xl bg-primary/15 text-primary glow-ring">
+               {settings?.logo_url ? <img src={settings.logo_url} alt="" className="h-full w-full object-contain" /> : <Terminal size={18} />}
             </span>
             <span className="font-display text-sm font-bold tracking-tight sm:text-base">
               {settings?.site_name ?? "ARIO SCRIPTS"}
@@ -152,6 +165,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             {settings?.support_url && (
               <a href={settings.support_url} target="_blank" rel="noreferrer" className="btn btn-ghost h-9 w-9 !p-0"><Github size={16} /></a>
             )}
+            {settings?.other_social_url && <a href={settings.other_social_url} target="_blank" rel="noreferrer" className="btn btn-ghost h-9 w-9 !p-0" aria-label="Other social link"><ExternalLink size={16} /></a>}
           </div>
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} {settings?.site_name ?? "ARIO SCRIPTS"}. Scripts are curated by our team.

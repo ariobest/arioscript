@@ -1,0 +1,6 @@
+- [ ] Verify and refresh real statistics after actions
+- [ ] Add 50 themes, light/dark, themed notifications, and first-visit rocket welcome
+- [ ] Add moderated profile photos with secure upload and ban handling
+- [ ] Add admin media manager and appearance/site controls
+- [ ] Extend announcements and confirm YouTube showcase/Lucide controls
+- [ ] Verify public and authenticated flows

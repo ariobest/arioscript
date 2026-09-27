@@ -22,6 +22,20 @@
       "when": 1790526121985,
       "tag": "0002_first_user_becomes_admin",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790527360587,
+      "tag": "0003_appearance_announcements_and_safe_avatars",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790527471469,
+      "tag": "0004_category_images_and_admin_avatar_gallery",
+      "breakpoints": true
     }
   ]
 }
