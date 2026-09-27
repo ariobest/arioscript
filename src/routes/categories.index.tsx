@@ -10,6 +10,8 @@ export const Route = createFileRoute("/categories/")({
       { name: "description", content: "Combat, automation, ESP, farming, teleport, utilities, UI and more script categories." },
       { property: "og:title", content: "Script Categories — ARIO SCRIPTS" },
       { property: "og:description", content: "Combat, automation, ESP, farming, teleport, utilities, UI and more script categories." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Categories,

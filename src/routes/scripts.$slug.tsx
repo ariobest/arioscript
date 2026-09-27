@@ -14,6 +14,7 @@ import { compact, formatDate } from "@/lib/format";
 import type { Script } from "@/lib/types";
 
 export const Route = createFileRoute("/scripts/$slug")({
+  head: () => ({ meta: [{ title: 'Script Details — ARIO SCRIPTS' }, { name: "description", content: 'Explore Lua script details, code and showcase on ARIO SCRIPTS.' }, { property: "og:title", content: 'Script Details — ARIO SCRIPTS' }, { property: "og:description", content: 'Explore Lua script details, code and showcase on ARIO SCRIPTS.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: ScriptPage,
 });
 

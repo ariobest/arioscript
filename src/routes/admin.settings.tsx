@@ -12,6 +12,7 @@ import { THEMES, applyTheme, applyMode } from "@/lib/theme";
 import { uploadSiteImage } from "@/lib/media";
 
 export const Route = createFileRoute("/admin/settings")({
+  head: () => ({ meta: [{ title: 'Site Settings — ARIO SCRIPTS' }, { name: "description", content: 'Control ARIO SCRIPTS appearance and site settings.' }, { property: "og:title", content: 'Site Settings — ARIO SCRIPTS' }, { property: "og:description", content: 'Control ARIO SCRIPTS appearance and site settings.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AdminSettings,
 });
 

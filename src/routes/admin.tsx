@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/admin")({
+  head: () => ({ meta: [{ title: 'Admin Login — ARIO SCRIPTS' }, { name: "description", content: 'Sign in to manage ARIO SCRIPTS.' }, { property: "og:title", content: 'Admin Login — ARIO SCRIPTS' }, { property: "og:description", content: 'Sign in to manage ARIO SCRIPTS.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AdminLayout,
 });
 

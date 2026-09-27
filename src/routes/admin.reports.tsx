@@ -8,6 +8,7 @@ import { adminLog } from "@/lib/adminLog";
 import { timeAgo } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/reports")({
+  head: () => ({ meta: [{ title: 'Reports — ARIO SCRIPTS' }, { name: "description", content: 'Review and resolve reported scripts.' }, { property: "og:title", content: 'Reports — ARIO SCRIPTS' }, { property: "og:description", content: 'Review and resolve reported scripts.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AdminReports,
 });
 

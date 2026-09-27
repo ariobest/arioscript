@@ -14,6 +14,7 @@ import type { Script } from "@/lib/types";
 import { uploadSiteImage } from "@/lib/media";
 
 export const Route = createFileRoute("/admin/scripts")({
+  head: () => ({ meta: [{ title: 'Manage Scripts — ARIO SCRIPTS' }, { name: "description", content: 'Add and manage scripts in the ARIO SCRIPTS library.' }, { property: "og:title", content: 'Manage Scripts — ARIO SCRIPTS' }, { property: "og:description", content: 'Add and manage scripts in the ARIO SCRIPTS library.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AdminScripts,
 });
 

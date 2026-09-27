@@ -8,6 +8,7 @@ import { ScriptGrid } from "@/components/site/ScriptCard";
 import type { Script } from "@/lib/types";
 
 export const Route = createFileRoute("/favorites")({
+  head: () => ({ meta: [{ title: 'My Favorites — ARIO SCRIPTS' }, { name: "description", content: 'View your saved Lua scripts on ARIO SCRIPTS.' }, { property: "og:title", content: 'My Favorites — ARIO SCRIPTS' }, { property: "og:description", content: 'View your saved Lua scripts on ARIO SCRIPTS.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Favorites,
 });
 

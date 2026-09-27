@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { compact, timeAgo } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/")({
+  head: () => ({ meta: [{ title: 'Admin Dashboard — ARIO SCRIPTS' }, { name: "description", content: 'View live ARIO SCRIPTS activity and statistics.' }, { property: "og:title", content: 'Admin Dashboard — ARIO SCRIPTS' }, { property: "og:description", content: 'View live ARIO SCRIPTS activity and statistics.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Dashboard,
 });
 

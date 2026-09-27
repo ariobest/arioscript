@@ -30,6 +30,8 @@ export const Route = createFileRoute("/scripts/")({
       { name: "description", content: "Search and filter the full ARIO SCRIPTS library by game, category, tag and popularity." },
       { property: "og:title", content: "Browse Scripts — ARIO SCRIPTS" },
       { property: "og:description", content: "Search and filter the full ARIO SCRIPTS library by game, category, tag and popularity." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Browse,

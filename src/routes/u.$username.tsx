@@ -14,6 +14,7 @@ import { formatDate, isOnline } from "@/lib/format";
 import type { Script } from "@/lib/types";
 
 export const Route = createFileRoute("/u/$username")({
+  head: () => ({ meta: [{ title: 'Member Profile — ARIO SCRIPTS' }, { name: "description", content: 'View an ARIO SCRIPTS member profile and favorite scripts.' }, { property: "og:title", content: 'Member Profile — ARIO SCRIPTS' }, { property: "og:description", content: 'View an ARIO SCRIPTS member profile and favorite scripts.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: ProfilePage,
 });
 

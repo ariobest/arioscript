@@ -13,6 +13,8 @@ export const Route = createFileRoute("/leaderboards")({
       { name: "description", content: "The most viewed, downloaded, copied and favorited scripts plus our most active members." },
       { property: "og:title", content: "Leaderboards — ARIO SCRIPTS" },
       { property: "og:description", content: "The most viewed, downloaded, copied and favorited scripts plus our most active members." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Leaderboards,

@@ -10,6 +10,7 @@ import { timeAgo } from "@/lib/format";
 import { DynamicIcon } from "@/components/site/DynamicIcon";
 
 export const Route = createFileRoute("/admin/announcements")({
+  head: () => ({ meta: [{ title: 'Announcements — ARIO SCRIPTS' }, { name: "description", content: 'Schedule and manage announcements on ARIO SCRIPTS.' }, { property: "og:title", content: 'Announcements — ARIO SCRIPTS' }, { property: "og:description", content: 'Schedule and manage announcements on ARIO SCRIPTS.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AdminAnnouncements,
 });
 

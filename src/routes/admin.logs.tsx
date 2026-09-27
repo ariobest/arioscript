@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { timeAgo } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/logs")({
+  head: () => ({ meta: [{ title: 'Admin Logs — ARIO SCRIPTS' }, { name: "description", content: 'Review staff activity on ARIO SCRIPTS.' }, { property: "og:title", content: 'Admin Logs — ARIO SCRIPTS' }, { property: "og:description", content: 'Review staff activity on ARIO SCRIPTS.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AdminLogs,
 });
 
