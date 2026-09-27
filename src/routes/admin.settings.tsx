@@ -146,7 +146,7 @@ function AdminSettings() {
 
       <div className="glass rounded-2xl p-5">
         <h2 className="font-display font-semibold">Categories</h2>
-        <div className="mt-3 flex gap-2">
+         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
           <input className="input-base" placeholder="New category name" value={newCat} onChange={(e) => setNewCat(e.target.value)} />
            <label className="flex min-w-0 flex-1 items-center gap-2"><DynamicIcon name={catIcon} size={17} className="shrink-0 text-primary" /><input className="input-base" placeholder="Lucide icon name" value={catIcon} onChange={(e) => setCatIcon(e.target.value)} /></label>
           <button onClick={() => void addCategory()} className="btn btn-primary"><Plus size={15} /></button>
