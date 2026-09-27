@@ -22,6 +22,7 @@ function AdminAnnouncements() {
   const [link, setLink] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
+  const [active, setActive] = useState(true);
 
   const items = useQuery({
     queryKey: ["admin_announcements"],
@@ -37,7 +38,7 @@ function AdminAnnouncements() {
     if (!title.trim() || !content.trim()) return toast.error("Title and content required");
     if (end && start && new Date(end) < new Date(start)) return toast.error("End date must follow start date");
     if (link && !/^https?:\/\//i.test(link)) return toast.error("Link must start with https://");
-    const { error } = await supabase.from("announcements").insert({ title: title.trim().slice(0, 120), content: content.trim().slice(0, 2000), icon: icon.trim().slice(0, 50), link_url: link || null, start_at: start ? new Date(start).toISOString() : null, end_at: end ? new Date(end).toISOString() : null });
+    const { error } = await supabase.from("announcements").insert({ title: title.trim().slice(0, 120), content: content.trim().slice(0, 2000), icon: icon.trim().slice(0, 50) || "Megaphone", link_url: link.trim() || null, start_at: start ? new Date(start).toISOString() : null, end_at: end ? new Date(end).toISOString() : null, active });
     if (error) return toast.error(error.message);
     if (user) await adminLog({ adminId: user.id, action: "created announcement", targetType: "announcement", details: title });
     setTitle("");
@@ -68,6 +69,7 @@ function AdminAnnouncements() {
         <input className="input-base" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
         <textarea className="input-base" rows={3} placeholder="Message shown on the homepage" value={content} onChange={(e) => setContent(e.target.value)} />
         <div className="grid gap-3 sm:grid-cols-2"><label className="text-xs text-muted-foreground">Lucide icon name <span className="inline-block align-middle text-primary"><DynamicIcon name={icon} size={15} /></span><input className="input-base mt-1" value={icon} onChange={e => setIcon(e.target.value)} placeholder="Megaphone" /></label><label className="text-xs text-muted-foreground">Link URL<input type="url" className="input-base mt-1" value={link} onChange={e => setLink(e.target.value)} placeholder="https://…" /></label><label className="text-xs text-muted-foreground">Start date<input type="datetime-local" className="input-base mt-1" value={start} onChange={e => setStart(e.target.value)} /></label><label className="text-xs text-muted-foreground">End date<input type="datetime-local" className="input-base mt-1" value={end} onChange={e => setEnd(e.target.value)} /></label></div>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} /> Enabled</label>
         <button onClick={() => void create()} className="btn btn-primary"><Plus size={15} /> Publish announcement</button>
       </div>
 

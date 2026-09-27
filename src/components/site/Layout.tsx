@@ -46,6 +46,24 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     return () => { document.documentElement.style.removeProperty("--background"); };
   }, [settings?.background_color]);
 
+  useEffect(() => {
+    if (!settings?.custom_css) return;
+    const stylesheet = document.createElement("style");
+    stylesheet.dataset.arioCustom = "true";
+    stylesheet.textContent = settings.custom_css;
+    document.head.appendChild(stylesheet);
+    return () => { stylesheet.remove(); };
+  }, [settings?.custom_css]);
+
+  useEffect(() => {
+    if (!settings?.favicon_url) return;
+    const icon = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+    if (!icon) return;
+    const original = icon.href;
+    icon.href = settings.favicon_url;
+    return () => { icon.href = original; };
+  }, [settings?.favicon_url]);
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
     navigate({ to: "/scripts", search: { q: q || undefined, sort: undefined, category: undefined, game: undefined } as never });

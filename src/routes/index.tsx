@@ -2,8 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
-  Search, Shuffle, Sparkles, Flame, Clock, Download, Eye, Copy, Gamepad2, LayoutGrid, Megaphone,
-   Users, Terminal, Heart,
+  Search, Shuffle, Sparkles, Flame, Clock, Download, Eye, Copy, Gamepad2, LayoutGrid,
+  Users, Terminal, Heart,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCategories, getGames, getStats, getTrending, listScripts } from "@/lib/queries";
@@ -20,6 +20,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Browse featured, trending and most downloaded Lua scripts. Curated, verified and always up to date." },
       { property: "og:title", content: "ARIO SCRIPTS — Premium Lua Script Database" },
       { property: "og:description", content: "Browse featured, trending and most downloaded Lua scripts. Curated, verified and always up to date." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Home,
@@ -98,10 +100,10 @@ function Home() {
             <Sparkles size={12} /> {stats.data?.online ?? 0} members online now
           </span>
           <h1 className="mt-5 font-display text-4xl font-bold leading-tight sm:text-6xl">
-            <span className="text-gradient">ARIO SCRIPTS</span>
+            <span className="text-gradient">{settings?.site_name ?? "ARIO SCRIPTS"}</span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-sm text-muted-foreground sm:text-base">
-            A curated database of premium Lua scripts. Every script is hand-checked, versioned and kept working.
+            {settings?.description ?? "A curated database of premium Lua scripts. Every script is hand-checked, versioned and kept working."}
           </p>
 
           <form onSubmit={search} className="relative mx-auto mt-8 max-w-xl">
