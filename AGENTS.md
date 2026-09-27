@@ -8,3 +8,8 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Decisions
+- tsconfig relaxes exactOptionalPropertyTypes/noImplicitReturns/noUncheckedIndexedAccess: TanStack + Supabase generated types make the strictest flags impractical across the app.
+- Script thumbnails live in a private "thumbnails" bucket and are referenced by long-lived signed URLs, because public buckets are blocked in this workspace.
+- The first account that signs up is granted the admin role automatically; later signups are normal users.
