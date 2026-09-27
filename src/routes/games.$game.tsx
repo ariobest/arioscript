@@ -6,6 +6,7 @@ import { ScriptGrid } from "@/components/site/ScriptCard";
 import type { Script } from "@/lib/types";
 
 export const Route = createFileRoute("/games/$game")({
+  head: () => ({ meta: [{ title: 'Game Scripts — ARIO SCRIPTS' }, { name: "description", content: 'Browse Lua scripts for a game on ARIO SCRIPTS.' }, { property: "og:title", content: 'Game Scripts — ARIO SCRIPTS' }, { property: "og:description", content: 'Browse Lua scripts for a game on ARIO SCRIPTS.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: GamePage,
 });
 

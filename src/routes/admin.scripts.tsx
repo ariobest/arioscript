@@ -11,8 +11,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { adminLog } from "@/lib/adminLog";
 import { compact, slugify, timeAgo } from "@/lib/format";
 import type { Script } from "@/lib/types";
+import { uploadSiteImage } from "@/lib/media";
 
 export const Route = createFileRoute("/admin/scripts")({
+  head: () => ({ meta: [{ title: 'Manage Scripts — ARIO SCRIPTS' }, { name: "description", content: 'Add and manage scripts in the ARIO SCRIPTS library.' }, { property: "og:title", content: 'Manage Scripts — ARIO SCRIPTS' }, { property: "og:description", content: 'Add and manage scripts in the ARIO SCRIPTS library.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AdminScripts,
 });
 
@@ -116,15 +118,8 @@ function AdminScripts() {
   }
 
   async function uploadImage(file: File) {
-    const path = `${crypto.randomUUID()}-${file.name.replace(/\s+/g, "-")}`;
-    const { error } = await supabase.storage.from("thumbnails").upload(path, file, { upsert: true });
-    if (error) return toast.error(error.message);
-    const { data, error: signErr } = await supabase.storage
-      .from("thumbnails")
-      .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
-    if (signErr || !data) return toast.error(signErr?.message ?? "Could not create image link");
-    setDraft((d) => ({ ...(d ?? {}), image_url: data.signedUrl }));
-    toast.success("Thumbnail uploaded");
+    try { const url = await uploadSiteImage(file); setDraft((d) => ({ ...(d ?? {}), image_url: url })); toast.success("Thumbnail uploaded"); }
+    catch (error) { toast.error(error instanceof Error ? error.message : "Upload failed"); }
   }
 
   const rows = (scripts.data ?? []).filter((s) =>

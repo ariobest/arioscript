@@ -11,6 +11,7 @@ import { DynamicIcon } from "@/components/site/DynamicIcon";
 import { SCRIPT_SELECT } from "@/lib/queries";
 
 export const Route = createFileRoute("/admin/users")({
+  head: () => ({ meta: [{ title: 'Manage Users — ARIO SCRIPTS' }, { name: "description", content: 'Manage ARIO SCRIPTS members, roles and badges.' }, { property: "og:title", content: 'Manage Users — ARIO SCRIPTS' }, { property: "og:description", content: 'Manage ARIO SCRIPTS members, roles and badges.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AdminUsers,
 });
 

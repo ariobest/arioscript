@@ -94,10 +94,52 @@
 [data-theme="royal"] { --primary: oklch(0.55 0.2 270); --accent: oklch(0.8 0.14 90); }
 [data-theme="blood"] { --primary: oklch(0.55 0.22 25); --accent: oklch(0.65 0.18 18); }
 [data-theme="mono"] { --primary: oklch(0.92 0 0); --accent: oklch(0.8 0 0); }
+[data-theme="coral"] { --primary: oklch(0.72 0.16 28); --accent: oklch(0.78 0.13 43); }
+[data-theme="peach"] { --primary: oklch(0.79 0.12 48); --accent: oklch(0.83 0.1 32); }
+[data-theme="ruby"] { --primary: oklch(0.62 0.22 15); --accent: oklch(0.72 0.17 7); }
+[data-theme="wine"] { --primary: oklch(0.55 0.16 355); --accent: oklch(0.68 0.14 10); }
+[data-theme="magenta"] { --primary: oklch(0.67 0.22 335); --accent: oklch(0.76 0.18 345); }
+[data-theme="orchid"] { --primary: oklch(0.72 0.17 315); --accent: oklch(0.78 0.14 325); }
+[data-theme="lavender"] { --primary: oklch(0.78 0.11 300); --accent: oklch(0.84 0.08 290); }
+[data-theme="periwinkle"] { --primary: oklch(0.72 0.13 280); --accent: oklch(0.82 0.09 270); }
+[data-theme="ocean"] { --primary: oklch(0.64 0.13 240); --accent: oklch(0.76 0.12 220); }
+[data-theme="marine"] { --primary: oklch(0.6 0.16 255); --accent: oklch(0.73 0.11 235); }
+[data-theme="sky"] { --primary: oklch(0.76 0.13 225); --accent: oklch(0.84 0.09 210); }
+[data-theme="lagoon"] { --primary: oklch(0.69 0.13 190); --accent: oklch(0.78 0.11 175); }
+[data-theme="forest"] { --primary: oklch(0.64 0.14 155); --accent: oklch(0.77 0.11 135); }
+[data-theme="jade"] { --primary: oklch(0.73 0.13 168); --accent: oklch(0.81 0.1 157); }
+[data-theme="olive"] { --primary: oklch(0.73 0.12 115); --accent: oklch(0.82 0.1 100); }
+[data-theme="citrus"] { --primary: oklch(0.82 0.18 106); --accent: oklch(0.85 0.13 85); }
+[data-theme="bronze"] { --primary: oklch(0.68 0.12 72); --accent: oklch(0.78 0.11 80); }
+[data-theme="copper"] { --primary: oklch(0.67 0.14 53); --accent: oklch(0.78 0.11 68); }
+[data-theme="pearl"] { --primary: oklch(0.87 0.03 90); --accent: oklch(0.8 0.05 165); }
+[data-theme="silver"] { --primary: oklch(0.8 0.02 255); --accent: oklch(0.88 0.03 220); }
+
+[data-mode="light"] {
+  --background: oklch(0.98 0.006 255); --surface: oklch(0.96 0.008 255);
+  --foreground: oklch(0.2 0.025 260); --card: oklch(1 0 0); --card-foreground: var(--foreground);
+  --popover: oklch(1 0 0); --popover-foreground: var(--foreground);
+  --secondary: oklch(0.93 0.014 255); --secondary-foreground: var(--foreground);
+  --muted: oklch(0.94 0.01 255); --muted-foreground: oklch(0.44 0.02 260);
+  --border: oklch(0.28 0.025 260 / 15%); --input: oklch(0.28 0.025 260 / 20%);
+  --primary-foreground: oklch(0.99 0 0);
+}
+[data-mode="light"] body { background-image: none; }
+[data-mode="light"] .glass { background: var(--card); box-shadow: 0 10px 28px -24px oklch(0.15 0.02 260 / 35%); }
+[data-mode="light"] .btn-ghost { background: var(--card); }
+[data-mode="light"] .input-base { background: var(--card); }
+
+.ario-toast { background: var(--card) !important; border: 1px solid var(--primary) !important; color: var(--foreground) !important; box-shadow: 0 8px 30px -14px var(--primary) !important; }
+[data-theme="blood"] .ario-toast { border-color: var(--destructive) !important; box-shadow: 0 10px 28px -12px var(--destructive) !important; animation: bloodDrop .6s ease-out both; }
+@keyframes bloodDrop { from { opacity: 0; transform: translateY(-26px) scaleY(1.2); } 65% { transform: translateY(5px) scaleY(.9); } to { opacity: 1; transform: none; } }
+@keyframes rocketArrival { 0% { opacity: 0; transform: translate(-110vw, 70vh) rotate(-35deg) scale(.55); } 65% { opacity: 1; transform: translate(8px, -12px) rotate(20deg); } 100% { transform: none; } }
+.welcome-rocket { animation: rocketArrival 1.2s cubic-bezier(.22,.8,.25,1) both; }
+@media (prefers-reduced-motion: reduce) { .welcome-rocket, [data-theme="blood"] .ario-toast, .fade-up { animation: none !important; } }
 
 @layer base {
   * { border-color: var(--color-border); }
   html { color-scheme: dark; }
+  html[data-mode="light"] { color-scheme: light; }
   body {
     background-color: var(--background);
     color: var(--foreground);

@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
-  Search, Shuffle, Sparkles, Flame, Clock, Download, Eye, Copy, Gamepad2, LayoutGrid, Megaphone,
+  Search, Shuffle, Sparkles, Flame, Clock, Download, Eye, Copy, Gamepad2, LayoutGrid,
   Users, Terminal, Heart,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,7 @@ import { ScriptGrid } from "@/components/site/ScriptCard";
 import { DynamicIcon } from "@/components/site/DynamicIcon";
 import { compact } from "@/lib/format";
 import type { Script } from "@/lib/types";
+import { useSettings } from "@/components/site/Layout";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,6 +20,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Browse featured, trending and most downloaded Lua scripts. Curated, verified and always up to date." },
       { property: "og:title", content: "ARIO SCRIPTS — Premium Lua Script Database" },
       { property: "og:description", content: "Browse featured, trending and most downloaded Lua scripts. Curated, verified and always up to date." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Home,
@@ -46,6 +49,8 @@ function Section({ title, icon: Icon, to, children }: { title: string; icon: Rea
 function Home() {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
+  const { data: settings } = useSettings();
+  const sections = Array.isArray(settings?.homepage_sections) ? settings.homepage_sections : ["featured", "trending", "recent", "downloads", "views", "copies", "games", "categories"];
 
   const stats = useQuery({ queryKey: ["stats"], queryFn: getStats });
   const featured = useQuery({ queryKey: ["s", "featured"], queryFn: () => listScripts({ featured: true, limit: 8 }) });
@@ -60,7 +65,8 @@ function Home() {
     queryKey: ["announcements"],
     queryFn: async () => {
       const { data } = await supabase.from("announcements").select("*").eq("active", true).order("created_at", { ascending: false }).limit(3);
-      return data ?? [];
+       const now = Date.now();
+       return (data ?? []).filter(a => (!a.start_at || new Date(a.start_at).getTime() <= now) && (!a.end_at || new Date(a.end_at).getTime() >= now));
     },
   });
 
@@ -88,16 +94,16 @@ function Home() {
   return (
     <div className="pb-10">
       {/* HERO */}
-      <section className="mx-auto max-w-7xl px-4 pt-14 sm:pt-20">
+       <section className="mx-auto max-w-7xl px-4 pt-14 sm:pt-20" style={settings?.hero_image_url ? { backgroundImage: `linear-gradient(to bottom, transparent, var(--background)), url("${settings.hero_image_url.replace(/["\\]/g, "")}")`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}>
         <div className="fade-up mx-auto max-w-3xl text-center">
           <span className="chip mx-auto text-primary">
             <Sparkles size={12} /> {stats.data?.online ?? 0} members online now
           </span>
           <h1 className="mt-5 font-display text-4xl font-bold leading-tight sm:text-6xl">
-            <span className="text-gradient">ARIO SCRIPTS</span>
+            <span className="text-gradient">{settings?.site_name ?? "ARIO SCRIPTS"}</span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-sm text-muted-foreground sm:text-base">
-            A curated database of premium Lua scripts. Every script is hand-checked, versioned and kept working.
+            {settings?.description ?? "A curated database of premium Lua scripts. Every script is hand-checked, versioned and kept working."}
           </p>
 
           <form onSubmit={search} className="relative mx-auto mt-8 max-w-xl">
@@ -127,10 +133,11 @@ function Home() {
           <div className="mx-auto mt-10 grid max-w-4xl gap-3">
             {announcements.data.map((a) => (
               <div key={a.id} className="glass flex gap-3 rounded-2xl p-4">
-                <Megaphone size={18} className="mt-0.5 shrink-0 text-primary" />
+                 <DynamicIcon name={a.icon} size={18} className="mt-0.5 shrink-0 text-primary" />
                 <div>
                   <p className="text-sm font-semibold">{a.title}</p>
                   <p className="mt-1 text-sm text-muted-foreground">{a.content}</p>
+                   {a.link_url && /^https?:\/\//.test(a.link_url) && <a href={a.link_url} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs text-primary">Learn more →</a>}
                 </div>
               </div>
             ))}
@@ -141,38 +148,38 @@ function Home() {
           {statTiles.map((s) => (
             <div key={s.label} className="glass rounded-2xl p-4">
               <s.icon size={15} className="text-primary" />
-              <p className="mt-2 font-display text-xl font-bold">{compact(s.value ?? 0)}</p>
+              <p className="mt-2 font-display text-xl font-bold">{stats.isError ? "—" : stats.isLoading ? "…" : compact(s.value ?? 0)}</p>
               <p className="text-xs text-muted-foreground">{s.label}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <Section title="Featured Scripts" icon={Sparkles} to="/scripts">
+       {sections.includes("featured") && <Section title="Featured Scripts" icon={Sparkles} to="/scripts">
         <ScriptGrid scripts={(featured.data ?? []) as Script[]} />
-      </Section>
+       </Section>}
 
-      <Section title="Trending This Week" icon={Flame} to="/scripts">
+       {sections.includes("trending") && <Section title="Trending This Week" icon={Flame} to="/scripts">
         <ScriptGrid scripts={(trending.data ?? []) as Script[]} />
-      </Section>
+       </Section>}
 
-      <Section title="Recently Added" icon={Clock} to="/scripts">
+       {sections.includes("recent") && <Section title="Recently Added" icon={Clock} to="/scripts">
         <ScriptGrid scripts={(recent.data ?? []) as Script[]} />
-      </Section>
+       </Section>}
 
-      <Section title="Most Downloaded" icon={Download} to="/scripts">
+       {sections.includes("downloads") && <Section title="Most Downloaded" icon={Download} to="/scripts">
         <ScriptGrid scripts={(downloaded.data ?? []) as Script[]} />
-      </Section>
+       </Section>}
 
-      <Section title="Most Viewed" icon={Eye} to="/scripts">
+       {sections.includes("views") && <Section title="Most Viewed" icon={Eye} to="/scripts">
         <ScriptGrid scripts={(viewed.data ?? []) as Script[]} />
-      </Section>
+       </Section>}
 
-      <Section title="Most Copied" icon={Copy} to="/scripts">
+       {sections.includes("copies") && <Section title="Most Copied" icon={Copy} to="/scripts">
         <ScriptGrid scripts={(copied.data ?? []) as Script[]} />
-      </Section>
+       </Section>}
 
-      <Section title="Popular Games" icon={Gamepad2} to="/games">
+       {sections.includes("games") && <Section title="Popular Games" icon={Gamepad2} to="/games">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {(games.data ?? []).slice(0, 12).map((g) => (
             <Link
@@ -187,9 +194,9 @@ function Home() {
             </Link>
           ))}
         </div>
-      </Section>
+       </Section>}
 
-      <Section title="Categories" icon={LayoutGrid} to="/categories">
+       {sections.includes("categories") && <Section title="Categories" icon={LayoutGrid} to="/categories">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {(categories.data ?? []).map((c) => (
             <Link
@@ -198,8 +205,8 @@ function Home() {
               params={{ slug: c.slug }}
               className="glass card-hover flex items-center gap-3 rounded-2xl p-4"
             >
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/15 text-primary">
-                <DynamicIcon name={c.icon} size={16} />
+               <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-xl bg-primary/15 text-primary">
+                 {c.image_url ? <img src={c.image_url} alt="" className="h-full w-full object-cover" /> : <DynamicIcon name={c.icon} size={16} />}
               </span>
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold">{c.name}</p>
@@ -208,7 +215,7 @@ function Home() {
             </Link>
           ))}
         </div>
-      </Section>
+       </Section>}
     </div>
   );
 }

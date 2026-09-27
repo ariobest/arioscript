@@ -14,6 +14,7 @@ import { compact, formatDate } from "@/lib/format";
 import type { Script } from "@/lib/types";
 
 export const Route = createFileRoute("/scripts/$slug")({
+  head: () => ({ meta: [{ title: 'Script Details — ARIO SCRIPTS' }, { name: "description", content: 'Explore Lua script details, code and showcase on ARIO SCRIPTS.' }, { property: "og:title", content: 'Script Details — ARIO SCRIPTS' }, { property: "og:description", content: 'Explore Lua script details, code and showcase on ARIO SCRIPTS.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: ScriptPage,
 });
 
@@ -55,8 +56,11 @@ function ScriptPage() {
   });
 
   useEffect(() => {
-    if (script.data?.id) void recordEvent(script.data.id, "view");
-  }, [script.data?.id]);
+    if (script.data?.id) void recordEvent(script.data.id, "view").then(() => {
+      void qc.invalidateQueries({ queryKey: ["script", slug] });
+      void qc.invalidateQueries({ queryKey: ["stats"] });
+    }).catch(() => { /* Keep the page readable when event recording is unavailable. */ });
+  }, [script.data?.id, slug, qc]);
 
   if (script.isLoading) {
     return <div className="mx-auto max-w-5xl px-4 py-20 text-center text-sm text-muted-foreground">Loading script…</div>;
@@ -77,14 +81,18 @@ function ScriptPage() {
       return;
     }
     if (fav.data) {
-      await supabase.from("favorites").delete().eq("script_id", s!.id).eq("user_id", user.id);
+      const { error } = await supabase.from("favorites").delete().eq("script_id", s!.id).eq("user_id", user.id);
+      if (error) return toast.error(error.message);
       toast("Removed from favorites");
     } else {
-      await supabase.from("favorites").insert({ script_id: s!.id, user_id: user.id });
+      const { error } = await supabase.from("favorites").insert({ script_id: s!.id, user_id: user.id });
+      if (error) return toast.error(error.message);
       toast.success("Added to favorites");
     }
     void qc.invalidateQueries({ queryKey: ["fav"] });
     void qc.invalidateQueries({ queryKey: ["script", slug] });
+    void qc.invalidateQueries({ queryKey: ["stats"] });
+    void qc.invalidateQueries({ queryKey: ["s"] });
   }
 
   async function share() {
@@ -93,10 +101,10 @@ function ScriptPage() {
       if (navigator.share) await navigator.share({ title: s!.name, url });
       else await navigator.clipboard.writeText(url);
       toast.success("Link shared");
+      try { await recordEvent(s!.id, "share"); void qc.invalidateQueries({ queryKey: ["script", slug] }); } catch { toast.error("Share count could not be updated"); }
     } catch {
       /* cancelled */
     }
-    await recordEvent(s!.id, "share");
   }
 
   async function submitReport() {
@@ -165,11 +173,11 @@ function ScriptPage() {
             filename={`${s.slug}.lua`}
             downloadEnabled={s.download_enabled}
             onCopy={() => {
-              void recordEvent(s.id, "copy");
+              void recordEvent(s.id, "copy").then(() => { void qc.invalidateQueries({ queryKey: ["script", slug] }); void qc.invalidateQueries({ queryKey: ["stats"] }); }).catch(() => toast.error("Copy count could not be updated"));
               toast.success("Script copied to clipboard");
             }}
             onDownload={() => {
-              void recordEvent(s.id, "download");
+              void recordEvent(s.id, "download").then(() => { void qc.invalidateQueries({ queryKey: ["script", slug] }); void qc.invalidateQueries({ queryKey: ["stats"] }); }).catch(() => toast.error("Download count could not be updated"));
               toast.success("Downloading .lua file");
             }}
           />

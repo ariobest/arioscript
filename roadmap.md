@@ -1,0 +1,7 @@
+- [x] Wire real statistics and refresh counters after script actions; verify the empty site's live totals.
+- [x] Add 50 themes, light/dark, themed notifications, and first-visit rocket welcome.
+- [x] Add moderated profile photos with secure upload and automatic suspension for clearly disallowed imagery.
+- [x] Add admin media manager and appearance/site controls.
+- [x] Extend announcements and confirm YouTube showcase/Lucide controls.
+- [x] Verify public pages and first-visit flow on desktop and mobile.
+- [ ] Verify signed-in script, admin, and profile-photo flows — blocked until the site owner creates the first account.

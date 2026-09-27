@@ -16,7 +16,7 @@ export function CodeViewer({ code, filename = "script.lua", onCopy, onDownload, 
     try {
       await navigator.clipboard.writeText(code);
     } catch {
-      /* ignore */
+      return;
     }
     setCopied(true);
     onCopy?.();

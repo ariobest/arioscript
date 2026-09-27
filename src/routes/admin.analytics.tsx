@@ -8,6 +8,7 @@ import { useTimeseries } from "./admin.index";
 import { compact } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/analytics")({
+  head: () => ({ meta: [{ title: 'Analytics — ARIO SCRIPTS' }, { name: "description", content: 'Review real script and member activity over time.' }, { property: "og:title", content: 'Analytics — ARIO SCRIPTS' }, { property: "og:description", content: 'Review real script and member activity over time.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Analytics,
 });
 

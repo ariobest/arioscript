@@ -6,6 +6,7 @@ import { ScriptGrid } from "@/components/site/ScriptCard";
 import type { Script } from "@/lib/types";
 
 export const Route = createFileRoute("/categories/$slug")({
+  head: () => ({ meta: [{ title: 'Category Scripts — ARIO SCRIPTS' }, { name: "description", content: 'Browse Lua scripts in an ARIO SCRIPTS category.' }, { property: "og:title", content: 'Category Scripts — ARIO SCRIPTS' }, { property: "og:description", content: 'Browse Lua scripts in an ARIO SCRIPTS category.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: CategoryPage,
 });
 

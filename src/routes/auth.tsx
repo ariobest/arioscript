@@ -5,8 +5,10 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/useAuth";
+import { useSettings } from "@/components/site/Layout";
 
 export const Route = createFileRoute("/auth")({
+  head: () => ({ meta: [{ title: "Sign in — ARIO SCRIPTS" }, { name: "description", content: "Sign in to save favorite Lua scripts and manage your ARIO SCRIPTS account." }, { property: "og:title", content: "Sign in — ARIO SCRIPTS" }, { property: "og:description", content: "Sign in to save favorite Lua scripts and manage your ARIO SCRIPTS account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AuthPage,
 });
 
@@ -18,6 +20,8 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { data: settings } = useSettings();
+  const registrationOpen = settings?.registration_enabled !== false;
 
   useEffect(() => {
     if (user) navigate({ to: "/" });
@@ -28,6 +32,7 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "signup") {
+        if (!registrationOpen) throw new Error("Registration is currently closed.");
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -98,10 +103,10 @@ function AuthPage() {
         <button onClick={() => void google()} className="btn btn-ghost w-full">Continue with Google</button>
 
         <p className="mt-5 text-center text-xs text-muted-foreground">
-          {mode === "signin" ? "No account yet?" : "Already registered?"}{" "}
-          <button onClick={() => setMode(mode === "signin" ? "signup" : "signin")} className="font-semibold text-primary">
+          {mode === "signin" ? registrationOpen ? "No account yet?" : "Registration is currently closed." : "Already registered?"}{" "}
+          {(registrationOpen || mode === "signup") && <button onClick={() => setMode(mode === "signin" ? "signup" : "signin")} className="font-semibold text-primary">
             {mode === "signin" ? "Create one" : "Sign in"}
-          </button>
+          </button>}
         </p>
       </div>
     </div>

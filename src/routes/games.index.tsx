@@ -11,6 +11,8 @@ export const Route = createFileRoute("/games/")({
       { name: "description", content: "Every game covered by the ARIO SCRIPTS library and how many scripts each one has." },
       { property: "og:title", content: "Games Directory — ARIO SCRIPTS" },
       { property: "og:description", content: "Every game covered by the ARIO SCRIPTS library and how many scripts each one has." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Games,

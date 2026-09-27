@@ -1,13 +1,14 @@
-import { useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Terminal, Search, Menu, X, Heart, LogIn, LogOut, Shield, Trophy, Gamepad2, LayoutGrid, User,
-  MessageCircle, Youtube, Send, Github,
+   MessageCircle, Youtube, Send, Github, ExternalLink,
 } from "lucide-react";
 import { ThemePicker } from "./ThemePicker";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { THEMES, applyTheme, applyMode } from "@/lib/theme";
 
 const NAV = [
   { to: "/scripts", label: "Scripts", icon: Terminal },
@@ -30,8 +31,39 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: state => state.location.pathname });
   const { user, profile, isStaff, signOut } = useAuth();
   const { data: settings } = useSettings();
+
+  useEffect(() => {
+    if (!settings) return;
+    if (!localStorage.getItem("ario-theme") && THEMES.some(t => t === settings.theme)) applyTheme(settings.theme as typeof THEMES[number], false);
+    if (!localStorage.getItem("ario-mode")) applyMode(settings.color_mode === "light" ? "light" : "dark", false);
+  }, [settings?.theme, settings?.color_mode]);
+
+  useEffect(() => {
+    if (!settings?.background_color || !/^#[0-9a-f]{6}$/i.test(settings.background_color)) return;
+    document.documentElement.style.setProperty("--background", settings.background_color);
+    return () => { document.documentElement.style.removeProperty("--background"); };
+  }, [settings?.background_color]);
+
+  useEffect(() => {
+    if (!settings?.custom_css) return;
+    const stylesheet = document.createElement("style");
+    stylesheet.dataset['arioCustom'] = "true";
+    stylesheet.textContent = settings.custom_css;
+    document.head.appendChild(stylesheet);
+    return () => { stylesheet.remove(); };
+  }, [settings?.custom_css]);
+
+  useEffect(() => {
+    if (!settings?.favicon_url) return;
+    const icon = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+    if (!icon) return;
+    const original = icon.href;
+    icon.href = settings.favicon_url;
+    return () => { icon.href = original; };
+  }, [settings?.favicon_url]);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -43,8 +75,8 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-border bg-[color-mix(in_oklab,var(--background)_78%,transparent)] backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4">
           <Link to="/" className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/15 text-primary glow-ring">
-              <Terminal size={18} />
+             <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-xl bg-primary/15 text-primary glow-ring">
+               {settings?.logo_url ? <img src={settings.logo_url} alt="" className="h-full w-full object-contain" /> : <Terminal size={18} />}
             </span>
             <span className="font-display text-sm font-bold tracking-tight sm:text-base">
               {settings?.site_name ?? "ARIO SCRIPTS"}
@@ -126,7 +158,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         )}
       </header>
 
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">{settings?.maintenance_mode && !isStaff && !pathname.startsWith("/auth") && !pathname.startsWith("/admin") ? <div className="mx-auto max-w-xl px-4 py-28 text-center"><h1 className="text-2xl font-bold">{settings.site_name} is under maintenance</h1><p className="mt-3 text-muted-foreground">Please check back soon.</p></div> : children}</main>
 
       <footer className="mt-16 border-t border-border py-10">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-5 px-4 text-center">
@@ -152,6 +184,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             {settings?.support_url && (
               <a href={settings.support_url} target="_blank" rel="noreferrer" className="btn btn-ghost h-9 w-9 !p-0"><Github size={16} /></a>
             )}
+            {settings?.other_social_url && <a href={settings.other_social_url} target="_blank" rel="noreferrer" className="btn btn-ghost h-9 w-9 !p-0" aria-label="Other social link"><ExternalLink size={16} /></a>}
           </div>
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} {settings?.site_name ?? "ARIO SCRIPTS"}. Scripts are curated by our team.

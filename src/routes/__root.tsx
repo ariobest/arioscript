@@ -7,14 +7,15 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/hooks/useAuth";
 import { SiteLayout } from "@/components/site/Layout";
-import { applyTheme, getTheme } from "@/lib/theme";
+import { applyTheme, getTheme, applyMode, getMode, type ColorMode } from "@/lib/theme";
+import { Welcome } from "@/components/site/Welcome";
 
 function NotFoundComponent() {
   return (
@@ -103,9 +104,15 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const [mode, setMode] = useState<ColorMode>("dark");
 
   useEffect(() => {
-    applyTheme(getTheme());
+    applyTheme(getTheme(), false);
+    applyMode(getMode(), false);
+    setMode(getMode());
+    const update = () => setMode(getMode());
+    window.addEventListener("ario-appearance", update);
+    return () => window.removeEventListener("ario-appearance", update);
   }, []);
 
   return (
@@ -115,7 +122,8 @@ function RootComponent() {
           {/* Required: nested routes render here. */}
           <Outlet />
         </SiteLayout>
-        <Toaster theme="dark" position="top-center" richColors />
+        <Welcome />
+        <Toaster theme={mode} position="top-center" toastOptions={{ className: "ario-toast" }} />
       </AuthProvider>
     </QueryClientProvider>
   );

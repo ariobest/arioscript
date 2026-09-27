@@ -1,13 +1,14 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  Shield, LayoutDashboard, Terminal, Users, Award, Flag, Megaphone, Settings, ScrollText, BarChart3, Lock, Mail, KeyRound,
+  Shield, LayoutDashboard, Terminal, Users, Award, Flag, Megaphone, Settings, ScrollText, BarChart3, Lock, Mail, KeyRound, Images,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/admin")({
+  head: () => ({ meta: [{ title: 'Admin Login — ARIO SCRIPTS' }, { name: "description", content: 'Sign in to manage ARIO SCRIPTS.' }, { property: "og:title", content: 'Admin Login — ARIO SCRIPTS' }, { property: "og:description", content: 'Sign in to manage ARIO SCRIPTS.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AdminLayout,
 });
 
@@ -18,6 +19,7 @@ const LINKS = [
   { to: "/admin/badges", label: "Badges", icon: Award },
   { to: "/admin/reports", label: "Reports", icon: Flag },
   { to: "/admin/announcements", label: "Announcements", icon: Megaphone },
+  { to: "/admin/media", label: "Media manager", icon: Images },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/admin/logs", label: "Admin logs", icon: ScrollText },
   { to: "/admin/settings", label: "Settings", icon: Settings },

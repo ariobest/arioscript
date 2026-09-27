@@ -49,21 +49,33 @@ export type Database = {
           active: boolean
           content: string
           created_at: string
+          end_at: string | null
+          icon: string
           id: string
+          link_url: string | null
+          start_at: string | null
           title: string
         }
         Insert: {
           active?: boolean
           content: string
           created_at?: string
+          end_at?: string | null
+          icon?: string
           id?: string
+          link_url?: string | null
+          start_at?: string | null
           title: string
         }
         Update: {
           active?: boolean
           content?: string
           created_at?: string
+          end_at?: string | null
+          icon?: string
           id?: string
+          link_url?: string | null
+          start_at?: string | null
           title?: string
         }
         Relationships: []
@@ -101,6 +113,7 @@ export type Database = {
           description: string | null
           icon: string | null
           id: string
+          image_url: string | null
           name: string
           slug: string
         }
@@ -109,6 +122,7 @@ export type Database = {
           description?: string | null
           icon?: string | null
           id?: string
+          image_url?: string | null
           name: string
           slug: string
         }
@@ -117,6 +131,7 @@ export type Database = {
           description?: string | null
           icon?: string | null
           id?: string
+          image_url?: string | null
           name?: string
           slug?: string
         }
@@ -354,12 +369,18 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          background_color: string | null
+          color_mode: string
+          custom_css: string | null
           description: string
           discord_url: string | null
           favicon_url: string | null
+          hero_image_url: string | null
+          homepage_sections: Json
           id: number
           logo_url: string | null
           maintenance_mode: boolean
+          other_social_url: string | null
           registration_enabled: boolean
           site_name: string
           support_url: string | null
@@ -369,12 +390,18 @@ export type Database = {
           youtube_url: string | null
         }
         Insert: {
+          background_color?: string | null
+          color_mode?: string
+          custom_css?: string | null
           description?: string
           discord_url?: string | null
           favicon_url?: string | null
+          hero_image_url?: string | null
+          homepage_sections?: Json
           id?: number
           logo_url?: string | null
           maintenance_mode?: boolean
+          other_social_url?: string | null
           registration_enabled?: boolean
           site_name?: string
           support_url?: string | null
@@ -384,12 +411,18 @@ export type Database = {
           youtube_url?: string | null
         }
         Update: {
+          background_color?: string | null
+          color_mode?: string
+          custom_css?: string | null
           description?: string
           discord_url?: string | null
           favicon_url?: string | null
+          hero_image_url?: string | null
+          homepage_sections?: Json
           id?: number
           logo_url?: string | null
           maintenance_mode?: boolean
+          other_social_url?: string | null
           registration_enabled?: boolean
           site_name?: string
           support_url?: string | null

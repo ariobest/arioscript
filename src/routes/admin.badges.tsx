@@ -10,6 +10,7 @@ import { DynamicIcon } from "@/components/site/DynamicIcon";
 import type { Badge } from "@/lib/types";
 
 export const Route = createFileRoute("/admin/badges")({
+  head: () => ({ meta: [{ title: 'Badges — ARIO SCRIPTS' }, { name: "description", content: 'Create and assign ARIO SCRIPTS member badges.' }, { property: "og:title", content: 'Badges — ARIO SCRIPTS' }, { property: "og:description", content: 'Create and assign ARIO SCRIPTS member badges.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AdminBadges,
 });
 
