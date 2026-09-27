@@ -10,33 +10,286 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as LeaderboardsRouteImport } from './routes/leaderboards'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminAnnouncementsRouteImport } from './routes/admin.announcements'
+import { Route as AdminBadgesRouteImport } from './routes/admin.badges'
+import { Route as AdminLogsRouteImport } from './routes/admin.logs'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
+import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
+import { Route as GamesIndexRouteImport } from './routes/games.index'
+import { Route as GamesGameRouteImport } from './routes/games.$game'
+import { Route as ScriptsIndexRouteImport } from './routes/scripts.index'
+import { Route as ScriptsSlugRouteImport } from './routes/scripts.$slug'
+import { Route as UUsernameRouteImport } from './routes/u.$username'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavoritesRoute = FavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardsRoute = LeaderboardsRouteImport.update({
+  id: '/leaderboards',
+  path: '/leaderboards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnnouncementsRoute = AdminAnnouncementsRouteImport.update({
+  id: '/announcements',
+  path: '/announcements',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBadgesRoute = AdminBadgesRouteImport.update({
+  id: '/badges',
+  path: '/badges',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLogsRoute = AdminLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminScriptsRoute = AdminScriptsRouteImport.update({
+  id: '/scripts',
+  path: '/scripts',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const CategoriesIndexRoute = CategoriesIndexRouteImport.update({
+  id: '/categories/',
+  path: '/categories/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
+  id: '/categories/$slug',
+  path: '/categories/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesIndexRoute = GamesIndexRouteImport.update({
+  id: '/games/',
+  path: '/games/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesGameRoute = GamesGameRouteImport.update({
+  id: '/games/$game',
+  path: '/games/$game',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScriptsIndexRoute = ScriptsIndexRouteImport.update({
+  id: '/scripts/',
+  path: '/scripts/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScriptsSlugRoute = ScriptsSlugRouteImport.update({
+  id: '/scripts/$slug',
+  path: '/scripts/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UUsernameRoute = UUsernameRouteImport.update({
+  id: '/u/$username',
+  path: '/u/$username',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/favorites': typeof FavoritesRoute
+  '/leaderboards': typeof LeaderboardsRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/announcements': typeof AdminAnnouncementsRoute
+  '/admin/badges': typeof AdminBadgesRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/scripts': typeof AdminScriptsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/categories/$slug': typeof CategoriesSlugRoute
+  '/games/$game': typeof GamesGameRoute
+  '/scripts/$slug': typeof ScriptsSlugRoute
+  '/u/$username': typeof UUsernameRoute
+  '/admin/': typeof AdminIndexRoute
+  '/categories/': typeof CategoriesIndexRoute
+  '/games/': typeof GamesIndexRoute
+  '/scripts/': typeof ScriptsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/favorites': typeof FavoritesRoute
+  '/leaderboards': typeof LeaderboardsRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/announcements': typeof AdminAnnouncementsRoute
+  '/admin/badges': typeof AdminBadgesRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/scripts': typeof AdminScriptsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/categories/$slug': typeof CategoriesSlugRoute
+  '/games/$game': typeof GamesGameRoute
+  '/scripts/$slug': typeof ScriptsSlugRoute
+  '/u/$username': typeof UUsernameRoute
+  '/admin': typeof AdminIndexRoute
+  '/categories': typeof CategoriesIndexRoute
+  '/games': typeof GamesIndexRoute
+  '/scripts': typeof ScriptsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/favorites': typeof FavoritesRoute
+  '/leaderboards': typeof LeaderboardsRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/announcements': typeof AdminAnnouncementsRoute
+  '/admin/badges': typeof AdminBadgesRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/scripts': typeof AdminScriptsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/categories/$slug': typeof CategoriesSlugRoute
+  '/games/$game': typeof GamesGameRoute
+  '/scripts/$slug': typeof ScriptsSlugRoute
+  '/u/$username': typeof UUsernameRoute
+  '/admin/': typeof AdminIndexRoute
+  '/categories/': typeof CategoriesIndexRoute
+  '/games/': typeof GamesIndexRoute
+  '/scripts/': typeof ScriptsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/favorites'
+    | '/leaderboards'
+    | '/admin/analytics'
+    | '/admin/announcements'
+    | '/admin/badges'
+    | '/admin/logs'
+    | '/admin/reports'
+    | '/admin/scripts'
+    | '/admin/settings'
+    | '/admin/users'
+    | '/categories/$slug'
+    | '/games/$game'
+    | '/scripts/$slug'
+    | '/u/$username'
+    | '/admin/'
+    | '/categories/'
+    | '/games/'
+    | '/scripts/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/favorites'
+    | '/leaderboards'
+    | '/admin/analytics'
+    | '/admin/announcements'
+    | '/admin/badges'
+    | '/admin/logs'
+    | '/admin/reports'
+    | '/admin/scripts'
+    | '/admin/settings'
+    | '/admin/users'
+    | '/categories/$slug'
+    | '/games/$game'
+    | '/scripts/$slug'
+    | '/u/$username'
+    | '/admin'
+    | '/categories'
+    | '/games'
+    | '/scripts'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/favorites'
+    | '/leaderboards'
+    | '/admin/analytics'
+    | '/admin/announcements'
+    | '/admin/badges'
+    | '/admin/logs'
+    | '/admin/reports'
+    | '/admin/scripts'
+    | '/admin/settings'
+    | '/admin/users'
+    | '/categories/$slug'
+    | '/games/$game'
+    | '/scripts/$slug'
+    | '/u/$username'
+    | '/admin/'
+    | '/categories/'
+    | '/games/'
+    | '/scripts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  FavoritesRoute: typeof FavoritesRoute
+  LeaderboardsRoute: typeof LeaderboardsRoute
+  CategoriesSlugRoute: typeof CategoriesSlugRoute
+  GamesGameRoute: typeof GamesGameRoute
+  ScriptsSlugRoute: typeof ScriptsSlugRoute
+  UUsernameRoute: typeof UUsernameRoute
+  CategoriesIndexRoute: typeof CategoriesIndexRoute
+  GamesIndexRoute: typeof GamesIndexRoute
+  ScriptsIndexRoute: typeof ScriptsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +301,188 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favorites': {
+      id: '/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof FavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboards': {
+      id: '/leaderboards'
+      path: '/leaderboards'
+      fullPath: '/leaderboards'
+      preLoaderRoute: typeof LeaderboardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/announcements': {
+      id: '/admin/announcements'
+      path: '/announcements'
+      fullPath: '/admin/announcements'
+      preLoaderRoute: typeof AdminAnnouncementsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/badges': {
+      id: '/admin/badges'
+      path: '/badges'
+      fullPath: '/admin/badges'
+      preLoaderRoute: typeof AdminBadgesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/logs': {
+      id: '/admin/logs'
+      path: '/logs'
+      fullPath: '/admin/logs'
+      preLoaderRoute: typeof AdminLogsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/scripts': {
+      id: '/admin/scripts'
+      path: '/scripts'
+      fullPath: '/admin/scripts'
+      preLoaderRoute: typeof AdminScriptsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/categories/': {
+      id: '/categories/'
+      path: '/categories'
+      fullPath: '/categories/'
+      preLoaderRoute: typeof CategoriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories/$slug': {
+      id: '/categories/$slug'
+      path: '/categories/$slug'
+      fullPath: '/categories/$slug'
+      preLoaderRoute: typeof CategoriesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games/': {
+      id: '/games/'
+      path: '/games'
+      fullPath: '/games/'
+      preLoaderRoute: typeof GamesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games/$game': {
+      id: '/games/$game'
+      path: '/games/$game'
+      fullPath: '/games/$game'
+      preLoaderRoute: typeof GamesGameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scripts/': {
+      id: '/scripts/'
+      path: '/scripts'
+      fullPath: '/scripts/'
+      preLoaderRoute: typeof ScriptsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scripts/$slug': {
+      id: '/scripts/$slug'
+      path: '/scripts/$slug'
+      fullPath: '/scripts/$slug'
+      preLoaderRoute: typeof ScriptsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/u/$username': {
+      id: '/u/$username'
+      path: '/u/$username'
+      fullPath: '/u/$username'
+      preLoaderRoute: typeof UUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminAnnouncementsRoute: typeof AdminAnnouncementsRoute
+  AdminBadgesRoute: typeof AdminBadgesRoute
+  AdminLogsRoute: typeof AdminLogsRoute
+  AdminReportsRoute: typeof AdminReportsRoute
+  AdminScriptsRoute: typeof AdminScriptsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminAnnouncementsRoute: AdminAnnouncementsRoute,
+  AdminBadgesRoute: AdminBadgesRoute,
+  AdminLogsRoute: AdminLogsRoute,
+  AdminReportsRoute: AdminReportsRoute,
+  AdminScriptsRoute: AdminScriptsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  AuthRoute: AuthRoute,
+  FavoritesRoute: FavoritesRoute,
+  LeaderboardsRoute: LeaderboardsRoute,
+  CategoriesSlugRoute: CategoriesSlugRoute,
+  GamesGameRoute: GamesGameRoute,
+  ScriptsSlugRoute: ScriptsSlugRoute,
+  UUsernameRoute: UUsernameRoute,
+  CategoriesIndexRoute: CategoriesIndexRoute,
+  GamesIndexRoute: GamesIndexRoute,
+  ScriptsIndexRoute: ScriptsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
