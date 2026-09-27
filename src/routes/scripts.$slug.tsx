@@ -58,7 +58,7 @@ function ScriptPage() {
     if (script.data?.id) void recordEvent(script.data.id, "view").then(() => {
       void qc.invalidateQueries({ queryKey: ["script", slug] });
       void qc.invalidateQueries({ queryKey: ["stats"] });
-    });
+    }).catch(() => { /* Keep the page readable when event recording is unavailable. */ });
   }, [script.data?.id, slug, qc]);
 
   if (script.isLoading) {
@@ -100,7 +100,7 @@ function ScriptPage() {
       if (navigator.share) await navigator.share({ title: s!.name, url });
       else await navigator.clipboard.writeText(url);
       toast.success("Link shared");
-      await recordEvent(s!.id, "share");
+      try { await recordEvent(s!.id, "share"); void qc.invalidateQueries({ queryKey: ["script", slug] }); } catch { toast.error("Share count could not be updated"); }
     } catch {
       /* cancelled */
     }
@@ -172,11 +172,11 @@ function ScriptPage() {
             filename={`${s.slug}.lua`}
             downloadEnabled={s.download_enabled}
             onCopy={() => {
-              void recordEvent(s.id, "copy").then(() => { void qc.invalidateQueries({ queryKey: ["script", slug] }); void qc.invalidateQueries({ queryKey: ["stats"] }); });
+              void recordEvent(s.id, "copy").then(() => { void qc.invalidateQueries({ queryKey: ["script", slug] }); void qc.invalidateQueries({ queryKey: ["stats"] }); }).catch(() => toast.error("Copy count could not be updated"));
               toast.success("Script copied to clipboard");
             }}
             onDownload={() => {
-              void recordEvent(s.id, "download").then(() => { void qc.invalidateQueries({ queryKey: ["script", slug] }); void qc.invalidateQueries({ queryKey: ["stats"] }); });
+              void recordEvent(s.id, "download").then(() => { void qc.invalidateQueries({ queryKey: ["script", slug] }); void qc.invalidateQueries({ queryKey: ["stats"] }); }).catch(() => toast.error("Download count could not be updated"));
               toast.success("Downloading .lua file");
             }}
           />

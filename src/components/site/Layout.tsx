@@ -49,7 +49,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!settings?.custom_css) return;
     const stylesheet = document.createElement("style");
-    stylesheet.dataset.arioCustom = "true";
+    stylesheet.dataset['arioCustom'] = "true";
     stylesheet.textContent = settings.custom_css;
     document.head.appendChild(stylesheet);
     return () => { stylesheet.remove(); };
