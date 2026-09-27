@@ -72,7 +72,8 @@ function Dashboard() {
         <p className="mt-1 text-sm text-muted-foreground">Live numbers straight from the database.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {stats.isError && <p className="text-sm text-destructive">Statistics could not be loaded. Please try again.</p>}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         <Tile icon={Users} label="Total users" value={s['users']} />
         <Tile icon={Wifi} label="Online now" value={s['online']} />
         <Tile icon={Terminal} label="Scripts" value={s['scripts']} />

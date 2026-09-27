@@ -148,7 +148,7 @@ function Home() {
           {statTiles.map((s) => (
             <div key={s.label} className="glass rounded-2xl p-4">
               <s.icon size={15} className="text-primary" />
-              <p className="mt-2 font-display text-xl font-bold">{compact(s.value ?? 0)}</p>
+              <p className="mt-2 font-display text-xl font-bold">{stats.isError ? "—" : stats.isLoading ? "…" : compact(s.value ?? 0)}</p>
               <p className="text-xs text-muted-foreground">{s.label}</p>
             </div>
           ))}

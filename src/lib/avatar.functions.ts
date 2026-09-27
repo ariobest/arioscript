@@ -20,7 +20,7 @@ export const uploadModeratedAvatar = createServerFn({ method: "POST" })
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST", signal: controller.signal,
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}`, "Lovable-API-Key": key },
-        body: JSON.stringify({ model: "google/gemini-3.7-flash", temperature: 0, max_tokens: 40, messages: [
+         body: JSON.stringify({ model: "google/gemini-3.7-flash", temperature: 0, max_tokens: 128, messages: [
           { role: "system", content: "Moderate this profile picture. Output ONLY SAFE, REJECT, or BAN. BAN only for clearly explicit nudity, sexual content involving minors, or clearly illegal abuse imagery. REJECT for ambiguous, hateful, graphic, or inappropriate images. SAFE for acceptable profile photos. If uncertain, REJECT. No other text." },
           { role: "user", content: [{ type: "text", text: "Classify this profile image." }, { type: "image_url", image_url: { url: data.image } }] },
         ] }),
