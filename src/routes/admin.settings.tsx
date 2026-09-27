@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Save, Plus, Trash2, Upload } from "lucide-react";
+import { DynamicIcon } from "@/components/site/DynamicIcon";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -147,7 +148,7 @@ function AdminSettings() {
         <h2 className="font-display font-semibold">Categories</h2>
         <div className="mt-3 flex gap-2">
           <input className="input-base" placeholder="New category name" value={newCat} onChange={(e) => setNewCat(e.target.value)} />
-          <input className="input-base" placeholder="Lucide icon name" value={catIcon} onChange={(e) => setCatIcon(e.target.value)} />
+           <label className="flex min-w-0 flex-1 items-center gap-2"><DynamicIcon name={catIcon} size={17} className="shrink-0 text-primary" /><input className="input-base" placeholder="Lucide icon name" value={catIcon} onChange={(e) => setCatIcon(e.target.value)} /></label>
           <button onClick={() => void addCategory()} className="btn btn-primary"><Plus size={15} /></button>
         </div>
         <div className="mt-2 flex items-center gap-2"><input className="input-base" placeholder="Category image URL" value={catImage} onChange={(e) => setCatImage(e.target.value)} /><label className="btn btn-ghost cursor-pointer"><Upload size={14} /><input hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => e.target.files?.[0] && void uploadImage(e.target.files[0], "category")} /></label></div>
