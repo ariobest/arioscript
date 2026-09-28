@@ -15,3 +15,4 @@
 - The first account that signs up is granted the admin role automatically; later signups are normal users.
 - Profile images are uploaded only through an authenticated server function after AI review; no direct avatar bucket writes, because unsafe images must never be published before moderation.
 - Site imagery uses the private site-media bucket with long-lived signed URLs, because public buckets are blocked.
+- Script loader commands derive from an optional admin-managed HTTPS raw URL, never from fetched remote code, because remote file contents can change outside the site.

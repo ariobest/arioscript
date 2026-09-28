@@ -171,7 +171,7 @@ function ScriptPage() {
 
           {s.raw_loader_url && validRawLoaderUrl(s.raw_loader_url) && <div>
             <h2 className="mb-3 font-display text-lg font-semibold">Loader</h2>
-            <CodeViewer code={loaderCommand(s.raw_loader_url)} filename={`${s.slug}-loader.lua`} downloadEnabled={false} onCopy={() => { void recordEvent(s.id, "copy").then(() => { void qc.invalidateQueries({ queryKey: ["script", slug] }); void qc.invalidateQueries({ queryKey: ["stats"] }); }).catch(() => toast.error("Copy count could not be updated")); toast.success("Loader copied to clipboard"); }} />
+            <CodeViewer code={loaderCommand(s.raw_loader_url)} filename={`${s.slug}-loader.lua`} downloadEnabled={s.download_enabled} onCopy={() => { void recordEvent(s.id, "copy").then(() => { void qc.invalidateQueries({ queryKey: ["script", slug] }); void qc.invalidateQueries({ queryKey: ["stats"] }); }).catch(() => toast.error("Copy count could not be updated")); toast.success("Loader copied to clipboard"); }} onDownload={() => { void recordEvent(s.id, "download").then(() => { void qc.invalidateQueries({ queryKey: ["script", slug] }); void qc.invalidateQueries({ queryKey: ["stats"] }); }).catch(() => toast.error("Download count could not be updated")); }} />
           </div>}
 
           {s.code && <CodeViewer

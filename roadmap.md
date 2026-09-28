@@ -5,3 +5,5 @@
 - [x] Extend announcements and confirm YouTube showcase/Lucide controls.
 - [x] Verify public pages and first-visit flow on desktop and mobile.
 - [ ] Verify signed-in script, admin, and profile-photo flows — blocked until the site owner creates the first account.
+- [x] Add raw HTTPS loader links to admin scripts with a generated copyable loader on public script pages.
+- [x] Upgrade the first-visit rocket scene and correct phone-sized header and search layout.
