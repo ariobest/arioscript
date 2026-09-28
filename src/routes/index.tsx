@@ -94,7 +94,7 @@ function Home() {
   return (
     <div className="pb-10">
       {/* HERO */}
-       <section className="mx-auto max-w-7xl px-4 pt-14 sm:pt-20" style={settings?.hero_image_url ? { backgroundImage: `linear-gradient(to bottom, transparent, var(--background)), url("${settings.hero_image_url.replace(/["\\]/g, "")}")`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}>
+       <section className="mx-auto max-w-7xl px-4 pt-9 sm:pt-20" style={settings?.hero_image_url ? { backgroundImage: `linear-gradient(to bottom, transparent, var(--background)), url("${settings.hero_image_url.replace(/["\\]/g, "")}")`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}>
         <div className="fade-up mx-auto max-w-3xl text-center">
           <span className="chip mx-auto text-primary">
             <Sparkles size={12} /> {stats.data?.online ?? 0} members online now
@@ -106,15 +106,15 @@ function Home() {
             {settings?.description ?? "A curated database of premium Lua scripts. Every script is hand-checked, versioned and kept working."}
           </p>
 
-          <form onSubmit={search} className="relative mx-auto mt-8 max-w-xl">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <form onSubmit={search} className="relative mx-auto mt-8 grid max-w-xl grid-cols-[minmax(0,1fr)_auto] gap-2 sm:block">
+            <Search size={18} className="absolute left-4 top-1/2 hidden -translate-y-1/2 text-muted-foreground sm:block" />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search by script, game, category or tag..."
-              className="input-base !rounded-2xl !py-4 !pl-12 !pr-28 text-base"
+              className="input-base min-w-0 !py-3 !pl-3 text-sm sm:!rounded-2xl sm:!py-4 sm:!pl-12 sm:!pr-28 sm:text-base"
             />
-            <button type="submit" className="btn btn-primary absolute right-2 top-1/2 -translate-y-1/2">
+            <button type="submit" className="btn btn-primary shrink-0 sm:absolute sm:right-2 sm:top-1/2 sm:-translate-y-1/2">
               Search
             </button>
           </form>

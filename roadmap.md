@@ -4,4 +4,7 @@
 - [x] Add admin media manager and appearance/site controls.
 - [x] Extend announcements and confirm YouTube showcase/Lucide controls.
 - [x] Verify public pages and first-visit flow on desktop and mobile.
-- [ ] Verify signed-in script, admin, and profile-photo flows — blocked until the site owner creates the first account.
+- [x] Verify signed-in admin script creation and public loader display; remove the temporary test script.
+- [ ] Verify profile-photo moderation end to end with an uploaded image; not part of this loader/layout update.
+- [x] Add raw HTTPS loader links to admin scripts with a generated copyable loader on public script pages.
+- [x] Upgrade the first-visit rocket scene and correct phone-sized header and search layout.

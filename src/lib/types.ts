@@ -16,6 +16,7 @@ export type Script = {
   code: string;
   image_url: string | null;
   youtube_url: string | null;
+  raw_loader_url: string | null;
   tags: string[];
   version: string;
   status: string;

@@ -12,6 +12,7 @@ import { recordEvent } from "@/lib/events";
 import { useAuth } from "@/hooks/useAuth";
 import { compact, formatDate } from "@/lib/format";
 import type { Script } from "@/lib/types";
+import { loaderCommand, validRawLoaderUrl } from "@/lib/loader";
 
 export const Route = createFileRoute("/scripts/$slug")({
   head: () => ({ meta: [{ title: 'Script Details — ARIO SCRIPTS' }, { name: "description", content: 'Explore Lua script details, code and showcase on ARIO SCRIPTS.' }, { property: "og:title", content: 'Script Details — ARIO SCRIPTS' }, { property: "og:description", content: 'Explore Lua script details, code and showcase on ARIO SCRIPTS.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -168,7 +169,12 @@ function ScriptPage() {
             </div>
           </div>
 
-          <CodeViewer
+          {s.raw_loader_url && validRawLoaderUrl(s.raw_loader_url) && <div>
+            <h2 className="mb-3 font-display text-lg font-semibold">Loader</h2>
+            <CodeViewer code={loaderCommand(s.raw_loader_url)} filename={`${s.slug}-loader.lua`} downloadEnabled={s.download_enabled} onCopy={() => { void recordEvent(s.id, "copy").then(() => { void qc.invalidateQueries({ queryKey: ["script", slug] }); void qc.invalidateQueries({ queryKey: ["stats"] }); }).catch(() => toast.error("Copy count could not be updated")); toast.success("Loader copied to clipboard"); }} onDownload={() => { void recordEvent(s.id, "download").then(() => { void qc.invalidateQueries({ queryKey: ["script", slug] }); void qc.invalidateQueries({ queryKey: ["stats"] }); }).catch(() => toast.error("Download count could not be updated")); }} />
+          </div>}
+
+          {s.code && <CodeViewer
             code={s.code}
             filename={`${s.slug}.lua`}
             downloadEnabled={s.download_enabled}
@@ -180,7 +186,7 @@ function ScriptPage() {
               void recordEvent(s.id, "download").then(() => { void qc.invalidateQueries({ queryKey: ["script", slug] }); void qc.invalidateQueries({ queryKey: ["stats"] }); }).catch(() => toast.error("Download count could not be updated"));
               toast.success("Downloading .lua file");
             }}
-          />
+          />}
 
           {embed && (
             <div className="glass overflow-hidden rounded-2xl">
