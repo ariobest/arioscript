@@ -17,6 +17,7 @@ import { Route as LeaderboardsRouteImport } from './routes/leaderboards'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAnnouncementsRouteImport } from './routes/admin.announcements'
+import { Route as AdminAssistantRouteImport } from './routes/admin.assistant'
 import { Route as AdminBadgesRouteImport } from './routes/admin.badges'
 import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
@@ -70,6 +71,11 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
 const AdminAnnouncementsRoute = AdminAnnouncementsRouteImport.update({
   id: '/announcements',
   path: '/announcements',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAssistantRoute = AdminAssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminBadgesRoute = AdminBadgesRouteImport.update({
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/leaderboards': typeof LeaderboardsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
+  '/admin/assistant': typeof AdminAssistantRoute
   '/admin/badges': typeof AdminBadgesRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByTo {
   '/leaderboards': typeof LeaderboardsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
+  '/admin/assistant': typeof AdminAssistantRoute
   '/admin/badges': typeof AdminBadgesRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -199,6 +207,7 @@ export interface FileRoutesById {
   '/leaderboards': typeof LeaderboardsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
+  '/admin/assistant': typeof AdminAssistantRoute
   '/admin/badges': typeof AdminBadgesRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/leaderboards'
     | '/admin/analytics'
     | '/admin/announcements'
+    | '/admin/assistant'
     | '/admin/badges'
     | '/admin/logs'
     | '/admin/media'
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/leaderboards'
     | '/admin/analytics'
     | '/admin/announcements'
+    | '/admin/assistant'
     | '/admin/badges'
     | '/admin/logs'
     | '/admin/media'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/leaderboards'
     | '/admin/analytics'
     | '/admin/announcements'
+    | '/admin/assistant'
     | '/admin/badges'
     | '/admin/logs'
     | '/admin/media'
@@ -360,6 +372,13 @@ declare module '@tanstack/react-router' {
       path: '/announcements'
       fullPath: '/admin/announcements'
       preLoaderRoute: typeof AdminAnnouncementsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/assistant': {
+      id: '/admin/assistant'
+      path: '/assistant'
+      fullPath: '/admin/assistant'
+      preLoaderRoute: typeof AdminAssistantRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/badges': {
@@ -466,6 +485,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminAnnouncementsRoute: typeof AdminAnnouncementsRoute
+  AdminAssistantRoute: typeof AdminAssistantRoute
   AdminBadgesRoute: typeof AdminBadgesRoute
   AdminLogsRoute: typeof AdminLogsRoute
   AdminMediaRoute: typeof AdminMediaRoute
@@ -479,6 +499,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminAnnouncementsRoute: AdminAnnouncementsRoute,
+  AdminAssistantRoute: AdminAssistantRoute,
   AdminBadgesRoute: AdminBadgesRoute,
   AdminLogsRoute: AdminLogsRoute,
   AdminMediaRoute: AdminMediaRoute,
