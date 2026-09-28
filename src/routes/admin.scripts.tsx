@@ -12,6 +12,9 @@ import { adminLog } from "@/lib/adminLog";
 import { compact, slugify, timeAgo } from "@/lib/format";
 import type { Script } from "@/lib/types";
 import { uploadSiteImage } from "@/lib/media";
+import { loaderCommand, validRawLoaderUrl } from "@/lib/loader";
+import { Button } from "@/components/ui/button";
+import { Copy, Check } from "lucide-react";
 
 export const Route = createFileRoute("/admin/scripts")({
   head: () => ({ meta: [{ title: 'Manage Scripts — ARIO SCRIPTS' }, { name: "description", content: 'Add and manage scripts in the ARIO SCRIPTS library.' }, { property: "og:title", content: 'Manage Scripts — ARIO SCRIPTS' }, { property: "og:description", content: 'Add and manage scripts in the ARIO SCRIPTS library.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -23,7 +26,7 @@ type Draft = Partial<Script> & { tagsText?: string };
 const EMPTY: Draft = {
   name: "", game_name: "", description: "", code: "", version: "1.0.0", status: "working",
   featured: false, verified: false, published: true, archived: false, download_enabled: true,
-  image_url: "", youtube_url: "", tagsText: "",
+  image_url: "", youtube_url: "", raw_loader_url: "", tagsText: "",
 };
 
 function AdminScripts() {
@@ -32,6 +35,7 @@ function AdminScripts() {
   const [draft, setDraft] = useState<Draft | null>(null);
   const [statsFor, setStatsFor] = useState<Script | null>(null);
   const [search, setSearch] = useState("");
+  const [copiedLoader, setCopiedLoader] = useState(false);
 
   const categories = useQuery({ queryKey: ["categories"], queryFn: getCategories });
   const scripts = useQuery({
@@ -60,8 +64,12 @@ function AdminScripts() {
 
   async function save() {
     if (!draft || !user) return;
-    if (!draft.name?.trim() || !draft.code?.trim()) {
-      toast.error("Name and Lua code are required");
+    if (!draft.name?.trim() || (!draft.code?.trim() && !draft.raw_loader_url?.trim())) {
+      toast.error("Name and Lua code or a raw loader URL are required");
+      return;
+    }
+    if (draft.raw_loader_url?.trim() && !validRawLoaderUrl(draft.raw_loader_url.trim())) {
+      toast.error("Use a public HTTPS raw Lua URL without credentials");
       return;
     }
     const payload = {
@@ -73,6 +81,7 @@ function AdminScripts() {
       code: draft.code,
       image_url: draft.image_url || null,
       youtube_url: draft.youtube_url || null,
+      raw_loader_url: draft.raw_loader_url?.trim() || null,
       tags: (draft.tagsText ?? "").split(",").map((t) => t.trim()).filter(Boolean),
       version: draft.version || "1.0.0",
       status: draft.status || "working",
@@ -131,7 +140,7 @@ function AdminScripts() {
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="font-display text-2xl font-bold">Scripts</h1>
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search…" className="input-base ml-auto max-w-48" />
-        <button onClick={() => setDraft({ ...EMPTY })} className="btn btn-primary"><Plus size={15} /> Add script</button>
+        <Button onClick={() => { setCopiedLoader(false); setDraft({ ...EMPTY }); }}><Plus size={15} /> Add script</Button>
       </div>
 
       <div className="glass overflow-x-auto rounded-2xl">
@@ -174,7 +183,7 @@ function AdminScripts() {
                     <button title="Verify" onClick={() => void patch(s, { verified: !s.verified }, s.verified ? "unverified script" : "verified script")} className="btn btn-ghost !p-1.5"><BadgeCheck size={14} /></button>
                     <button title="Publish" onClick={() => void patch(s, { published: !s.published }, s.published ? "unpublished script" : "published script")} className="btn btn-ghost !p-1.5">{s.published ? <Eye size={14} /> : <EyeOff size={14} />}</button>
                     <button title="Archive" onClick={() => void patch(s, { archived: !s.archived }, s.archived ? "restored script" : "archived script")} className="btn btn-ghost !p-1.5"><Archive size={14} /></button>
-                    <button title="Edit" onClick={() => setDraft({ ...s, tagsText: (s.tags ?? []).join(", ") })} className="btn btn-ghost !p-1.5"><Pencil size={14} /></button>
+                    <button title="Edit" onClick={() => { setCopiedLoader(false); setDraft({ ...s, tagsText: (s.tags ?? []).join(", ") }); }} className="btn btn-ghost !p-1.5"><Pencil size={14} /></button>
                     <button title="Delete" onClick={() => void remove(s)} className="btn btn-ghost !p-1.5 text-destructive"><Trash2 size={14} /></button>
                   </div>
                 </td>
@@ -232,12 +241,21 @@ function AdminScripts() {
               <input className="input-base" placeholder="Tags (comma separated)" value={draft.tagsText ?? ""} onChange={(e) => setDraft({ ...draft, tagsText: e.target.value })} />
               <input className="input-base" placeholder="Thumbnail URL" value={draft.image_url ?? ""} onChange={(e) => setDraft({ ...draft, image_url: e.target.value })} />
               <input className="input-base" placeholder="YouTube showcase URL" value={draft.youtube_url ?? ""} onChange={(e) => setDraft({ ...draft, youtube_url: e.target.value })} />
+              <div className="min-w-0 sm:col-span-2">
+                <label htmlFor="raw-loader-url" className="mb-1.5 block text-xs font-semibold text-muted-foreground">Raw loader link</label>
+                <input id="raw-loader-url" type="url" className="input-base" placeholder="https://example.com/script.lua" value={draft.raw_loader_url ?? ""} onChange={(e) => { setCopiedLoader(false); setDraft({ ...draft, raw_loader_url: e.target.value }); }} />
+                <p className="mt-1.5 text-xs text-muted-foreground">Use a public HTTPS raw Lua file. Only add links you trust; its contents can change outside this site.</p>
+              </div>
+              {draft.raw_loader_url?.trim() && validRawLoaderUrl(draft.raw_loader_url.trim()) && <div className="min-w-0 rounded-md border border-border bg-secondary/50 p-3 sm:col-span-2">
+                <div className="mb-2 flex items-center justify-between gap-2"><span className="text-xs font-semibold">Generated loader</span><Button variant="ghost" size="sm" title="Copy loader" aria-label="Copy loader" onClick={async () => { try { await navigator.clipboard.writeText(loaderCommand(draft.raw_loader_url?.trim() ?? "")); setCopiedLoader(true); toast.success("Loader copied"); } catch { toast.error("Could not copy loader"); } }}>{copiedLoader ? <Check size={14} /> : <Copy size={14} />}</Button></div>
+                <code className="block overflow-x-auto whitespace-pre font-mono text-xs text-primary">{loaderCommand(draft.raw_loader_url.trim())}</code>
+              </div>}
               <label className="btn btn-ghost cursor-pointer sm:col-span-2">
                 <Upload size={14} /> Upload thumbnail image
                 <input type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && void uploadImage(e.target.files[0])} />
               </label>
               <textarea className="input-base sm:col-span-2" rows={3} placeholder="Description" value={draft.description ?? ""} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
-              <textarea className="input-base sm:col-span-2 font-mono text-xs" rows={10} placeholder="-- Lua code here" value={draft.code ?? ""} onChange={(e) => setDraft({ ...draft, code: e.target.value })} />
+              <textarea className="input-base sm:col-span-2 font-mono text-xs" rows={10} placeholder="-- Lua code here (optional when a raw loader link is set)" value={draft.code ?? ""} onChange={(e) => setDraft({ ...draft, code: e.target.value })} />
             </div>
 
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
