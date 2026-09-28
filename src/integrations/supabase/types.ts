@@ -295,6 +295,7 @@ export type Database = {
           image_url: string | null
           name: string
           published: boolean
+          raw_loader_url: string | null
           shares: number
           slug: string
           status: string
@@ -321,6 +322,7 @@ export type Database = {
           image_url?: string | null
           name: string
           published?: boolean
+          raw_loader_url?: string | null
           shares?: number
           slug: string
           status?: string
@@ -347,6 +349,7 @@ export type Database = {
           image_url?: string | null
           name?: string
           published?: boolean
+          raw_loader_url?: string | null
           shares?: number
           slug?: string
           status?: string
@@ -536,6 +539,7 @@ export type Database = {
           image_url: string | null
           name: string
           published: boolean
+          raw_loader_url: string | null
           shares: number
           slug: string
           status: string
