@@ -9,7 +9,8 @@ import {
   THEMES, getTheme, switchTheme, themeLabel, getMode, applyMode, getMotion, applyMotion,
   getAccent, applyAccent, type Theme, type ColorMode,
 } from "@/lib/theme";
-import { logAdmin } from "@/lib/adminLog";
+import { adminLog } from "@/lib/adminLog";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/admin/themes")({
   head: () => ({ meta: [{ title: "Theme Manager — ARIO SCRIPTS" }, { name: "description", content: "Preview and manage ARIO SCRIPTS themes, colors and animations." }, { property: "og:title", content: "Theme Manager — ARIO SCRIPTS" }, { property: "og:description", content: "Preview and manage ARIO SCRIPTS themes, colors and animations." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/admin/themes")({
 
 function ThemesAdmin() {
   const qc = useQueryClient();
+  const { user } = useAuth();
   const { data: settings } = useSettings();
   const [theme, setTheme] = useState<Theme>("midnight");
   const [mode, setMode] = useState<ColorMode>("dark");
@@ -41,7 +43,7 @@ function ThemesAdmin() {
     const { error } = await supabase.from("site_settings").update({ theme, color_mode: mode }).eq("id", 1);
     setSaving(false);
     if (error) return toast.error("Could not save the site default");
-    await logAdmin("changed_settings", "site_settings", "1", { theme, color_mode: mode });
+    if (user) await adminLog({ adminId: user.id, action: "changed_theme", targetType: "site_settings", targetId: "1", details: `${theme} / ${mode}` });
     qc.invalidateQueries({ queryKey: ["site_settings"] });
     toast.success(`${themeLabel(theme)} is now the site default`);
   }
