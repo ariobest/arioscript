@@ -14,7 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/hooks/useAuth";
 import { SiteLayout } from "@/components/site/Layout";
-import { applyTheme, getTheme, applyMode, getMode, type ColorMode } from "@/lib/theme";
+import { applyTheme, getTheme, applyMode, getMode, applyMotion, getMotion, applyAccent, getAccent, type ColorMode } from "@/lib/theme";
 import { Welcome } from "@/components/site/Welcome";
 
 function NotFoundComponent() {
@@ -109,6 +109,8 @@ function RootComponent() {
   useEffect(() => {
     applyTheme(getTheme(), false);
     applyMode(getMode(), false);
+    applyMotion(getMotion());
+    if (getAccent()) applyAccent(getAccent());
     setMode(getMode());
     const update = () => setMode(getMode());
     window.addEventListener("ario-appearance", update);

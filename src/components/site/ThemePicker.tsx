@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Palette, Check, Sun, Moon } from "lucide-react";
 import { toast } from "sonner";
-import { THEMES, applyTheme, getTheme, applyMode, getMode, type Theme, type ColorMode } from "@/lib/theme";
+import { THEMES, applyTheme, getTheme, applyMode, getMode, switchTheme, themeLabel, type Theme, type ColorMode } from "@/lib/theme";
 
 export function ThemePicker() {
   const [open, setOpen] = useState(false);
@@ -37,7 +37,7 @@ export function ThemePicker() {
         <Palette size={16} />
       </button>
       {open && (
-        <div className="glass fade-up absolute right-0 z-50 mt-2 w-64 rounded-2xl p-3">
+        <div className="glass fade-up absolute right-0 z-50 mt-2 w-[min(16rem,calc(100vw-2rem))] rounded-2xl p-3">
           <div className="mb-3 flex gap-1 rounded-lg bg-secondary p-1">
             {(["dark", "light"] as const).map((value) => <button key={value} onClick={() => { setMode(value); applyMode(value); }} className={`btn flex-1 !py-1.5 capitalize ${mode === value ? "btn-primary" : "btn-ghost"}`}>{value === "dark" ? <Moon size={13} /> : <Sun size={13} />}{value}</button>)}
           </div>
@@ -46,10 +46,10 @@ export function ThemePicker() {
             {THEMES.map((t) => (
               <button
                 key={t}
-                onClick={() => {
+                onClick={(e) => {
                   setTheme(t);
-                  applyTheme(t);
-                  toast.success(`${t.toUpperCase()} theme selected`);
+                  switchTheme(t, { x: e.clientX, y: e.clientY });
+                  toast(`💧 ${themeLabel(t)} Theme enabled`);
                 }}
                 data-theme={t}
                 className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs capitalize transition-colors hover:bg-secondary"
