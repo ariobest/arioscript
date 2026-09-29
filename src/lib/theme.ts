@@ -38,3 +38,61 @@ export function applyTheme(theme: Theme, persist = true) {
   if (persist) localStorage.setItem(KEY, theme);
   window.dispatchEvent(new Event("ario-appearance"));
 }
+
+const MOTION_KEY = "ario-motion";
+const ACCENT_KEY = "ario-accent";
+
+export function themeLabel(theme: string) {
+  return theme.charAt(0).toUpperCase() + theme.slice(1);
+}
+
+export function getMotion(): boolean {
+  if (typeof window === "undefined") return true;
+  return localStorage.getItem(MOTION_KEY) !== "off";
+}
+
+export function applyMotion(on: boolean) {
+  if (typeof document === "undefined") return;
+  document.documentElement.setAttribute("data-motion", on ? "on" : "off");
+  localStorage.setItem(MOTION_KEY, on ? "on" : "off");
+}
+
+export function getAccent(): string | null {
+  if (typeof window === "undefined") return null;
+  const v = localStorage.getItem(ACCENT_KEY);
+  return v && /^#[0-9a-f]{6}$/i.test(v) ? v : null;
+}
+
+export function applyAccent(color: string | null) {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement.style;
+  if (color && /^#[0-9a-f]{6}$/i.test(color)) {
+    root.setProperty("--primary", color);
+    localStorage.setItem(ACCENT_KEY, color);
+  } else {
+    root.removeProperty("--primary");
+    localStorage.removeItem(ACCENT_KEY);
+  }
+  window.dispatchEvent(new Event("ario-appearance"));
+}
+
+/** Smoothly switch theme with a water-drop ripple from the given point. */
+export function switchTheme(theme: Theme, origin?: { x: number; y: number }) {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  const motion = getMotion() && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (motion) {
+    root.classList.add("theme-transition");
+    window.setTimeout(() => root.classList.remove("theme-transition"), 650);
+    const x = origin?.x ?? window.innerWidth / 2;
+    const y = origin?.y ?? window.innerHeight / 2;
+    const drop = document.createElement("span");
+    drop.className = "theme-ripple";
+    drop.setAttribute("data-theme", theme);
+    drop.style.left = `${x}px`;
+    drop.style.top = `${y}px`;
+    document.body.appendChild(drop);
+    window.setTimeout(() => drop.remove(), 900);
+  }
+  applyTheme(theme);
+}

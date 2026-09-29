@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Rocket, X, Moon, Sun, ArrowRight, Sparkles, Terminal } from "lucide-react";
-import { THEMES, applyMode, applyTheme, getMode, getTheme, type ColorMode, type Theme } from "@/lib/theme";
+import { THEMES, applyMode, applyTheme, switchTheme, getMode, getTheme, type ColorMode, type Theme } from "@/lib/theme";
 import { Button } from "@/components/ui/button";
 
 export function Welcome() {
@@ -35,7 +35,7 @@ export function Welcome() {
             {(["dark", "light"] as const).map(v => <Button key={v} variant={mode === v ? "default" : "outline"} className="w-full" onClick={() => { setMode(v); applyMode(v); }}>{v === "dark" ? <Moon size={16} /> : <Sun size={16} />}{v === "dark" ? "Dark" : "Light"}</Button>)}
           </div></div>
           <div><label className="mb-2 block text-sm font-semibold" htmlFor="welcome-theme">Theme</label>
-            <select id="welcome-theme" className="input-base capitalize" value={theme} onChange={e => { const t = e.target.value as Theme; setTheme(t); applyTheme(t); }}>{THEMES.map(t => <option key={t} value={t} className="bg-background capitalize">{t}</option>)}</select>
+            <select id="welcome-theme" className="input-base capitalize" value={theme} onChange={e => { const t = e.target.value as Theme; setTheme(t); switchTheme(t); }}>{THEMES.map(t => <option key={t} value={t} className="bg-background capitalize">{t}</option>)}</select>
           </div>
         </div>
         <div className="mt-6 grid grid-cols-2 gap-2 sm:mt-8">

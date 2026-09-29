@@ -8,3 +8,4 @@
 - [ ] Verify profile-photo moderation end to end with an uploaded image; not part of this loader/layout update.
 - [x] Add raw HTTPS loader links to admin scripts with a generated copyable loader on public script pages.
 - [x] Upgrade the first-visit rocket scene and correct phone-sized header and search layout.
+- [x] Mobile polish, smooth theme transitions with water ripple + themed 💧 toasts, admin Themes page (previews, accent, animations).

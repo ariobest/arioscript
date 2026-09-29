@@ -24,6 +24,7 @@ import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminThemesRouteImport } from './routes/admin.themes'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
@@ -108,6 +109,11 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminThemesRoute = AdminThemesRouteImport.update({
+  id: '/themes',
+  path: '/themes',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/themes': typeof AdminThemesRoute
   '/admin/users': typeof AdminUsersRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/games/$game': typeof GamesGameRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/themes': typeof AdminThemesRoute
   '/admin/users': typeof AdminUsersRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/games/$game': typeof GamesGameRoute
@@ -214,6 +222,7 @@ export interface FileRoutesById {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/themes': typeof AdminThemesRoute
   '/admin/users': typeof AdminUsersRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/games/$game': typeof GamesGameRoute
@@ -241,6 +250,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/scripts'
     | '/admin/settings'
+    | '/admin/themes'
     | '/admin/users'
     | '/categories/$slug'
     | '/games/$game'
@@ -265,6 +275,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/scripts'
     | '/admin/settings'
+    | '/admin/themes'
     | '/admin/users'
     | '/categories/$slug'
     | '/games/$game'
@@ -290,6 +301,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/scripts'
     | '/admin/settings'
+    | '/admin/themes'
     | '/admin/users'
     | '/categories/$slug'
     | '/games/$game'
@@ -423,6 +435,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/themes': {
+      id: '/admin/themes'
+      path: '/themes'
+      fullPath: '/admin/themes'
+      preLoaderRoute: typeof AdminThemesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -492,6 +511,7 @@ interface AdminRouteChildren {
   AdminReportsRoute: typeof AdminReportsRoute
   AdminScriptsRoute: typeof AdminScriptsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminThemesRoute: typeof AdminThemesRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -506,6 +526,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminReportsRoute: AdminReportsRoute,
   AdminScriptsRoute: AdminScriptsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminThemesRoute: AdminThemesRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
