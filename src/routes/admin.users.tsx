@@ -124,7 +124,7 @@ function AdminUsers() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="font-display text-2xl font-bold">Users</h1>
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search users…" className="input-base ml-auto max-w-56" />
+        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search users…" className="input-base w-full sm:ml-auto sm:w-auto sm:max-w-56" />
       </div>
 
       <div className="glass overflow-x-auto rounded-2xl">

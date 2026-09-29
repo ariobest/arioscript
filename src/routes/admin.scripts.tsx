@@ -139,7 +139,7 @@ function AdminScripts() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="font-display text-2xl font-bold">Scripts</h1>
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search…" className="input-base ml-auto max-w-48" />
+        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search…" className="input-base min-w-0 flex-1 sm:ml-auto sm:max-w-48 sm:flex-none" />
         <Button onClick={() => { setCopiedLoader(false); setDraft({ ...EMPTY }); }}><Plus size={15} /> Add script</Button>
       </div>
 
