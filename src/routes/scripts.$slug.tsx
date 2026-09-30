@@ -155,8 +155,8 @@ function ScriptPage() {
         <ArrowLeft size={13} /> Back to scripts
       </Link>
 
-      <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-        <div className="space-y-6">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+        <div className="min-w-0 space-y-6">
           <div className="glass overflow-hidden rounded-2xl">
             {s.image_url ? (
               <img src={s.image_url} alt={s.name} className="aspect-[16/7] w-full object-cover" />
@@ -217,7 +217,7 @@ function ScriptPage() {
           )}
         </div>
 
-        <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+        <aside className="min-w-0 space-y-4 lg:sticky lg:top-24 lg:self-start">
           <div className="glass rounded-2xl p-5">
             <div className="grid grid-cols-2 gap-3 text-sm">
               {[

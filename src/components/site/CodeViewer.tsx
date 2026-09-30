@@ -35,7 +35,7 @@ export function CodeViewer({ code, filename = "script.lua", onCopy, onDownload, 
   }
 
   return (
-    <div className="glass min-w-0 overflow-hidden rounded-2xl">
+    <div className="glass w-full min-w-0 overflow-hidden rounded-2xl">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border bg-[color-mix(in_oklab,var(--background)_60%,transparent)] px-3 py-2.5 sm:px-4">
         <div className="flex min-w-0 items-center gap-2.5">
           <div className="flex shrink-0 gap-1.5" aria-hidden="true">
@@ -57,7 +57,7 @@ export function CodeViewer({ code, filename = "script.lua", onCopy, onDownload, 
           </button>
         </div>
       </div>
-      <pre className="max-h-[520px] max-w-full overflow-auto p-3 font-mono text-[12px] leading-relaxed text-foreground/90 sm:p-4 sm:text-[13px]">
+      <pre className="w-0 min-w-full max-w-full max-h-[520px] overflow-auto p-3 font-mono text-[12px] leading-relaxed text-foreground/90 sm:p-4 sm:text-[13px]">
         <code>{code}</code>
       </pre>
     </div>
