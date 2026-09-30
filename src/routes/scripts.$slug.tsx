@@ -32,6 +32,7 @@ function ScriptPage() {
   const [reportOpen, setReportOpen] = useState(false);
   const [reason, setReason] = useState("Not working");
   const [details, setDetails] = useState("");
+  const [quickCopied, setQuickCopied] = useState(false);
 
   const script = useQuery({
     queryKey: ["script", slug],
@@ -108,6 +109,24 @@ function ScriptPage() {
     }
   }
 
+  async function quickCopy() {
+    const copyable = s!.raw_loader_url && validRawLoaderUrl(s!.raw_loader_url)
+      ? loaderCommand(s!.raw_loader_url)
+      : s!.code;
+    if (!copyable) return toast.error("No code is available to copy");
+    try {
+      await navigator.clipboard.writeText(copyable);
+      setQuickCopied(true);
+      toast.success(s!.raw_loader_url ? "Loader copied to clipboard" : "Script copied to clipboard");
+      await recordEvent(s!.id, "copy");
+      void qc.invalidateQueries({ queryKey: ["script", slug] });
+      void qc.invalidateQueries({ queryKey: ["stats"] });
+      window.setTimeout(() => setQuickCopied(false), 2000);
+    } catch {
+      toast.error("Could not copy the script");
+    }
+  }
+
   async function submitReport() {
     if (!user) {
       toast.error("Sign in to report a script");
@@ -131,7 +150,7 @@ function ScriptPage() {
   const statusColor = s.status === "working" ? "text-[var(--success)]" : s.status === "patched" ? "text-destructive" : "text-[var(--warning)]";
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
+    <div className="mx-auto max-w-6xl px-4 py-6 pb-28 sm:py-8 sm:pb-8">
       <Link to="/scripts" className="mb-5 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary">
         <ArrowLeft size={13} /> Back to scripts
       </Link>
@@ -146,7 +165,7 @@ function ScriptPage() {
                 <Gamepad2 size={40} className="text-primary/70" />
               </div>
             )}
-            <div className="p-5">
+            <div className="p-4 sm:p-5">
               <div className="flex flex-wrap items-center gap-2">
                 {s.featured && <span className="chip text-primary"><Star size={11} /> Featured</span>}
                 {s.verified && <span className="chip text-[var(--accent)]"><BadgeCheck size={11} /> Verified</span>}
@@ -220,7 +239,7 @@ function ScriptPage() {
             </p>
           </div>
 
-          <div className="glass space-y-2 rounded-2xl p-4">
+          <div className="glass hidden space-y-2 rounded-2xl p-4 lg:block">
             <button onClick={() => void toggleFavorite()} className={`btn w-full ${fav.data ? "btn-primary" : "btn-ghost"}`}>
               <Heart size={15} fill={fav.data ? "currentColor" : "none"} />
               {fav.data ? "Favorited" : "Add to favorites"}
@@ -252,6 +271,35 @@ function ScriptPage() {
           </div>
         </aside>
       </div>
+
+      <div className="mobile-action-dock lg:hidden" aria-label="Script actions">
+        <button onClick={() => void quickCopy()} className="mobile-action mobile-action-primary">
+          {quickCopied ? <BadgeCheck size={18} /> : <Copy size={18} />}
+          <span>{quickCopied ? "Copied" : "Copy"}</span>
+        </button>
+        <button onClick={() => void toggleFavorite()} className={`mobile-action ${fav.data ? "text-primary" : ""}`}>
+          <Heart size={18} fill={fav.data ? "currentColor" : "none"} />
+          <span>{fav.data ? "Saved" : "Favorite"}</span>
+        </button>
+        <button onClick={() => void share()} className="mobile-action"><Share2 size={18} /><span>Share</span></button>
+        <button onClick={() => setReportOpen((v) => !v)} className="mobile-action text-destructive"><Flag size={18} /><span>Report</span></button>
+      </div>
+
+      {reportOpen && (
+        <div className="fixed inset-0 z-[70] flex items-end bg-[color-mix(in_oklab,var(--background)_70%,transparent)] p-3 backdrop-blur-sm lg:hidden" onClick={() => setReportOpen(false)}>
+          <div className="glass fade-up w-full space-y-3 rounded-2xl p-4 pb-[max(1rem,env(safe-area-inset-bottom))]" onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="font-display font-semibold">Report script</h2>
+              <button onClick={() => setReportOpen(false)} className="btn btn-ghost h-10 w-10 !p-0" aria-label="Close report form">×</button>
+            </div>
+            <select value={reason} onChange={(e) => setReason(e.target.value)} className="input-base">
+              {["Not working", "Patched", "Malicious code", "Stolen script", "Wrong information", "Other"].map((r) => <option key={r} value={r} className="bg-background">{r}</option>)}
+            </select>
+            <textarea value={details} onChange={(e) => setDetails(e.target.value)} placeholder="More details (optional)" rows={3} className="input-base" />
+            <button onClick={() => void submitReport()} className="btn btn-primary w-full">Send report</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

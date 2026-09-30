@@ -39,10 +39,10 @@ export function useTimeseries(days: number) {
 
 function Tile({ icon: Icon, label, value, pending }: { icon: React.ElementType; label: string; value?: number; pending?: boolean }) {
   return (
-    <div className="glass rounded-2xl p-4">
-      <Icon size={15} className="text-primary" />
-      <p className="mt-2 font-display text-xl font-bold">{pending ? "—" : compact(value ?? 0)}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
+    <div className="glass admin-stat-tile min-w-0 rounded-2xl p-3.5 sm:p-4">
+      <div className="grid h-8 w-8 place-items-center rounded-xl bg-primary/10 text-primary"><Icon size={15} /></div>
+      <p className="mt-3 truncate font-display text-xl font-bold">{pending ? "—" : compact(value ?? 0)}</p>
+      <p className="truncate text-xs text-muted-foreground">{label}</p>
     </div>
   );
 }
@@ -66,7 +66,7 @@ function Dashboard() {
   const s = stats.data ?? {};
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-5 sm:space-y-6">
       <div>
         <h1 className="font-display text-2xl font-bold">Dashboard</h1>
         <p className="mt-1 text-sm text-muted-foreground">Live numbers straight from the database.</p>
@@ -84,9 +84,9 @@ function Dashboard() {
         <Tile icon={Flag} label="Open reports" value={s['reports']} pending={!stats.data} />
       </div>
 
-      <div className="glass rounded-2xl p-5">
+      <div className="glass min-w-0 overflow-hidden rounded-2xl p-3 sm:p-5">
         <h2 className="mb-4 font-display font-semibold">Last 30 days</h2>
-        <div className="h-64">
+        <div className="h-56 min-w-0 sm:h-64">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={ts.data ?? []}>
               <defs>
@@ -107,7 +107,7 @@ function Dashboard() {
         </div>
       </div>
 
-      <div className="glass rounded-2xl p-5">
+      <div className="glass rounded-2xl p-4 sm:p-5">
         <div className="mb-3 flex items-center gap-2">
           <Activity size={15} className="text-primary" />
           <h2 className="font-display font-semibold">Recent admin activity</h2>
@@ -115,7 +115,7 @@ function Dashboard() {
         </div>
         <ul className="space-y-1.5 text-sm">
           {(activity.data ?? []).map((a) => (
-            <li key={a.id} className="flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-secondary">
+            <li key={a.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl px-2 py-2 hover:bg-secondary">
               <span className="min-w-0 flex-1 truncate">
                 <span className="font-semibold text-primary">{(a as { profiles?: { username?: string } }).profiles?.username ?? "admin"}</span>{" "}
                 {a.action} {a.details ? `· ${a.details}` : ""}
