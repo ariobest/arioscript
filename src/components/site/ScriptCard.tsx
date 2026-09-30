@@ -12,7 +12,7 @@ export function ScriptCard({ script }: { script: Script }) {
     <Link
       to="/scripts/$slug"
       params={{ slug: script.slug }}
-      className="glass card-hover group flex flex-col overflow-hidden rounded-2xl"
+      className="glass card-hover group flex min-w-0 flex-col overflow-hidden rounded-2xl"
     >
       <div className="relative aspect-[16/9] overflow-hidden bg-secondary">
         {script.image_url ? (
@@ -42,7 +42,7 @@ export function ScriptCard({ script }: { script: Script }) {
         <span className={`chip absolute right-2 top-2 capitalize ${statusColor}`}>{status}</span>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 p-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
         <div>
           <h3 className="truncate font-display text-base font-semibold text-foreground">{script.name}</h3>
           <p className="mt-0.5 truncate text-xs text-muted-foreground">{script.game_name}</p>
@@ -54,10 +54,10 @@ export function ScriptCard({ script }: { script: Script }) {
         </div>
 
         <div className="mt-auto grid grid-cols-4 gap-1 border-t border-border pt-3 text-[11px] text-muted-foreground">
-          <span className="flex items-center gap-1"><Eye size={12} />{compact(script.views)}</span>
-          <span className="flex items-center gap-1"><Download size={12} />{compact(script.downloads)}</span>
-          <span className="flex items-center gap-1"><Copy size={12} />{compact(script.copies)}</span>
-          <span className="flex items-center gap-1"><Heart size={12} />{compact(script.favorites)}</span>
+          <span className="flex min-w-0 items-center justify-center gap-1"><Eye size={12} className="shrink-0" />{compact(script.views)}</span>
+          <span className="flex min-w-0 items-center justify-center gap-1"><Download size={12} className="shrink-0" />{compact(script.downloads)}</span>
+          <span className="flex min-w-0 items-center justify-center gap-1"><Copy size={12} className="shrink-0" />{compact(script.copies)}</span>
+          <span className="flex min-w-0 items-center justify-center gap-1"><Heart size={12} className="shrink-0" />{compact(script.favorites)}</span>
         </div>
       </div>
     </Link>

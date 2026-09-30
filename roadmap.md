@@ -9,3 +9,4 @@
 - [x] Add raw HTTPS loader links to admin scripts with a generated copyable loader on public script pages.
 - [x] Upgrade the first-visit rocket scene and correct phone-sized header and search layout.
 - [x] Mobile polish, smooth theme transitions with water ripple + themed 💧 toasts, admin Themes page (previews, accent, animations).
+- [x] Apply the frosted-glass mobile direction, expose script actions on phones, and polish admin navigation, cards, statistics, and overflow.

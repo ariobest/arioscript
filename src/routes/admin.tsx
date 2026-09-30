@@ -89,7 +89,7 @@ function AdminLayout() {
   }
 
   return (
-    <div className="mx-auto flex max-w-7xl gap-6 px-4 py-8">
+    <div className="admin-shell mx-auto flex max-w-7xl gap-6 px-3 py-4 sm:px-4 sm:py-8">
       <aside className="glass hidden h-fit w-56 shrink-0 rounded-2xl p-3 lg:block lg:sticky lg:top-24">
         <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Admin</p>
         <nav className="space-y-0.5">
@@ -108,10 +108,10 @@ function AdminLayout() {
       </aside>
 
       <div className="min-w-0 flex-1">
-        <div className="mb-4 flex gap-1.5 overflow-x-auto lg:hidden">
+        <div className="admin-mobile-nav glass sticky top-[4.5rem] z-30 -mx-1 mb-4 flex gap-1.5 overflow-x-auto rounded-2xl p-2 lg:hidden">
           {LINKS.map((l) => (
-            <Link key={l.to} to={l.to} className="chip whitespace-nowrap text-muted-foreground" activeProps={{ className: "chip whitespace-nowrap !border-primary text-primary" }}>
-              {l.label}
+            <Link key={l.to} to={l.to} className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-transparent px-3 text-xs font-semibold text-muted-foreground" activeProps={{ className: "flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-primary/40 bg-primary/10 px-3 text-xs font-semibold text-primary" }}>
+              <l.icon size={14} className="shrink-0" /> {l.label}
             </Link>
           ))}
         </div>
