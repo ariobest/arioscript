@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Check, Moon, Sun, Sparkles, RotateCcw, Save, Search } from "lucide-react";
+import { Check, Moon, Sun, Sparkles, RotateCcw, Save, Search, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSettings } from "@/components/site/Layout";
 import {
   THEMES, getTheme, switchTheme, themeLabel, getMode, applyMode, getMotion, applyMotion,
-  getAccent, applyAccent, type Theme, type ColorMode,
+  getAccent, applyAccent, getMobileStyle, applyMobileStyle, type Theme, type ColorMode, type MobileStyle,
 } from "@/lib/theme";
 import { adminLog } from "@/lib/adminLog";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,10 +25,11 @@ function ThemesAdmin() {
   const [mode, setMode] = useState<ColorMode>("dark");
   const [motion, setMotion] = useState(true);
   const [accent, setAccent] = useState<string | null>(null);
+  const [mStyle, setMStyle] = useState<MobileStyle>("cyber");
   const [filter, setFilter] = useState("");
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => { setTheme(getTheme()); setMode(getMode()); setMotion(getMotion()); setAccent(getAccent()); }, []);
+  useEffect(() => { setTheme(getTheme()); setMode(getMode()); setMotion(getMotion()); setAccent(getAccent()); setMStyle(getMobileStyle()); }, []);
 
   const list = useMemo(() => THEMES.filter(t => t.includes(filter.toLowerCase().trim())), [filter]);
 
@@ -58,7 +59,7 @@ function ThemesAdmin() {
         <button onClick={saveDefault} disabled={saving} className="btn btn-primary shrink-0"><Save size={15} /><span className="hidden sm:inline">{saving ? "Saving…" : "Set as site default"}</span></button>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         <div className="glass rounded-2xl p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Mode</p>
           <div className="mt-3 flex gap-1 rounded-lg bg-secondary p-1">
@@ -74,6 +75,15 @@ function ThemesAdmin() {
             <span className="min-w-0 flex-1 truncate font-mono text-sm">{accent ?? "Theme default"}</span>
             <button onClick={() => { setAccent(null); applyAccent(null); }} className="btn btn-ghost h-9 w-9 !p-0" aria-label="Reset accent"><RotateCcw size={14} /></button>
           </div>
+        </div>
+        <div className="glass rounded-2xl p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Mobile style</p>
+          <div className="mt-3 flex gap-1 rounded-lg bg-secondary p-1">
+            {([["cyber", "Neon Cyberpunk"], ["classic", "Classic"]] as const).map(([v, label]) => (
+              <button key={v} onClick={() => { setMStyle(v); applyMobileStyle(v); toast(v === "cyber" ? "⚡ Neon Cyberpunk mobile style" : "Classic mobile style"); }} className={`btn flex-1 !py-1.5 ${mStyle === v ? "btn-primary" : "btn-ghost"}`}><Smartphone size={13} />{label}</button>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">Cyberpunk colors follow the active theme.</p>
         </div>
         <div className="glass rounded-2xl p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Animations</p>

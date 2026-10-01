@@ -261,3 +261,95 @@ img, video, iframe { max-width: 100%; }
   .card-hover:hover { transform: none; }
 }
 @media (min-width: 1024px) { .mobile-action-dock { display: none; } }
+
+/* ===== Neon Cyberpunk mobile style (data-mobile-style="cyber") ===== */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+@media (max-width: 639px) {
+  html[data-mobile-style="cyber"] body {
+    background-image:
+      linear-gradient(color-mix(in oklab, var(--primary) 5%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, var(--primary) 5%, transparent) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+  html[data-mobile-style="cyber"] .glass {
+    border-radius: .9rem;
+    border-color: color-mix(in oklab, var(--primary) 24%, var(--border));
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 7%, transparent),
+      0 16px 36px -22px color-mix(in oklab, var(--primary) 50%, transparent);
+  }
+  html[data-mobile-style="cyber"] .font-display { letter-spacing: -0.03em; }
+  html[data-mobile-style="cyber"] .glass .font-display { font-family: var(--font-mono); }
+  html[data-mobile-style="cyber"] .chip {
+    border-radius: 999px;
+    font-size: .6875rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  html[data-mobile-style="cyber"] .btn {
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    font-weight: 800;
+    font-size: .75rem;
+  }
+  html[data-mobile-style="cyber"] .btn-primary {
+    box-shadow: 0 0 18px -4px color-mix(in oklab, var(--primary) 70%, transparent);
+  }
+  html[data-mobile-style="cyber"] .input-base {
+    border-radius: .9rem;
+    border-color: color-mix(in oklab, var(--primary) 20%, var(--border));
+  }
+  html[data-mobile-style="cyber"] .input-base:focus {
+    border-color: color-mix(in oklab, var(--primary) 60%, var(--border));
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 18%, transparent);
+  }
+  html[data-mobile-style="cyber"] .text-gradient {
+    background-image: linear-gradient(100deg, var(--foreground) 20%, var(--primary) 55%, var(--accent) 90%);
+  }
+}
+
+/* ===== Rocket launch upgrades ===== */
+.welcome-count {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font: 700 2.4rem var(--font-mono); color: var(--primary);
+  text-shadow: 0 0 24px color-mix(in oklab, var(--primary) 70%, transparent);
+  animation: countTick 1.5s steps(3) both;
+}
+@keyframes countTick {
+  0% { opacity: 1; transform: scale(1); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.6); }
+}
+.welcome-flame {
+  position: absolute; left: 50%; top: 64%; width: 14px; height: 46px;
+  transform: translateX(-50%);
+  background: linear-gradient(to bottom, oklch(0.9 0.15 90), var(--primary), transparent);
+  border-radius: 999px; filter: blur(4px);
+  animation: flameFlicker .12s ease-in-out infinite alternate;
+}
+@keyframes flameFlicker {
+  from { transform: translateX(-50%) scaleY(.8); opacity: .7; }
+  to { transform: translateX(-50%) scaleY(1.25); opacity: 1; }
+}
+.welcome-shake { animation: siteShake .45s 1.05s ease-in-out; }
+@keyframes siteShake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(3px, -2px); }
+  60% { transform: translate(-2px, -2px); }
+  80% { transform: translate(2px, 2px); }
+}
+.welcome-particle {
+  position: absolute; width: 4px; height: 4px; border-radius: 50%;
+  background: var(--primary); opacity: 0;
+  animation: particleRise 1.8s ease-out infinite;
+}
+@keyframes particleRise {
+  0% { transform: translateY(30px) scale(.4); opacity: 0; }
+  25% { opacity: .9; }
+  100% { transform: translateY(-90px) scale(1); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-count, .welcome-flame, .welcome-shake, .welcome-particle { animation: none !important; }
+}
