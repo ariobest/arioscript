@@ -92,7 +92,7 @@ function Browse() {
         />
       </form>
 
-      <div className="glass mt-4 flex flex-wrap items-center gap-2 rounded-2xl p-3">
+      <div className="glass no-scrollbar mt-4 flex items-center gap-2 rounded-2xl p-3 max-sm:flex-nowrap max-sm:overflow-x-auto sm:flex-wrap">
         <SlidersHorizontal size={15} className="text-primary" />
         {SORTS.map((s) => (
           <button

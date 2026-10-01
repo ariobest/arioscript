@@ -20,10 +20,16 @@ export function Welcome() {
         <Button title="Close welcome" aria-label="Close welcome" variant="ghost" size="icon" onClick={done}><X size={18} /></Button>
       </div>
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center py-7 text-center sm:py-10">
-        <div className="welcome-flight relative mx-auto mb-5 flex h-40 w-full max-w-sm items-center justify-center overflow-hidden sm:mb-8 sm:h-52" aria-hidden="true">
+        <div className="welcome-flight welcome-shake relative mx-auto mb-5 flex h-40 w-full max-w-sm items-center justify-center overflow-hidden sm:mb-8 sm:h-52" aria-hidden="true">
           <div className="welcome-orbit welcome-orbit-outer" /><div className="welcome-orbit welcome-orbit-inner" />
           <div className="welcome-star welcome-star-one" /><div className="welcome-star welcome-star-two" /><div className="welcome-star welcome-star-three" /><div className="welcome-star welcome-star-four" />
+          <div className="welcome-particle" style={{ left: "42%", top: "70%" }} />
+          <div className="welcome-particle" style={{ left: "55%", top: "74%", animationDelay: ".4s" }} />
+          <div className="welcome-particle" style={{ left: "48%", top: "78%", animationDelay: ".8s" }} />
+          <div className="welcome-particle" style={{ left: "60%", top: "68%", animationDelay: "1.1s" }} />
+          <div className="welcome-count">3·2·1</div>
           <div className="welcome-launch-trail" />
+          <div className="welcome-flame" />
           <div className="welcome-rocket"><Rocket size={64} strokeWidth={1.25} className="drop-shadow-lg sm:h-20 sm:w-20" /></div>
           <div className="welcome-arrival"><Sparkles size={15} /> READY FOR LAUNCH</div>
         </div>
