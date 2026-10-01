@@ -202,6 +202,36 @@ export type Database = {
         }
         Relationships: []
       }
+      raw_scripts: {
+        Row: {
+          code: string
+          created_at: string
+          enabled: boolean
+          id: string
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          code?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reports: {
         Row: {
           created_at: string
@@ -506,6 +536,7 @@ export type Database = {
           views: number
         }[]
       }
+      get_raw_script: { Args: { _slug: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

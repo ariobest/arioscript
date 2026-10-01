@@ -21,6 +21,7 @@ import { Route as AdminAssistantRouteImport } from './routes/admin.assistant'
 import { Route as AdminBadgesRouteImport } from './routes/admin.badges'
 import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
+import { Route as AdminRawRouteImport } from './routes/admin.raw'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -30,6 +31,7 @@ import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as GamesIndexRouteImport } from './routes/games.index'
 import { Route as GamesGameRouteImport } from './routes/games.$game'
+import { Route as RawSlugRouteImport } from './routes/raw.$slug'
 import { Route as ScriptsIndexRouteImport } from './routes/scripts.index'
 import { Route as ScriptsSlugRouteImport } from './routes/scripts.$slug'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
@@ -94,6 +96,11 @@ const AdminMediaRoute = AdminMediaRouteImport.update({
   path: '/media',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRawRoute = AdminRawRouteImport.update({
+  id: '/raw',
+  path: '/raw',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -139,6 +146,11 @@ const GamesGameRoute = GamesGameRouteImport.update({
   path: '/games/$game',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RawSlugRoute = RawSlugRouteImport.update({
+  id: '/raw/$slug',
+  path: '/raw/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ScriptsIndexRoute = ScriptsIndexRouteImport.update({
   id: '/scripts/',
   path: '/scripts/',
@@ -167,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/admin/badges': typeof AdminBadgesRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
+  '/admin/raw': typeof AdminRawRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -174,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/games/$game': typeof GamesGameRoute
+  '/raw/$slug': typeof RawSlugRoute
   '/scripts/$slug': typeof ScriptsSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/admin/': typeof AdminIndexRoute
@@ -192,6 +206,7 @@ export interface FileRoutesByTo {
   '/admin/badges': typeof AdminBadgesRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
+  '/admin/raw': typeof AdminRawRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -199,6 +214,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/games/$game': typeof GamesGameRoute
+  '/raw/$slug': typeof RawSlugRoute
   '/scripts/$slug': typeof ScriptsSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/admin': typeof AdminIndexRoute
@@ -219,6 +235,7 @@ export interface FileRoutesById {
   '/admin/badges': typeof AdminBadgesRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
+  '/admin/raw': typeof AdminRawRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -226,6 +243,7 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/games/$game': typeof GamesGameRoute
+  '/raw/$slug': typeof RawSlugRoute
   '/scripts/$slug': typeof ScriptsSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/admin/': typeof AdminIndexRoute
@@ -247,6 +265,7 @@ export interface FileRouteTypes {
     | '/admin/badges'
     | '/admin/logs'
     | '/admin/media'
+    | '/admin/raw'
     | '/admin/reports'
     | '/admin/scripts'
     | '/admin/settings'
@@ -254,6 +273,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/categories/$slug'
     | '/games/$game'
+    | '/raw/$slug'
     | '/scripts/$slug'
     | '/u/$username'
     | '/admin/'
@@ -272,6 +292,7 @@ export interface FileRouteTypes {
     | '/admin/badges'
     | '/admin/logs'
     | '/admin/media'
+    | '/admin/raw'
     | '/admin/reports'
     | '/admin/scripts'
     | '/admin/settings'
@@ -279,6 +300,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/categories/$slug'
     | '/games/$game'
+    | '/raw/$slug'
     | '/scripts/$slug'
     | '/u/$username'
     | '/admin'
@@ -298,6 +320,7 @@ export interface FileRouteTypes {
     | '/admin/badges'
     | '/admin/logs'
     | '/admin/media'
+    | '/admin/raw'
     | '/admin/reports'
     | '/admin/scripts'
     | '/admin/settings'
@@ -305,6 +328,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/categories/$slug'
     | '/games/$game'
+    | '/raw/$slug'
     | '/scripts/$slug'
     | '/u/$username'
     | '/admin/'
@@ -321,6 +345,7 @@ export interface RootRouteChildren {
   LeaderboardsRoute: typeof LeaderboardsRoute
   CategoriesSlugRoute: typeof CategoriesSlugRoute
   GamesGameRoute: typeof GamesGameRoute
+  RawSlugRoute: typeof RawSlugRoute
   ScriptsSlugRoute: typeof ScriptsSlugRoute
   UUsernameRoute: typeof UUsernameRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
@@ -414,6 +439,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMediaRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/raw': {
+      id: '/admin/raw'
+      path: '/raw'
+      fullPath: '/admin/raw'
+      preLoaderRoute: typeof AdminRawRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reports': {
       id: '/admin/reports'
       path: '/reports'
@@ -477,6 +509,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GamesGameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/raw/$slug': {
+      id: '/raw/$slug'
+      path: '/raw/$slug'
+      fullPath: '/raw/$slug'
+      preLoaderRoute: typeof RawSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/scripts/': {
       id: '/scripts/'
       path: '/scripts'
@@ -508,6 +547,7 @@ interface AdminRouteChildren {
   AdminBadgesRoute: typeof AdminBadgesRoute
   AdminLogsRoute: typeof AdminLogsRoute
   AdminMediaRoute: typeof AdminMediaRoute
+  AdminRawRoute: typeof AdminRawRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminScriptsRoute: typeof AdminScriptsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -523,6 +563,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBadgesRoute: AdminBadgesRoute,
   AdminLogsRoute: AdminLogsRoute,
   AdminMediaRoute: AdminMediaRoute,
+  AdminRawRoute: AdminRawRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminScriptsRoute: AdminScriptsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
@@ -541,6 +582,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardsRoute: LeaderboardsRoute,
   CategoriesSlugRoute: CategoriesSlugRoute,
   GamesGameRoute: GamesGameRoute,
+  RawSlugRoute: RawSlugRoute,
   ScriptsSlugRoute: ScriptsSlugRoute,
   UUsernameRoute: UUsernameRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
