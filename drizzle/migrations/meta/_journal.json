@@ -43,6 +43,13 @@
       "when": 1790610024412,
       "tag": "0005_add_script_raw_loader_url",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790862955218,
+      "tag": "0006_raw_scripts",
+      "breakpoints": true
     }
   ]
 }
