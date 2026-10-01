@@ -58,7 +58,7 @@ function ThemesAdmin() {
         <button onClick={saveDefault} disabled={saving} className="btn btn-primary shrink-0"><Save size={15} /><span className="hidden sm:inline">{saving ? "Saving…" : "Set as site default"}</span></button>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         <div className="glass rounded-2xl p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Mode</p>
           <div className="mt-3 flex gap-1 rounded-lg bg-secondary p-1">
@@ -74,6 +74,15 @@ function ThemesAdmin() {
             <span className="min-w-0 flex-1 truncate font-mono text-sm">{accent ?? "Theme default"}</span>
             <button onClick={() => { setAccent(null); applyAccent(null); }} className="btn btn-ghost h-9 w-9 !p-0" aria-label="Reset accent"><RotateCcw size={14} /></button>
           </div>
+        </div>
+        <div className="glass rounded-2xl p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Mobile style</p>
+          <div className="mt-3 flex gap-1 rounded-lg bg-secondary p-1">
+            {([["cyber", "Neon Cyberpunk"], ["classic", "Classic"]] as const).map(([v, label]) => (
+              <button key={v} onClick={() => { setMStyle(v); applyMobileStyle(v); toast(v === "cyber" ? "⚡ Neon Cyberpunk mobile style" : "Classic mobile style"); }} className={`btn flex-1 !py-1.5 ${mStyle === v ? "btn-primary" : "btn-ghost"}`}><Smartphone size={13} />{label}</button>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">Cyberpunk colors follow the active theme.</p>
         </div>
         <div className="glass rounded-2xl p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Animations</p>
