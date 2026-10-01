@@ -14,7 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/hooks/useAuth";
 import { SiteLayout } from "@/components/site/Layout";
-import { applyTheme, getTheme, applyMode, getMode, applyMotion, getMotion, applyAccent, getAccent, type ColorMode } from "@/lib/theme";
+import { applyTheme, getTheme, applyMode, getMode, applyMotion, getMotion, applyAccent, getAccent, applyMobileStyle, getMobileStyle, type ColorMode } from "@/lib/theme";
 import { Welcome } from "@/components/site/Welcome";
 
 function NotFoundComponent() {
