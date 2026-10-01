@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Check, Moon, Sun, Sparkles, RotateCcw, Save, Search } from "lucide-react";
+import { Check, Moon, Sun, Sparkles, RotateCcw, Save, Search, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSettings } from "@/components/site/Layout";
 import {
   THEMES, getTheme, switchTheme, themeLabel, getMode, applyMode, getMotion, applyMotion,
-  getAccent, applyAccent, type Theme, type ColorMode,
+  getAccent, applyAccent, getMobileStyle, applyMobileStyle, type Theme, type ColorMode, type MobileStyle,
 } from "@/lib/theme";
 import { adminLog } from "@/lib/adminLog";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,10 +25,11 @@ function ThemesAdmin() {
   const [mode, setMode] = useState<ColorMode>("dark");
   const [motion, setMotion] = useState(true);
   const [accent, setAccent] = useState<string | null>(null);
+  const [mStyle, setMStyle] = useState<MobileStyle>("cyber");
   const [filter, setFilter] = useState("");
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => { setTheme(getTheme()); setMode(getMode()); setMotion(getMotion()); setAccent(getAccent()); }, []);
+  useEffect(() => { setTheme(getTheme()); setMode(getMode()); setMotion(getMotion()); setAccent(getAccent()); setMStyle(getMobileStyle()); }, []);
 
   const list = useMemo(() => THEMES.filter(t => t.includes(filter.toLowerCase().trim())), [filter]);
 
