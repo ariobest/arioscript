@@ -96,3 +96,18 @@ export function switchTheme(theme: Theme, origin?: { x: number; y: number }) {
   }
   applyTheme(theme);
 }
+
+const MSTYLE_KEY = "ario-mobile-style";
+export type MobileStyle = "classic" | "cyber";
+
+export function getMobileStyle(): MobileStyle {
+  if (typeof window === "undefined") return "cyber";
+  return localStorage.getItem(MSTYLE_KEY) === "classic" ? "classic" : "cyber";
+}
+
+export function applyMobileStyle(style: MobileStyle) {
+  if (typeof document === "undefined") return;
+  document.documentElement.setAttribute("data-mobile-style", style);
+  localStorage.setItem(MSTYLE_KEY, style);
+  window.dispatchEvent(new Event("ario-appearance"));
+}

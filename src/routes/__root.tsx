@@ -110,6 +110,7 @@ function RootComponent() {
     applyTheme(getTheme(), false);
     applyMode(getMode(), false);
     applyMotion(getMotion());
+    applyMobileStyle(getMobileStyle());
     if (getAccent()) applyAccent(getAccent());
     setMode(getMode());
     const update = () => setMode(getMode());
