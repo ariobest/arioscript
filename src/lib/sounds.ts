@@ -43,7 +43,8 @@ export function installUISounds() {
     if (!(target instanceof Element)) return;
     const control = target.closest('button, a, [role="tab"], input[type="checkbox"], input[type="radio"], summary');
     if (!control || control.matches(':disabled, [aria-disabled="true"]')) return;
-    const kind: SoundKind = control.matches('input[type="checkbox"], input[type="radio"], [role="switch"]') ? "toggle"
+    if (control.matches('input[type="checkbox"], input[type="radio"]')) return; // Their change event handles the sound once.
+    const kind: SoundKind = control.matches('[role="switch"]') ? "toggle"
       : control.matches('[role="tab"], a') ? "tab"
       : control.matches('[aria-expanded="true"]') ? "close"
       : control.matches('[aria-expanded="false"], [aria-haspopup]') ? "open" : "click";
