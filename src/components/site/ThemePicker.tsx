@@ -44,7 +44,7 @@ export function ThemePicker() {
         <Palette size={16} />
       </button>
       {open && (
-        <div className="glass fade-up fixed inset-x-4 top-16 z-50 rounded-2xl p-3 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-64">
+        <div className="glass appearance-panel fade-up fixed inset-x-4 top-16 z-50 rounded-2xl p-3 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-64">
           <div className="mb-3 flex gap-1 rounded-lg bg-secondary p-1">
             {(["dark", "light"] as const).map((value) => <button key={value} onClick={() => { setMode(value); applyMode(value); }} className={`btn flex-1 !py-1.5 capitalize ${mode === value ? "btn-primary" : "btn-ghost"}`}>{value === "dark" ? <Moon size={13} /> : <Sun size={13} />}{value}</button>)}
           </div>
