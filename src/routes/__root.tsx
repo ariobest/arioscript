@@ -16,6 +16,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { SiteLayout } from "@/components/site/Layout";
 import { applyTheme, getTheme, applyMode, getMode, applyMotion, getMotion, applyAccent, getAccent, applyMobileStyle, getMobileStyle, type ColorMode } from "@/lib/theme";
 import { Welcome } from "@/components/site/Welcome";
+import { RouteProgress } from "@/components/site/RouteProgress";
 
 function NotFoundComponent() {
   return (
@@ -125,6 +126,7 @@ function RootComponent() {
           {/* Required: nested routes render here. */}
           <Outlet />
         </SiteLayout>
+        <RouteProgress />
         <Welcome />
         <Toaster theme={mode} position="top-center" toastOptions={{ className: "ario-toast" }} />
       </AuthProvider>

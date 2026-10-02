@@ -353,3 +353,10 @@ img, video, iframe { max-width: 100%; }
 @media (prefers-reduced-motion: reduce) {
   .welcome-count, .welcome-flame, .welcome-shake, .welcome-particle { animation: none !important; }
 }
+
+/* Theme neon laser route progress bar */
+.route-progress { position: fixed; inset: 0 0 auto 0; height: 3.5px; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity .3s ease; }
+.route-progress[data-visible="true"] { opacity: 1; }
+.route-progress-bar { position: relative; height: 100%; background: linear-gradient(90deg, transparent, var(--primary) 30%, var(--accent)); box-shadow: 0 0 10px var(--primary), 0 0 22px color-mix(in oklab, var(--primary) 60%, transparent); border-radius: 0 999px 999px 0; transition: width .2s ease-out; }
+.route-progress-spark { position: absolute; right: -3px; top: 50%; width: 10px; height: 10px; transform: translateY(-50%); border-radius: 999px; background: var(--primary-foreground, #fff); box-shadow: 0 0 8px #fff, 0 0 16px var(--primary), 0 0 30px var(--primary); animation: route-spark 0.8s ease-in-out infinite alternate; }
+@keyframes route-spark { from { opacity: .7; transform: translateY(-50%) scale(.85); } to { opacity: 1; transform: translateY(-50%) scale(1.2); } }
