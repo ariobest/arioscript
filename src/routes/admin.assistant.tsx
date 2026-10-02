@@ -21,6 +21,14 @@ export const Route = createFileRoute("/admin/assistant")({
 });
 
 type Msg = { role: "user" | "assistant"; content: string };
+type Model = "openai/gpt-6-astra" | "anthropic/claude-fable-5-1" | "anthropic/claude-sonnet-5" | "anthropic/claude-opus-5-5";
+type Library = "windui" | "rayfield" | "orion";
+const MODELS: { id: Model; label: string }[] = [
+  { id: "openai/gpt-6-astra", label: "GPT-6 Astra" },
+  { id: "anthropic/claude-fable-5-1", label: "Claude Fable 5.1" },
+  { id: "anthropic/claude-sonnet-5", label: "Claude Sonnet 5" },
+  { id: "anthropic/claude-opus-5-5", label: "Claude Opus 5.5" },
+];
 
 const PRESETS = [
   "Universal hub with Speed, Jump and Fly toggles",
@@ -40,6 +48,8 @@ function Assistant() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [prompt, setPrompt] = useState("");
   const [busy, setBusy] = useState(false);
+  const [model, setModel] = useState<Model>("openai/gpt-6-astra");
+  const [library, setLibrary] = useState<Library>("windui");
   const ask = useServerFn(generateScript);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +61,7 @@ function Assistant() {
     setPrompt("");
     setBusy(true);
     try {
-      const result = await ask({ data: { messages: next.slice(-10) } });
+      const result = await ask({ data: { messages: next.slice(-10), model, library } });
       setMessages([...next, { role: "assistant", content: result.text }]);
       setTimeout(() => endRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
     } catch (e) {
@@ -72,9 +82,21 @@ function Assistant() {
           <div className="min-w-0">
             <h1 className="font-display text-lg font-bold">Script assistant</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Describe the Roblox script you want. It is written with the WindUI interface library and comes ready to copy or download as a .lua file.
+              Describe the Roblox script you want. Copy the result or download it as a .lua file.
             </p>
           </div>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <label className="text-xs font-semibold text-muted-foreground">Model
+            <select className="input-base mt-1" value={model} disabled={busy} onChange={e => { setModel(e.target.value as Model); setMessages([]); }}>
+              {MODELS.map(option => <option key={option.id} value={option.id}>{option.label}</option>)}
+            </select>
+          </label>
+          <label className="text-xs font-semibold text-muted-foreground">Roblox UI library
+            <select className="input-base mt-1" value={library} disabled={busy} onChange={e => { setLibrary(e.target.value as Library); setMessages([]); }}>
+              <option value="windui">WindUI</option><option value="rayfield">Rayfield</option><option value="orion">Orion</option>
+            </select>
+          </label>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
           {PRESETS.map((p) => (
@@ -113,7 +135,7 @@ function Assistant() {
                   <p className="whitespace-pre-wrap">{note}</p>
                 </div>
               )}
-              {code ? <CodeViewer code={code} filename="ario-windui-script.lua" /> : null}
+              {code ? <CodeViewer code={code} filename={`ario-${library}-script.lua`} /> : null}
             </div>
           );
         })}

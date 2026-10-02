@@ -11,4 +11,4 @@
 - [x] Mobile polish, smooth theme transitions with water ripple + themed 💧 toasts, admin Themes page (previews, accent, animations).
 - [x] Apply the frosted-glass mobile direction, expose script actions on phones, and polish admin navigation, cards, statistics, and overflow.
 - [x] Add optional UI sounds, enhanced themed notifications, and personal background options.
-- [ ] Add verified assistant model selection and Roblox UI library selection; verify live AI request.
+- [x] Add verified assistant model selection and Roblox UI library selection; verify live AI request.
