@@ -130,6 +130,13 @@
 [data-mode="light"] .input-base { background: var(--card); }
 
 .ario-toast { background: var(--card) !important; border: 1px solid var(--primary) !important; color: var(--foreground) !important; box-shadow: 0 8px 30px -14px var(--primary) !important; }
+.ario-toast[data-sonner-toast] { position: relative; overflow: hidden; border-radius: 10px !important; border-color: color-mix(in oklab, var(--primary) 55%, var(--border)) !important; background: color-mix(in oklab, var(--card) 93%, var(--primary)) !important; backdrop-filter: blur(20px) saturate(140%); box-shadow: 0 18px 55px -23px var(--primary), 0 1px 0 color-mix(in oklab, var(--primary) 25%, transparent) inset !important; padding: 16px 18px !important; font-family: var(--font-sans); }
+.ario-toast[data-sonner-toast]::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--primary); box-shadow: 0 0 16px var(--primary); }
+.ario-toast[data-sonner-toast] [data-title] { font-weight: 700; }
+.ario-toast[data-sonner-toast] [data-icon] { color: var(--primary); }
+.ario-toast[data-sonner-toast] [data-description] { color: var(--muted-foreground); }
+.ario-toast[data-sonner-toast][data-type="error"] { border-color: var(--destructive) !important; }
+.ario-toast[data-sonner-toast][data-type="error"]::before { background: var(--destructive); }
 [data-theme="blood"] .ario-toast { border-color: var(--destructive) !important; box-shadow: 0 10px 28px -12px var(--destructive) !important; animation: bloodDrop .6s ease-out both; }
 @keyframes bloodDrop { from { opacity: 0; transform: translateY(-26px) scaleY(1.2); } 65% { transform: translateY(5px) scaleY(.9); } to { opacity: 1; transform: none; } }
 @keyframes rocketArrival { 0% { opacity: 0; transform: translate(-110vw, 70vh) rotate(-35deg) scale(.55); } 65% { opacity: 1; transform: translate(8px, -12px) rotate(20deg); } 100% { transform: none; } }
@@ -152,6 +159,8 @@
   h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
   ::selection { background: color-mix(in oklab, var(--primary) 40%, transparent); }
 }
+html[data-backdrop="plain"] body { background-image: none !important; }
+html[data-backdrop="grid"] body { background-image: linear-gradient(color-mix(in oklab, var(--primary) 7%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in oklab, var(--primary) 7%, transparent) 1px, transparent 1px) !important; background-size: 36px 36px; }
 
 @utility glass {
   background: linear-gradient(160deg, color-mix(in oklab, var(--card) 78%, transparent), color-mix(in oklab, var(--background) 74%, transparent));

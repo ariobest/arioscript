@@ -12,6 +12,19 @@ export type Theme = (typeof THEMES)[number];
 
 const KEY = "ario-theme";
 const MODE_KEY = "ario-mode";
+const BACKDROP_KEY = "ario-backdrop";
+export type Backdrop = "glow" | "grid" | "plain";
+export function getBackdrop(): Backdrop {
+  if (typeof window === "undefined") return "glow";
+  const value = localStorage.getItem(BACKDROP_KEY);
+  return value === "grid" || value === "plain" ? value : "glow";
+}
+export function applyBackdrop(value: Backdrop) {
+  if (typeof document === "undefined") return;
+  document.documentElement.setAttribute("data-backdrop", value);
+  localStorage.setItem(BACKDROP_KEY, value);
+  window.dispatchEvent(new Event("ario-appearance"));
+}
 export type ColorMode = "dark" | "light";
 
 export function getMode(): ColorMode {

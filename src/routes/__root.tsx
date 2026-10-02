@@ -9,12 +9,13 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "sonner";
+import { installUISounds, playSound } from "@/lib/sounds";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/hooks/useAuth";
 import { SiteLayout } from "@/components/site/Layout";
-import { applyTheme, getTheme, applyMode, getMode, applyMotion, getMotion, applyAccent, getAccent, applyMobileStyle, getMobileStyle, type ColorMode } from "@/lib/theme";
+import { applyTheme, getTheme, applyMode, getMode, applyMotion, getMotion, applyAccent, getAccent, applyMobileStyle, getMobileStyle, applyBackdrop, getBackdrop, type ColorMode } from "@/lib/theme";
 import { Welcome } from "@/components/site/Welcome";
 import { RouteProgress } from "@/components/site/RouteProgress";
 
@@ -112,11 +113,22 @@ function RootComponent() {
     applyMode(getMode(), false);
     applyMotion(getMotion());
     applyMobileStyle(getMobileStyle());
+    applyBackdrop(getBackdrop());
     if (getAccent()) applyAccent(getAccent());
     setMode(getMode());
     const update = () => setMode(getMode());
     window.addEventListener("ario-appearance", update);
     return () => window.removeEventListener("ario-appearance", update);
+  }, []);
+
+  useEffect(() => {
+    const cleanup = installUISounds();
+    const observer = new MutationObserver((changes) => {
+      if (changes.some(change => [...change.addedNodes].some(node => node instanceof Element && (node.matches('[data-sonner-toast]') || node.querySelector('[data-sonner-toast]'))))) playSound("notification");
+    });
+    const host = document.querySelector('[data-sonner-toaster]');
+    if (host) observer.observe(host, { childList: true, subtree: true });
+    return () => { cleanup(); observer.disconnect(); };
   }, []);
 
   return (
@@ -128,7 +140,7 @@ function RootComponent() {
         </SiteLayout>
         <RouteProgress />
         <Welcome />
-        <Toaster theme={mode} position="top-center" toastOptions={{ className: "ario-toast" }} />
+        <Toaster theme={mode} position="top-center" visibleToasts={3} closeButton richColors toastOptions={{ className: "ario-toast", duration: 4000 }} />
       </AuthProvider>
     </QueryClientProvider>
   );
