@@ -13,12 +13,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as KeysRouteImport } from './routes/keys'
 import { Route as LeaderboardsRouteImport } from './routes/leaderboards'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAnnouncementsRouteImport } from './routes/admin.announcements'
 import { Route as AdminAssistantRouteImport } from './routes/admin.assistant'
 import { Route as AdminBadgesRouteImport } from './routes/admin.badges'
+import { Route as AdminKeysRouteImport } from './routes/admin.keys'
 import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminRawRouteImport } from './routes/admin.raw'
@@ -35,6 +37,7 @@ import { Route as RawSlugRouteImport } from './routes/raw.$slug'
 import { Route as ScriptsIndexRouteImport } from './routes/scripts.index'
 import { Route as ScriptsSlugRouteImport } from './routes/scripts.$slug'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
+import { Route as ApiPublicKeysValidateRouteImport } from './routes/api/public/keys/validate'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -54,6 +57,11 @@ const AuthRoute = AuthRouteImport.update({
 const FavoritesRoute = FavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KeysRoute = KeysRouteImport.update({
+  id: '/keys',
+  path: '/keys',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeaderboardsRoute = LeaderboardsRouteImport.update({
@@ -84,6 +92,11 @@ const AdminAssistantRoute = AdminAssistantRouteImport.update({
 const AdminBadgesRoute = AdminBadgesRouteImport.update({
   id: '/badges',
   path: '/badges',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminKeysRoute = AdminKeysRouteImport.update({
+  id: '/keys',
+  path: '/keys',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLogsRoute = AdminLogsRouteImport.update({
@@ -166,17 +179,24 @@ const UUsernameRoute = UUsernameRouteImport.update({
   path: '/u/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicKeysValidateRoute = ApiPublicKeysValidateRouteImport.update({
+  id: '/api/public/keys/validate',
+  path: '/api/public/keys/validate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
+  '/keys': typeof KeysRoute
   '/leaderboards': typeof LeaderboardsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/assistant': typeof AdminAssistantRoute
   '/admin/badges': typeof AdminBadgesRoute
+  '/admin/keys': typeof AdminKeysRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/raw': typeof AdminRawRoute
@@ -194,16 +214,19 @@ export interface FileRoutesByFullPath {
   '/categories/': typeof CategoriesIndexRoute
   '/games/': typeof GamesIndexRoute
   '/scripts/': typeof ScriptsIndexRoute
+  '/api/public/keys/validate': typeof ApiPublicKeysValidateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
+  '/keys': typeof KeysRoute
   '/leaderboards': typeof LeaderboardsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/assistant': typeof AdminAssistantRoute
   '/admin/badges': typeof AdminBadgesRoute
+  '/admin/keys': typeof AdminKeysRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/raw': typeof AdminRawRoute
@@ -221,6 +244,7 @@ export interface FileRoutesByTo {
   '/categories': typeof CategoriesIndexRoute
   '/games': typeof GamesIndexRoute
   '/scripts': typeof ScriptsIndexRoute
+  '/api/public/keys/validate': typeof ApiPublicKeysValidateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -228,11 +252,13 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
+  '/keys': typeof KeysRoute
   '/leaderboards': typeof LeaderboardsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/assistant': typeof AdminAssistantRoute
   '/admin/badges': typeof AdminBadgesRoute
+  '/admin/keys': typeof AdminKeysRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/raw': typeof AdminRawRoute
@@ -250,6 +276,7 @@ export interface FileRoutesById {
   '/categories/': typeof CategoriesIndexRoute
   '/games/': typeof GamesIndexRoute
   '/scripts/': typeof ScriptsIndexRoute
+  '/api/public/keys/validate': typeof ApiPublicKeysValidateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -258,11 +285,13 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/favorites'
+    | '/keys'
     | '/leaderboards'
     | '/admin/analytics'
     | '/admin/announcements'
     | '/admin/assistant'
     | '/admin/badges'
+    | '/admin/keys'
     | '/admin/logs'
     | '/admin/media'
     | '/admin/raw'
@@ -280,16 +309,19 @@ export interface FileRouteTypes {
     | '/categories/'
     | '/games/'
     | '/scripts/'
+    | '/api/public/keys/validate'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/favorites'
+    | '/keys'
     | '/leaderboards'
     | '/admin/analytics'
     | '/admin/announcements'
     | '/admin/assistant'
     | '/admin/badges'
+    | '/admin/keys'
     | '/admin/logs'
     | '/admin/media'
     | '/admin/raw'
@@ -307,17 +339,20 @@ export interface FileRouteTypes {
     | '/categories'
     | '/games'
     | '/scripts'
+    | '/api/public/keys/validate'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/auth'
     | '/favorites'
+    | '/keys'
     | '/leaderboards'
     | '/admin/analytics'
     | '/admin/announcements'
     | '/admin/assistant'
     | '/admin/badges'
+    | '/admin/keys'
     | '/admin/logs'
     | '/admin/media'
     | '/admin/raw'
@@ -335,6 +370,7 @@ export interface FileRouteTypes {
     | '/categories/'
     | '/games/'
     | '/scripts/'
+    | '/api/public/keys/validate'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -342,6 +378,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   FavoritesRoute: typeof FavoritesRoute
+  KeysRoute: typeof KeysRoute
   LeaderboardsRoute: typeof LeaderboardsRoute
   CategoriesSlugRoute: typeof CategoriesSlugRoute
   GamesGameRoute: typeof GamesGameRoute
@@ -351,6 +388,7 @@ export interface RootRouteChildren {
   CategoriesIndexRoute: typeof CategoriesIndexRoute
   GamesIndexRoute: typeof GamesIndexRoute
   ScriptsIndexRoute: typeof ScriptsIndexRoute
+  ApiPublicKeysValidateRoute: typeof ApiPublicKeysValidateRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -381,6 +419,13 @@ declare module '@tanstack/react-router' {
       path: '/favorites'
       fullPath: '/favorites'
       preLoaderRoute: typeof FavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/keys': {
+      id: '/keys'
+      path: '/keys'
+      fullPath: '/keys'
+      preLoaderRoute: typeof KeysRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leaderboards': {
@@ -423,6 +468,13 @@ declare module '@tanstack/react-router' {
       path: '/badges'
       fullPath: '/admin/badges'
       preLoaderRoute: typeof AdminBadgesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/keys': {
+      id: '/admin/keys'
+      path: '/keys'
+      fullPath: '/admin/keys'
+      preLoaderRoute: typeof AdminKeysRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/logs': {
@@ -537,6 +589,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/keys/validate': {
+      id: '/api/public/keys/validate'
+      path: '/api/public/keys/validate'
+      fullPath: '/api/public/keys/validate'
+      preLoaderRoute: typeof ApiPublicKeysValidateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -545,6 +604,7 @@ interface AdminRouteChildren {
   AdminAnnouncementsRoute: typeof AdminAnnouncementsRoute
   AdminAssistantRoute: typeof AdminAssistantRoute
   AdminBadgesRoute: typeof AdminBadgesRoute
+  AdminKeysRoute: typeof AdminKeysRoute
   AdminLogsRoute: typeof AdminLogsRoute
   AdminMediaRoute: typeof AdminMediaRoute
   AdminRawRoute: typeof AdminRawRoute
@@ -561,6 +621,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAnnouncementsRoute: AdminAnnouncementsRoute,
   AdminAssistantRoute: AdminAssistantRoute,
   AdminBadgesRoute: AdminBadgesRoute,
+  AdminKeysRoute: AdminKeysRoute,
   AdminLogsRoute: AdminLogsRoute,
   AdminMediaRoute: AdminMediaRoute,
   AdminRawRoute: AdminRawRoute,
@@ -579,6 +640,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   FavoritesRoute: FavoritesRoute,
+  KeysRoute: KeysRoute,
   LeaderboardsRoute: LeaderboardsRoute,
   CategoriesSlugRoute: CategoriesSlugRoute,
   GamesGameRoute: GamesGameRoute,
@@ -588,6 +650,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategoriesIndexRoute: CategoriesIndexRoute,
   GamesIndexRoute: GamesIndexRoute,
   ScriptsIndexRoute: ScriptsIndexRoute,
+  ApiPublicKeysValidateRoute: ApiPublicKeysValidateRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
