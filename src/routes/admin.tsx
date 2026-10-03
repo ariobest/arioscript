@@ -16,6 +16,7 @@ const LINKS = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/scripts", label: "Scripts", icon: Terminal },
   { to: "/admin/raw", label: "Raw loader", icon: Terminal },
+  { to: "/admin/keys", label: "Keys", icon: KeyRound },
   { to: "/admin/assistant", label: "Script assistant", icon: Bot },
   { to: "/admin/themes", label: "Themes", icon: Palette },
   { to: "/admin/users", label: "Users", icon: Users },
