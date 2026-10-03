@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Terminal, Mail, Lock, User as UserIcon } from "lucide-react";
+import { Mail, Lock, User as UserIcon } from "lucide-react";
+import logo from "@/assets/ario-logo.png.asset.json";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -66,9 +67,7 @@ function AuthPage() {
   return (
     <div className="mx-auto flex max-w-md flex-col px-4 py-16">
       <div className="glass fade-up rounded-2xl p-7">
-        <span className="mx-auto grid h-11 w-11 place-items-center rounded-2xl bg-primary/15 text-primary glow-ring">
-          <Terminal size={20} />
-        </span>
+        <img src={logo.url} alt="ARIO SCRIPTS logo" className="mx-auto h-16 w-16 object-contain drop-shadow-lg" />
         <h1 className="mt-4 text-center font-display text-xl font-bold">
           {mode === "signin" ? "Sign in to ARIO SCRIPTS" : "Create your account"}
         </h1>

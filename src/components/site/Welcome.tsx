@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Rocket, X, Moon, Sun, ArrowRight, Sparkles, Terminal } from "lucide-react";
+import { Rocket, X, Moon, Sun, ArrowRight, Sparkles } from "lucide-react";
+import logo from "@/assets/ario-logo.png.asset.json";
 import { THEMES, applyMode, applyTheme, switchTheme, getMode, getTheme, type ColorMode, type Theme } from "@/lib/theme";
 import { Button } from "@/components/ui/button";
 
@@ -16,7 +17,7 @@ export function Welcome() {
   return <div className="welcome-overlay fixed inset-0 z-[90] overflow-y-auto bg-background" role="dialog" aria-modal="true" aria-label="Welcome to ARIO SCRIPTS">
     <div className="relative mx-auto flex min-h-[100dvh] w-full max-w-5xl flex-col px-5 pb-10 pt-5 sm:px-8 sm:pb-14 sm:pt-8">
       <div className="flex shrink-0 items-center justify-between border-b border-border pb-4">
-        <span className="flex items-center gap-2 font-display text-sm font-bold"><Terminal size={19} className="text-primary" /> ARIO SCRIPTS</span>
+        <span className="flex items-center gap-2 font-display text-sm font-bold"><img src={logo.url} alt="" className="h-6 w-6 object-contain" /> ARIO SCRIPTS</span>
         <Button title="Close welcome" aria-label="Close welcome" variant="ghost" size="icon" onClick={done}><X size={18} /></Button>
       </div>
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center py-7 text-center sm:py-10">
