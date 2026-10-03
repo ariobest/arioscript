@@ -15,6 +15,7 @@ const NAV = [
   { to: "/games", label: "Games", icon: Gamepad2 },
   { to: "/categories", label: "Categories", icon: LayoutGrid },
   { to: "/leaderboards", label: "Leaderboards", icon: Trophy },
+  { to: "/keys", label: "Get Key", icon: KeyRound },
 ] as const;
 
 export function useSettings() {
