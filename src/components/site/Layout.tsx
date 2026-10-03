@@ -3,6 +3,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Terminal, Search, Menu, X, Heart, LogIn, LogOut, Shield, Trophy, Gamepad2, LayoutGrid, User,
    MessageCircle, Youtube, Send, Github, ExternalLink,
+  KeyRound,
 } from "lucide-react";
 import { ThemePicker } from "./ThemePicker";
 import { useAuth } from "@/hooks/useAuth";
