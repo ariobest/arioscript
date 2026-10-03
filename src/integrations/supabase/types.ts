@@ -166,6 +166,111 @@ export type Database = {
           },
         ]
       }
+      key_checks: {
+        Row: {
+          created_at: string
+          id: number
+          ok: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          ok: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          ok?: boolean
+        }
+        Relationships: []
+      }
+      key_requests: {
+        Row: {
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      key_settings: {
+        Row: {
+          enabled: boolean
+          free_hours: number
+          id: number
+          premium_hours: number
+          updated_at: string
+          wait_seconds: number
+        }
+        Insert: {
+          enabled?: boolean
+          free_hours?: number
+          id?: number
+          premium_hours?: number
+          updated_at?: string
+          wait_seconds?: number
+        }
+        Update: {
+          enabled?: boolean
+          free_hours?: number
+          id?: number
+          premium_hours?: number
+          updated_at?: string
+          wait_seconds?: number
+        }
+        Relationships: []
+      }
+      license_keys: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          key: string
+          key_type: string
+          last_used_at: string | null
+          max_uses: number | null
+          notes: string | null
+          user_id: string | null
+          uses: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          key: string
+          key_type?: string
+          last_used_at?: string | null
+          max_uses?: number | null
+          notes?: string | null
+          user_id?: string | null
+          uses?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          key?: string
+          key_type?: string
+          last_used_at?: string | null
+          max_uses?: number | null
+          notes?: string | null
+          user_id?: string | null
+          uses?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -524,6 +629,37 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_generate_keys: {
+        Args: {
+          _count: number
+          _hours: number
+          _max_uses: number
+          _notes: string
+          _type: string
+          _user: string
+        }
+        Returns: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          key: string
+          key_type: string
+          last_used_at: string | null
+          max_uses: number | null
+          notes: string | null
+          user_id: string | null
+          uses: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "license_keys"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_key_stats: { Args: never; Returns: Json }
       admin_stats: { Args: never; Returns: Json }
       admin_timeseries: {
         Args: { _days?: number }
@@ -536,6 +672,7 @@ export type Database = {
           views: number
         }[]
       }
+      claim_free_key: { Args: never; Returns: Json }
       get_raw_script: { Args: { _slug: string }; Returns: string }
       has_role: {
         Args: {
@@ -545,12 +682,14 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      new_key_text: { Args: never; Returns: string }
       record_script_event: {
         Args: { _event_type: string; _script_id: string; _session_id?: string }
         Returns: undefined
       }
       script_analytics: { Args: { _script_id: string }; Returns: Json }
       site_stats: { Args: never; Returns: Json }
+      start_key_request: { Args: never; Returns: number }
       touch_presence: { Args: never; Returns: undefined }
       trending_scripts: {
         Args: { _limit?: number }
@@ -588,6 +727,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      validate_key: { Args: { _key: string }; Returns: Json }
     }
     Enums: {
       app_role: "user" | "moderator" | "admin"
