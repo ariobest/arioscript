@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Users, Terminal, Eye, Download, Copy, Heart, Flag, Wifi, Activity,
+  Users, Terminal, Eye, Download, Copy, Heart, Flag, Wifi, Activity, KeyRound, Palette, Megaphone, ShieldCheck, ArrowUpRight,
 } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
@@ -82,6 +82,20 @@ function Dashboard() {
         <Tile icon={Copy} label="Copies" value={s['copies']} pending={!stats.data} />
         <Tile icon={Heart} label="Favorites" value={s['favorites']} pending={!stats.data} />
         <Tile icon={Flag} label="Open reports" value={s['reports']} pending={!stats.data} />
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          { to: "/admin/keys", icon: KeyRound, title: "Key control", text: "Generate, revoke and inspect keys" },
+          { to: "/admin/themes", icon: Palette, title: "Theme studio", text: "Switch the site look and motion" },
+          { to: "/admin/announcements", icon: Megaphone, title: "Announcements", text: "Publish a message to users" },
+          { to: "/admin/settings", icon: ShieldCheck, title: "Site controls", text: "Security and global settings" },
+        ].map((item) => (
+          <Link key={item.to} to={item.to} className="glass group rounded-2xl p-4 transition-transform hover:-translate-y-0.5 hover:border-primary/40">
+            <div className="flex items-center justify-between"><span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary"><item.icon size={17} /></span><ArrowUpRight size={15} className="text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></div>
+            <p className="mt-3 font-semibold">{item.title}</p><p className="mt-1 text-xs text-muted-foreground">{item.text}</p>
+          </Link>
+        ))}
       </div>
 
       <div className="glass min-w-0 overflow-hidden rounded-2xl p-3 sm:p-5">
