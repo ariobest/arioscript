@@ -30,13 +30,13 @@ export default defineConfig({
   vite: {
     define: {
       "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
-        process.env.VITE_SUPABASE_URL || FALLBACK_ENV.VITE_SUPABASE_URL
+        process.env['VITE_SUPABASE_URL'] || FALLBACK_ENV.VITE_SUPABASE_URL
       ),
       "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
-        process.env.VITE_SUPABASE_PUBLISHABLE_KEY || FALLBACK_ENV.VITE_SUPABASE_PUBLISHABLE_KEY
+        process.env['VITE_SUPABASE_PUBLISHABLE_KEY'] || FALLBACK_ENV.VITE_SUPABASE_PUBLISHABLE_KEY
       ),
       "import.meta.env.VITE_SUPABASE_PROJECT_ID": JSON.stringify(
-        process.env.VITE_SUPABASE_PROJECT_ID || FALLBACK_ENV.VITE_SUPABASE_PROJECT_ID
+        process.env['VITE_SUPABASE_PROJECT_ID'] || FALLBACK_ENV.VITE_SUPABASE_PROJECT_ID
       ),
     },
   },
