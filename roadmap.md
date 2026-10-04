@@ -12,6 +12,3 @@
 - [x] Apply the frosted-glass mobile direction, expose script actions on phones, and polish admin navigation, cards, statistics, and overflow.
 - [x] Add optional UI sounds, enhanced themed notifications, and personal background options.
 - [x] Add verified assistant model selection and Roblox UI library selection; verify live AI request.
-- [ ] Enforce one free key per rolling 24 hours and show live eligibility on the key portal.
-- [ ] Upgrade theme-colored desktop/mobile navigation and admin dashboard glass styling.
-- [ ] Add copyable executor key GUI templates and previews to admin keys.

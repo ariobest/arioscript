@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { KeyRound, Copy, Ban, Trash2, CalendarPlus, Download, Plus, Search, RefreshCw, Users, Clock3, UserCheck, Zap, Sparkles } from "lucide-react";
+import { KeyRound, Copy, Ban, Trash2, CalendarPlus, Download, Plus, Search } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -46,10 +46,6 @@ function AdminKeys() {
     (status === "all" || keyStatus(k).toLowerCase() === status) &&
     (!q || `${k.key} ${k.notes ?? ""} ${k.profiles?.username ?? ""}`.toLowerCase().includes(q.toLowerCase()))), [list.data, q, type, status]);
 
-  const activeOwners = useMemo(() => new Set((list.data ?? []).filter(k => k.active && (!k.expires_at || new Date(k.expires_at).getTime() > Date.now()) && k.user_id).map(k => k.user_id)).size, [list.data]);
-  const unassigned = useMemo(() => (list.data ?? []).filter(k => !k.user_id && k.active && (!k.expires_at || new Date(k.expires_at).getTime() > Date.now())).length, [list.data]);
-  const expiringSoon = useMemo(() => (list.data ?? []).filter(k => k.active && k.expires_at && new Date(k.expires_at).getTime() > Date.now() && new Date(k.expires_at).getTime() < Date.now() + 7 * 864e5).length, [list.data]);
-
   if (!isAdmin) return <p className="text-sm text-muted-foreground">Only administrators can manage keys.</p>;
 
   async function saveSettings(patch: Record<string, unknown>) {
@@ -62,15 +58,9 @@ function AdminKeys() {
   async function generate() {
     let uid: string | null = null;
     if (gen.username.trim()) {
-      if (gen.count !== 1) return toast.error("A user can only have 1 active key");
       const { data } = await supabase.from("profiles").select("id").eq("username", gen.username.trim()).maybeSingle();
       if (!data) return toast.error("No user with that username");
       uid = data.id;
-      const { data: existing } = await supabase.from("license_keys").select("id,key,expires_at,active").eq("user_id", uid).eq("active", true).limit(1);
-      const current = existing?.[0];
-      if (current && (!current.expires_at || new Date(current.expires_at).getTime() > Date.now())) {
-        return toast.error("That user already has an active key. Revoke it first or leave the user field blank.");
-      }
     }
     const { data, error } = await supabase.rpc("admin_generate_keys", {
       _type: gen.type, _count: gen.count, _hours: gen.type === "lifetime" ? null as never : gen.hours,
@@ -125,13 +115,13 @@ function AdminKeys() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {([["Total", st?.total, KeyRound], ["Active", st?.active, Zap], ["Active owners", activeOwners, UserCheck], ["Unassigned", unassigned, Users], ["Expiring in 7d", expiringSoon, Clock3], ["Premium", st?.premium, Sparkles], ["Lifetime", st?.lifetime, KeyRound], ["Generated today", st?.today, Plus], ["Key checks", st?.checks, RefreshCw], ["Failed checks", st?.failed, Ban]] as const).map(([l, v, Icon]) =>
-          <div key={l} className="glass admin-stat-tile rounded-xl p-4"><div className="flex items-center justify-between"><p className="text-xs text-muted-foreground">{l}</p><Icon size={14} className="text-primary" /></div><p className="mt-1 font-mono text-2xl font-semibold">{v ?? "—"}</p></div>)}
+        {([["Total", st?.total], ["Active", st?.active], ["Expired", st?.expired], ["Premium", st?.premium], ["Lifetime", st?.lifetime], ["Generated today", st?.today], ["Key checks", st?.checks], ["Failed checks", st?.failed]] as const).map(([l, v]) =>
+          <div key={l} className="glass admin-stat-tile rounded-xl p-4"><p className="text-xs text-muted-foreground">{l}</p><p className="mt-1 font-mono text-2xl font-semibold">{v ?? "—"}</p></div>)}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="glass rounded-2xl p-5">
-          <div className="flex items-center justify-between gap-2"><h2 className="font-semibold">Generate keys</h2><span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-1 text-[10px] font-semibold text-primary">1 active key / user</span></div>
+          <h2 className="font-semibold">Generate keys</h2>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <select className="input-base" value={gen.type} onChange={e => setGen({ ...gen, type: e.target.value, hours: e.target.value === "premium" ? s?.premium_hours ?? 720 : s?.free_hours ?? 24 })}>
               <option value="free">Free</option><option value="premium">Premium</option><option value="lifetime">Lifetime</option>
@@ -166,10 +156,7 @@ function AdminKeys() {
           <Button size="sm" variant="outline" disabled={!sel.size} onClick={() => void bulk("revoke", [...sel])}><Ban size={14} /> Revoke ({sel.size})</Button>
           <Button size="sm" variant="outline" disabled={!sel.size} onClick={() => void bulk("extend", [...sel])}><CalendarPlus size={14} /> +7 days</Button>
           <Button size="sm" variant="outline" disabled={!sel.size} onClick={() => void bulk("delete", [...sel])}><Trash2 size={14} /> Delete</Button>
-          <Button size="sm" variant="outline" disabled={!sel.size} onClick={() => void navigator.clipboard.writeText(rows.filter(k => sel.has(k.id)).map(k => k.key).join("\n")).then(() => toast.success(`${sel.size} key(s) copied`))}><Copy size={14} /> Copy selected</Button>
           <Button size="sm" variant="outline" onClick={exportCsv}><Download size={14} /> Export</Button>
-          <Button size="sm" variant="outline" onClick={() => { refresh(); toast.success("Keys refreshed"); }}><RefreshCw size={14} /> Refresh</Button>
-          <Button size="sm" variant="outline" onClick={() => { const ids = rows.filter(k => k.expires_at && new Date(k.expires_at).getTime() <= Date.now() && k.active).map(k => k.id); if (ids.length) void bulk("revoke", ids); else toast("No expired active keys"); }}><Clock3 size={14} /> Revoke expired</Button>
         </div>
         <div className="mt-3 overflow-x-auto">
           <table className="w-full min-w-[720px] text-sm">

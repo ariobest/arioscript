@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { playSound } from "@/lib/sounds";
 
 export const Route = createFileRoute("/keys")({
   head: () => ({ meta: [{ title: "Get Key — ARIO SCRIPTS" }, { name: "description", content: "Get your free ARIO SCRIPTS key and see your active keys." }, { property: "og:title", content: "Get Key — ARIO SCRIPTS" }, { property: "og:description", content: "Get your free ARIO SCRIPTS key and see your active keys." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -117,7 +116,6 @@ function KeyModal({ onClose }: { onClose: () => void }) {
     const { data, error } = await supabase.rpc("claim_free_key");
     if (error) { setErr(error.message); setPhase("error"); return; }
     setResult(data as never); setPhase("done");
-    playSound("key", true);
     toast.success("Key generated");
   }
 
@@ -138,13 +136,7 @@ function KeyModal({ onClose }: { onClose: () => void }) {
           </p>
         </>}
         {phase === "done" && result && <>
-          <div className="relative mx-auto mt-4 grid h-24 w-24 place-items-center rounded-full border border-primary/30 bg-primary/10 key-success-glow key-success-pop">
-            <span className="absolute -right-1 top-1 text-primary key-sparkle">✦</span>
-            <span className="absolute -left-1 bottom-2 text-primary key-sparkle" style={{ animationDelay: "250ms" }}>✦</span>
-            <KeyRound size={34} className="text-primary" />
-          </div>
-          <div className="mt-5 rounded-xl border border-primary/30 bg-primary/5 p-4 text-center">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">Your key is ready</p>
+          <div className="mt-4 rounded-xl border border-border bg-background/50 p-4 text-center">
             <code className="break-all font-mono text-base font-semibold">{result.key}</code>
           </div>
           <p className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground"><ShieldCheck size={14} className="text-primary" /> Active · {result.expires_at ? `expires ${new Date(result.expires_at).toLocaleString()}` : "never expires"}</p>

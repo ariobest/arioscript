@@ -18,5 +18,3 @@
 - Script loader commands derive from an optional admin-managed HTTPS raw URL, never from fetched remote code, because remote file contents can change outside the site.
 - Assistant model and Roblox UI library selection is validated inside the admin-only server function, because browser choices must not authorize arbitrary gateway models or prompts.
 - UI sounds and background preferences remain local to each browser, because these are personal appearance choices rather than shared site settings.
-- Free-key issuance is serialized and limited inside database functions to one per rolling 24 hours, because client-side timers cannot prevent concurrent or repeated claims.
-- Executor key UI templates are administrator-facing examples; verification uses the public endpoint but client-side Lua cannot guarantee tamper resistance.
