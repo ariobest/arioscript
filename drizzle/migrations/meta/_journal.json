@@ -64,6 +64,13 @@
       "when": 1791046307783,
       "tag": "0008_one_active_key_per_user",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791119163805,
+      "tag": "0009_enforce_daily_free_key_limit",
+      "breakpoints": true
     }
   ]
 }
