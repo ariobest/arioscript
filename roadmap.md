@@ -12,3 +12,5 @@
 - [x] Apply the frosted-glass mobile direction, expose script actions on phones, and polish admin navigation, cards, statistics, and overflow.
 - [x] Add optional UI sounds, enhanced themed notifications, and personal background options.
 - [x] Add verified assistant model selection and Roblox UI library selection; verify live AI request.
+- [x] Enhance admin dashboard: quick actions, live system status, key/raw stats, top scripts (database-backed).
+- [ ] Next spec sections: login upgrade (remember me, forgot password, Discord, email verification), user dashboard, admin roles & audit.

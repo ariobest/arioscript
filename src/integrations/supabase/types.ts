@@ -660,6 +660,7 @@ export type Database = {
         }
       }
       admin_key_stats: { Args: never; Returns: Json }
+      admin_overview: { Args: never; Returns: Json }
       admin_stats: { Args: never; Returns: Json }
       admin_timeseries: {
         Args: { _days?: number }
