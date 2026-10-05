@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Users, Terminal, Eye, Download, Copy, Heart, Flag, Wifi, Activity,
+  Users, Terminal, Eye, Download, Copy, Heart, Flag, Wifi, Activity, KeyRound, Plus, Bot, Palette, Settings, Megaphone, ShieldCheck, Zap, Trophy,
 } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
@@ -64,6 +64,16 @@ function Dashboard() {
   });
 
   const s = stats.data ?? {};
+  const ov = useQuery({
+    queryKey: ["admin_overview"],
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_overview");
+      if (error) throw error;
+      return data as unknown as Overview;
+    },
+  });
+  const o = ov.data;
 
   return (
     <div className="min-w-0 space-y-5 sm:space-y-6">
@@ -82,6 +92,48 @@ function Dashboard() {
         <Tile icon={Copy} label="Copies" value={s['copies']} pending={!stats.data} />
         <Tile icon={Heart} label="Favorites" value={s['favorites']} pending={!stats.data} />
         <Tile icon={Flag} label="Open reports" value={s['reports']} pending={!stats.data} />
+      </div>
+
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+        {QUICK.map((q) => (
+          <Link key={q.to} to={q.to} className="glass admin-stat-tile flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-2xl p-3 text-center text-xs font-semibold transition-transform hover:-translate-y-0.5 hover:text-primary">
+            <q.icon size={18} className="text-primary" /> {q.label}
+          </Link>
+        ))}
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="glass rounded-2xl p-4 sm:p-5">
+          <div className="mb-3 flex items-center gap-2"><ShieldCheck size={15} className="text-primary" /><h2 className="font-display font-semibold">System status</h2></div>
+          <ul className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+            <Status label="Key system" ok={!!o?.key_system} on="Online" off="Off" />
+            <Status label="Maintenance" ok={!o?.maintenance} on="Site live" off="Maintenance on" />
+            <Status label="Registration" ok={!!o?.registration} on="Open" off="Closed" />
+            <Status label="Raw loaders" ok={(o?.raw_enabled ?? 0) > 0} on={`${o?.raw_enabled ?? 0}/${o?.raw_total ?? 0} enabled`} off={`${o?.raw_enabled ?? 0}/${o?.raw_total ?? 0} enabled`} />
+          </ul>
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            <Mini icon={KeyRound} label="Active keys" v={o?.keys_active} />
+            <Mini icon={Zap} label="Keys today" v={o?.keys_today} />
+            <Mini icon={Activity} label="Checks today" v={o?.key_checks_today} />
+            <Mini icon={Terminal} label="Drafts" v={o?.drafts} />
+            <Mini icon={Megaphone} label="Live notices" v={o?.announcements} />
+            <Mini icon={Users} label="Banned" v={o?.banned} />
+          </div>
+        </div>
+        <div className="glass rounded-2xl p-4 sm:p-5">
+          <div className="mb-3 flex items-center gap-2"><Trophy size={15} className="text-primary" /><h2 className="font-display font-semibold">Top scripts</h2></div>
+          <ol className="space-y-1.5 text-sm">
+            {(o?.top_scripts ?? []).map((t, i) => (
+              <li key={t.id} className="grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-2 rounded-xl px-2 py-2 hover:bg-secondary">
+                <span className="font-mono text-xs text-muted-foreground">#{i + 1}</span>
+                <Link to="/scripts/$slug" params={{ slug: t.slug }} className="truncate font-medium hover:text-primary">{t.name}</Link>
+                <span className="flex gap-2 font-mono text-xs text-muted-foreground"><span className="flex items-center gap-0.5"><Eye size={11} />{compact(t.views)}</span><span className="flex items-center gap-0.5"><Copy size={11} />{compact(t.copies)}</span></span>
+              </li>
+            ))}
+            {o && !o.top_scripts.length && <p className="text-sm text-muted-foreground">No scripts yet.</p>}
+            {!o && <p className="text-sm text-muted-foreground">{ov.isError ? "Could not load." : "Loading…"}</p>}
+          </ol>
+        </div>
       </div>
 
       <div className="glass min-w-0 overflow-hidden rounded-2xl p-3 sm:p-5">
@@ -126,6 +178,43 @@ function Dashboard() {
           {!(activity.data ?? []).length && <p className="text-sm text-muted-foreground">No admin activity yet.</p>}
         </ul>
       </div>
+    </div>
+  );
+}
+
+type Overview = {
+  keys_active: number; keys_today: number; key_checks_today: number; key_system: boolean;
+  raw_total: number; raw_enabled: number; drafts: number; archived: number; banned: number;
+  announcements: number; maintenance: boolean; registration: boolean;
+  top_scripts: { id: string; name: string; slug: string; views: number; copies: number; downloads: number }[];
+};
+
+const QUICK = [
+  { to: "/admin/scripts", label: "New script", icon: Plus },
+  { to: "/admin/keys", label: "Keys", icon: KeyRound },
+  { to: "/admin/raw", label: "Raw loader", icon: Terminal },
+  { to: "/admin/assistant", label: "Assistant", icon: Bot },
+  { to: "/admin/themes", label: "Themes", icon: Palette },
+  { to: "/admin/settings", label: "Settings", icon: Settings },
+] as const;
+
+function Status({ label, ok, on, off }: { label: string; ok: boolean; on: string; off: string }) {
+  return (
+    <li className="flex items-center justify-between gap-2 rounded-xl border border-border bg-background/30 px-3 py-2">
+      <span className="text-muted-foreground">{label}</span>
+      <span className={`flex items-center gap-1.5 text-xs font-semibold ${ok ? "text-success" : "text-destructive"}`}>
+        <span className={`h-2 w-2 animate-pulse rounded-full ${ok ? "bg-success" : "bg-destructive"}`} />{ok ? on : off}
+      </span>
+    </li>
+  );
+}
+
+function Mini({ icon: Icon, label, v }: { icon: React.ElementType; label: string; v?: number }) {
+  return (
+    <div className="min-w-0 rounded-xl border border-border bg-background/30 p-2.5">
+      <Icon size={13} className="text-primary" />
+      <p className="mt-1 font-mono text-lg font-semibold">{v ?? "—"}</p>
+      <p className="truncate text-[11px] text-muted-foreground">{label}</p>
     </div>
   );
 }
