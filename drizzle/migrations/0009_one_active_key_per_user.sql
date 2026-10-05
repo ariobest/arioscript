@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS license_keys_one_active_per_user ON public.license_keys(user_id) WHERE active AND user_id IS NOT NULL;

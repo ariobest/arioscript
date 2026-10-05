@@ -99,9 +99,10 @@ function Home() {
           <span className="chip mx-auto text-primary">
             <Sparkles size={12} /> {stats.data?.online ?? 0} members online now
           </span>
-          <h1 className="mt-5 font-display text-4xl font-bold leading-tight sm:text-6xl">
-            <span className="text-gradient">{settings?.site_name ?? "ARIO SCRIPTS"}</span>
+          <h1 className="hero-title mt-6 font-display text-[2.6rem] font-black uppercase leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl">
+            <span className="hero-title-text" data-text={settings?.site_name ?? "ARIO SCRIPTS"}>{settings?.site_name ?? "ARIO SCRIPTS"}</span>
           </h1>
+          <div className="hero-title-line mx-auto mt-4" aria-hidden />
           <p className="mx-auto mt-4 max-w-xl text-sm text-muted-foreground sm:text-base">
             {settings?.description ?? "A curated database of premium Lua scripts. Every script is hand-checked, versioned and kept working."}
           </p>

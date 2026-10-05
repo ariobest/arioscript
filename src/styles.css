@@ -373,3 +373,25 @@ img, video, iframe { max-width: 100%; }
 .route-progress-bar { position: relative; height: 100%; background: linear-gradient(90deg, transparent, var(--primary) 30%, var(--accent)); box-shadow: 0 0 10px var(--primary), 0 0 22px color-mix(in oklab, var(--primary) 60%, transparent); border-radius: 0 999px 999px 0; transition: width .2s ease-out; }
 .route-progress-spark { position: absolute; right: -3px; top: 50%; width: 10px; height: 10px; transform: translateY(-50%); border-radius: 999px; background: var(--primary-foreground, #fff); box-shadow: 0 0 8px #fff, 0 0 16px var(--primary), 0 0 30px var(--primary); animation: route-spark 0.8s ease-in-out infinite alternate; }
 @keyframes route-spark { from { opacity: .7; transform: translateY(-50%) scale(.85); } to { opacity: 1; transform: translateY(-50%) scale(1.2); } }
+
+/* Home hero title */
+.hero-title { position: relative; }
+.hero-title-text {
+  position: relative; display: inline-block;
+  background: linear-gradient(110deg, var(--foreground) 20%, var(--primary) 45%, var(--accent) 55%, var(--foreground) 80%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: hero-shine 6s linear infinite;
+  filter: drop-shadow(0 0 24px color-mix(in oklab, var(--primary) 45%, transparent));
+}
+.hero-title-text::after {
+  content: attr(data-text); position: absolute; inset: 0; z-index: -1;
+  color: var(--primary); opacity: .35; filter: blur(18px);
+}
+.hero-title-line {
+  height: 3px; width: min(220px, 50%); border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--primary), var(--accent), transparent);
+  box-shadow: 0 0 16px var(--primary);
+}
+@keyframes hero-shine { to { background-position: -250% 0; } }
+@media (prefers-reduced-motion: reduce) { .hero-title-text { animation: none; } }

@@ -6,6 +6,7 @@ import {
   KeyRound,
 } from "lucide-react";
 import { ThemePicker } from "./ThemePicker";
+import catLogo from "@/assets/ario-logo.png.asset.json";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -77,9 +78,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-border bg-[color-mix(in_oklab,var(--background)_78%,transparent)] backdrop-blur-xl">
         <div className="mx-auto grid h-16 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 md:flex md:gap-3">
           <Link to="/" className="flex min-w-0 items-center gap-2">
-             <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-xl bg-primary/15 text-primary glow-ring">
-               {settings?.logo_url ? <img src={settings.logo_url} alt="" className="h-full w-full object-contain" /> : <Terminal size={18} />}
-            </span>
+             <img src={catLogo.url} alt="" className="h-9 w-9 shrink-0 object-contain drop-shadow-[0_0_10px_var(--primary)]" />
              <span className="min-w-0 truncate font-display text-sm font-bold tracking-tight sm:text-base">
               {settings?.site_name ?? "ARIO SCRIPTS"}
             </span>
