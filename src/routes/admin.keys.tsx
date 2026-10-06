@@ -146,6 +146,14 @@ function AdminKeys() {
         </div>
       </div>
 
+      {st && <div className="glass rounded-2xl p-5">
+        <div className="flex items-center justify-between text-sm"><span className="font-semibold">Key check success rate</span><span className="font-mono">{st.checks ? Math.round(((st.checks - st.failed) / st.checks) * 100) : 0}%</span></div>
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${st.checks ? ((st.checks - st.failed) / st.checks) * 100 : 0}%` }} /></div>
+        <p className="mt-2 text-xs text-muted-foreground">{st.checks - st.failed} accepted · {st.failed} refused</p>
+      </div>}
+
+      <LoaderBuilder />
+
       <div className="glass rounded-2xl p-4">
         <div className="flex flex-wrap gap-2">
           <div className="relative min-w-0 flex-1"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" /><input className="input-base !pl-9" value={q} onChange={e => setQ(e.target.value)} placeholder="Search key, owner, notes" /></div>
