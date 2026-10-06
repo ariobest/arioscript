@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { KeyRound, Copy, Ban, Trash2, CalendarPlus, Download, Plus, Search } from "lucide-react";
+import { KeyRound, Copy, Ban, Trash2, CalendarPlus, Download, Plus, Search, Gamepad2 } from "lucide-react";
+import { KEY_GUIS, buildKeyGui, type KeyGuiId } from "@/lib/keyGuis";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -146,6 +147,14 @@ function AdminKeys() {
         </div>
       </div>
 
+      {st && <div className="glass rounded-2xl p-5">
+        <div className="flex items-center justify-between text-sm"><span className="font-semibold">Key check success rate</span><span className="font-mono">{st.checks ? Math.round(((st.checks - st.failed) / st.checks) * 100) : 0}%</span></div>
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${st.checks ? ((st.checks - st.failed) / st.checks) * 100 : 0}%` }} /></div>
+        <p className="mt-2 text-xs text-muted-foreground">{st.checks - st.failed} accepted · {st.failed} refused</p>
+      </div>}
+
+      <LoaderBuilder />
+
       <div className="glass rounded-2xl p-4">
         <div className="flex flex-wrap gap-2">
           <div className="relative min-w-0 flex-1"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" /><input className="input-base !pl-9" value={q} onChange={e => setQ(e.target.value)} placeholder="Search key, owner, notes" /></div>
@@ -182,6 +191,45 @@ function AdminKeys() {
           </table>
           {!rows.length && <p className="p-4 text-center text-sm text-muted-foreground">{list.isLoading ? "Loading…" : "No keys found."}</p>}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function LoaderBuilder() {
+  const [style, setStyle] = useState<KeyGuiId>("aurora");
+  const [slug, setSlug] = useState("");
+  const [title, setTitle] = useState("ARIO HUB");
+  const [accent, setAccent] = useState("#3b82f6");
+  const raws = useQuery({ queryKey: ["raw_scripts_pick"], queryFn: async () => (await supabase.from("raw_scripts").select("name,slug").eq("enabled", true).order("name")).data ?? [] });
+  const origin = typeof window !== "undefined" ? (window.location.hostname.includes("id-preview--") || window.location.hostname === "localhost" ? "https://arioscript.lovable.app" : window.location.origin) : "";
+  const code = buildKeyGui({ style, origin, scriptUrl: `${origin}/raw/${slug || "YOUR_SCRIPT_SLUG"}`, title: title || "ARIO HUB", accent });
+  function download() {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([code], { type: "text/plain" }));
+    a.download = `ario-key-${style}.lua`; a.click();
+  }
+  return (
+    <div className="glass rounded-2xl p-5">
+      <h2 className="flex items-center gap-2 font-semibold"><Gamepad2 size={16} className="text-primary" /> Roblox key menus</h2>
+      <p className="mt-1 text-xs text-muted-foreground">Pick a style and script. Players get a Get Key button, the key is checked with your site, then your script runs.</p>
+      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+        {KEY_GUIS.map(g => <button key={g.id} onClick={() => setStyle(g.id)} className={`rounded-xl border p-3 text-left transition-colors ${style === g.id ? "border-primary bg-primary/10" : "border-border hover:bg-secondary"}`}>
+          <p className="text-sm font-semibold">{g.name}</p><p className="mt-0.5 text-xs text-muted-foreground">{g.desc}</p>
+        </button>)}
+      </div>
+      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]">
+        <select className="input-base" value={slug} onChange={e => setSlug(e.target.value)}>
+          <option value="">Choose raw script…</option>
+          {raws.data?.map(r => <option key={r.slug} value={r.slug}>{r.name}</option>)}
+        </select>
+        <input className="input-base" value={title} onChange={e => setTitle(e.target.value.slice(0, 40))} placeholder="Menu title" />
+        <input type="color" className="h-10 w-full rounded-lg border border-border bg-transparent sm:w-14" value={accent} onChange={e => setAccent(e.target.value)} aria-label="Accent colour" />
+      </div>
+      <pre className="mt-3 max-h-56 overflow-auto rounded-lg bg-background/50 p-3 font-mono text-[11px] leading-relaxed">{code}</pre>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <Button onClick={() => void navigator.clipboard.writeText(code).then(() => toast.success("Loader copied"))}><Copy size={14} /> Copy code</Button>
+        <Button variant="outline" onClick={download}><Download size={14} /> .lua file</Button>
       </div>
     </div>
   );

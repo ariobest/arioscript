@@ -192,6 +192,20 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           </p>
         </div>
       </footer>
+      <div className="h-20" aria-hidden />
+      <nav className="fixed inset-x-0 bottom-3 z-40 flex justify-center px-3" aria-label="Quick navigation">
+        <div className="glass flex w-full max-w-md items-center justify-between gap-1 rounded-2xl border border-border p-1.5 shadow-lg">
+          {[{ to: "/", label: "Home", icon: Terminal }, ...NAV.filter(n => n.to !== "/categories")].map(n => {
+            const active = n.to === "/" ? pathname === "/" : pathname.startsWith(n.to);
+            return (
+              <Link key={n.to} to={n.to} className={`flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 text-[10px] font-medium transition-colors ${active ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`}>
+                <n.icon size={18} />
+                <span className="truncate">{n.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }
