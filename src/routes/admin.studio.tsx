@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ElementType } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Bot, Check, Code2, Copy, FileCode2, Filter, Layers3, Loader2, Search, Sparkles, Wand2,
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/admin/studio")({
   component: Studio,
 });
 
-type IconEntry = { name: string; icon: React.ElementType };
+type IconEntry = { name: string; icon: ElementType };
 const ICONS: IconEntry[] = [
   ["Activity", Activity], ["AlarmClock", AlarmClock], ["Archive", Archive], ["BadgeCheck", BadgeCheck],
   ["Bell", Bell], ["Bot", Bot], ["Box", Box], ["Braces", Braces], ["Bug", Bug], ["Calendar", Calendar],
