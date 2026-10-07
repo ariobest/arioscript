@@ -18,7 +18,8 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-  const [busy, setBusy] = useState(false);\n  const [passwordFocus, setPasswordFocus] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [passwordFocus, setPasswordFocus] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const { data: settings } = useSettings();
@@ -67,7 +68,7 @@ function AuthPage() {
   return (
     <div className="mx-auto flex max-w-md flex-col px-4 py-16">
       <div className="glass fade-up rounded-2xl p-7">
-        <div className={`auth-cat-wrap ${passwordFocus ? "auth-cat-away" : ""}`} aria-hidden="true"><img src={logo.url} alt="" className="auth-cat mx-auto h-16 w-16 object-contain drop-shadow-lg" /></div>
+        <div className={`auth-cat-wrap ${passwordFocus ? "auth-cat-away" : ""}`} aria-hidden="true"><span className="auth-cat mx-auto h-16 w-16" style={{ WebkitMaskImage: `url(${logo.url})`, maskImage: `url(${logo.url})`, WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat", WebkitMaskPosition: "center", maskPosition: "center", WebkitMaskSize: "contain", maskSize: "contain" }} /></div>
         <h1 className="mt-4 text-center font-display text-xl font-bold">
           {mode === "signin" ? "Sign in to ARIO SCRIPTS" : "Create your account"}
         </h1>
