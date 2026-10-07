@@ -29,7 +29,7 @@ function KeysPage() {
   const [open, setOpen] = useState(false);
   const settings = useQuery({
     queryKey: ["key_settings"],
-    queryFn: async () => (await supabase.from("key_settings").select("enabled,wait_seconds").eq("id", 1).single()).data,
+    queryFn: async () => (await supabase.from("key_settings").select("enabled,wait_seconds").limit(1).maybeSingle()).data,
   });
   const mine = useQuery({
     queryKey: ["my_keys", user?.id],
