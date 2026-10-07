@@ -10,7 +10,8 @@ export function ThemePicker() {
   const [theme, setTheme] = useState<Theme>("midnight");
   const [mode, setMode] = useState<ColorMode>("dark");
   const [backdrop, setBackdrop] = useState<Backdrop>("glow");
-  const [soundOn, setSoundOn] = useState(false);\n  const [volume, setVolume] = useState(0.45);
+  const [soundOn, setSoundOn] = useState(false);
+  const [volume, setVolume] = useState(0.45);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -19,7 +20,8 @@ export function ThemePicker() {
     applyTheme(t, false);
     setMode(getMode());
     setBackdrop(getBackdrop());
-    setSoundOn(soundsEnabled());\n    setVolume(getSoundVolume());
+    setSoundOn(soundsEnabled());
+    setVolume(getSoundVolume());
     const sync = () => { setTheme(getTheme()); setMode(getMode()); setBackdrop(getBackdrop()); setSoundOn(soundsEnabled()); setVolume(getSoundVolume()); };
     window.addEventListener("ario-appearance", sync);
     return () => window.removeEventListener("ario-appearance", sync);
@@ -52,7 +54,10 @@ export function ThemePicker() {
           <div className="mb-3 flex gap-1 rounded-lg bg-secondary p-1">
             {(["glow", "grid", "particles", "aurora", "waves", "matrix", "plain"] as const).map(value => <button key={value} onClick={() => { setBackdrop(value); applyBackdrop(value); }} className={`btn min-w-0 !px-1 !py-1.5 text-xs capitalize ${backdrop === value ? "btn-primary" : "btn-ghost"}`}>{value}</button>)}
           </div>
-          <div className="mb-3 rounded-xl bg-secondary p-2">\n            <button onClick={() => { setSoundsEnabled(!soundOn); setSoundOn(!soundOn); }} className="btn btn-ghost w-full justify-start text-xs" aria-label={soundOn ? "Mute UI sounds" : "Enable UI sounds"}>{soundOn ? <Volume2 size={14} /> : <VolumeX size={14} />} UI sounds {soundOn ? "on" : "off"}</button>\n            <label className="mt-2 flex items-center gap-2 px-2 text-[11px] text-muted-foreground"><span>Volume</span><input className="min-w-0 flex-1 accent-[var(--primary)]" type="range" min="0" max="1" step="0.05" value={volume} onChange={e => { const v=Number(e.target.value); setVolume(v); setSoundVolume(v); if(soundOn) playSound("notification"); }} /><span className="w-8 text-right font-mono">{Math.round(volume*100)}%</span></label>\n          </div>
+          <div className="mb-3 rounded-xl bg-secondary p-2">
+            <button onClick={() => { setSoundsEnabled(!soundOn); setSoundOn(!soundOn); }} className="btn btn-ghost w-full justify-start text-xs" aria-label={soundOn ? "Mute UI sounds" : "Enable UI sounds"}>{soundOn ? <Volume2 size={14} /> : <VolumeX size={14} />} UI sounds {soundOn ? "on" : "off"}</button>
+            <label className="mt-2 flex items-center gap-2 px-2 text-[11px] text-muted-foreground"><span>Volume</span><input className="min-w-0 flex-1 accent-[var(--primary)]" type="range" min="0" max="1" step="0.05" value={volume} onChange={e => { const v=Number(e.target.value); setVolume(v); setSoundVolume(v); if(soundOn) playSound("notification"); }} /><span className="w-8 text-right font-mono">{Math.round(volume*100)}%</span></label>
+          </div>
           <p className="mb-2 px-1 text-xs font-semibold text-muted-foreground">50 themes</p>
           <div className="grid max-h-72 grid-cols-2 gap-1 overflow-y-auto pr-1">
             {THEMES.map((t) => (
