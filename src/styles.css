@@ -634,6 +634,8 @@ img, video, iframe { max-width: 100%; }
 }
 .auth-cat {
   position: relative;
+  display: block;
+  background: var(--primary);
   z-index: 1;
   transform-origin: 50% 75%;
   animation: cat-breathe 2.7s ease-in-out infinite;
