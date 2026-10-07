@@ -79,7 +79,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-border bg-[color-mix(in_oklab,var(--background)_78%,transparent)] backdrop-blur-xl">
         <div className="mx-auto grid h-16 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 md:flex md:gap-3">
           <Link to="/" className="flex min-w-0 items-center gap-2">
-             <img src={catLogo.url} alt="" className="ario-theme-logo h-9 w-9 shrink-0 object-contain drop-shadow-[0_0_10px_var(--primary)]" />
+             <span aria-hidden="true" className="ario-theme-logo h-9 w-9 shrink-0 bg-[var(--primary)] drop-shadow-[0_0_10px_var(--primary)]" style={{ WebkitMaskImage: `url(${catLogo.url})`, maskImage: `url(${catLogo.url})`, WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat", WebkitMaskPosition: "center", maskPosition: "center", WebkitMaskSize: "contain", maskSize: "contain" }} />
              <span className="min-w-0 truncate font-display text-sm font-bold tracking-tight sm:text-base">
               {settings?.site_name ?? SITE_BRAND.name}
             </span>
