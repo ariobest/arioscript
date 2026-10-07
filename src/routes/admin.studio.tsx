@@ -81,7 +81,7 @@ function Studio() {
           library,
         },
       });
-      const match = result.text.match(/\`\`\`(?:lua)?\n([\\s\\S]*?)\`\`\`/);
+      const match = result.text.match(/```(?:lua)?\n([\s\S]*?)```/);
       setCode((match?.[1] ?? result.text).trim());
       toast.success("Lua script generated");
     } catch (e) {
@@ -138,9 +138,9 @@ function Studio() {
             <span className="grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary"><CurrentIcon size={iconSize} strokeWidth={stroke} /></span>
             <div className="min-w-0"><p className="font-semibold">{selectedIcon}</p><code className="block truncate text-xs text-muted-foreground">{snippet}</code></div>
           </div>
-        </section>
+        </section>}
 
-        <section className="glass rounded-3xl p-4 sm:p-5">
+        {panel === "script" && <section className="glass rounded-3xl p-4 sm:p-5">
           <div className="flex items-center gap-2">
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary"><Bot size={16} /></span>
             <div><h2 className="font-display font-semibold">Roblox Lua maker</h2><p className="text-xs text-muted-foreground">Choose a real model and UI library, then describe the script.</p></div>
@@ -158,7 +158,7 @@ function Studio() {
             {busy ? "Generating with AI…" : "Generate Lua"}
           </button>
           {code && <div className="mt-4"><CodeViewer code={code} filename={`ario-${library}-generated.lua`} /></div>}
-        </section>
+        </section>}
       </div>}
     </div>
   );
