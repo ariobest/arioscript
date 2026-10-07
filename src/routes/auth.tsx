@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Mail, Lock, User as UserIcon } from "lucide-react";
-import logo from "@/assets/ario-logo.png.asset.json";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -68,7 +67,7 @@ function AuthPage() {
   return (
     <div className="mx-auto flex max-w-md flex-col px-4 py-16">
       <div className="glass fade-up rounded-2xl p-7">
-        <div className={`auth-cat-wrap ${passwordFocus ? "auth-cat-away" : ""}`} aria-hidden="true"><span className="auth-cat mx-auto h-16 w-16" style={{ WebkitMaskImage: `url(${logo.url})`, maskImage: `url(${logo.url})`, WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat", WebkitMaskPosition: "center", maskPosition: "center", WebkitMaskSize: "contain", maskSize: "contain" }} /></div>
+        <div className={`auth-cat-wrap ${passwordFocus ? "auth-cat-away" : ""}`} aria-hidden="true"><span className="auth-cat mx-auto h-16 w-16" style={{ WebkitMaskImage: "url(https://arioscript.lovable.app/__l5e/assets-v1/193455b7-1a87-4e65-950a-dbf7cc575bad/ario-logo.png)", maskImage: "url(https://arioscript.lovable.app/__l5e/assets-v1/193455b7-1a87-4e65-950a-dbf7cc575bad/ario-logo.png)", WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat", WebkitMaskPosition: "center", maskPosition: "center", WebkitMaskSize: "contain", maskSize: "contain" }} /></div>
         <h1 className="mt-4 text-center font-display text-xl font-bold">
           {mode === "signin" ? "Sign in to ARIO SCRIPTS" : "Create your account"}
         </h1>
