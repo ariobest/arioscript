@@ -249,6 +249,8 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/themes': typeof AdminThemesRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/studio': typeof AdminStudioRoute
+  '/admin/discord': typeof AdminDiscordRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/games/$game': typeof GamesGameRoute
   '/raw/$slug': typeof RawSlugRoute
@@ -281,6 +283,8 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/themes': typeof AdminThemesRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/studio': typeof AdminStudioRoute
+  '/admin/discord': typeof AdminDiscordRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/games/$game': typeof GamesGameRoute
   '/raw/$slug': typeof RawSlugRoute
