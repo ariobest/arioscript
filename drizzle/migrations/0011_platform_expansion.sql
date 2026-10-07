@@ -1,0 +1,5 @@
+-- ARIO SCRIPTS platform expansion
+-- Applied to Supabase project yxbzblbtzqioexszjjkc.
+-- Adds dashboard data, notifications, API keys, script versions, activity and platform RLS.
+-- This file is intentionally additive and does not touch auth secrets.
+-- See the live Supabase project for the applied migration.
