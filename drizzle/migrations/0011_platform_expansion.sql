@@ -18,3 +18,17 @@ drop policy if exists api_keys_own_insert on public.developer_api_keys; create p
 drop policy if exists api_keys_own_update on public.developer_api_keys; create policy api_keys_own_update on public.developer_api_keys for update to authenticated using(auth.uid()=user_id) with check(auth.uid()=user_id);
 drop policy if exists activity_own_read on public.activity_events; create policy activity_own_read on public.activity_events for select to authenticated using(auth.uid()=user_id);
 drop policy if exists activity_own_insert on public.activity_events; create policy activity_own_insert on public.activity_events for insert to authenticated with check(auth.uid()=user_id);
+
+-- Security hardening applied after initial rollout
+revoke all on function public.grant_owner_admin() from anon, authenticated;
+revoke all on function public.handle_new_user() from anon, authenticated;
+revoke all on function public.snapshot_script_version() from anon, authenticated;
+revoke all on function public.sync_favorite_count() from anon, authenticated;
+alter function public.handle_new_user() set search_path = public;
+alter function public.grant_owner_admin() set search_path = public;
+drop policy if exists categories_public_read on public.categories; create policy categories_public_read on public.categories for select using(true);
+drop policy if exists key_settings_public_read on public.key_settings; create policy key_settings_public_read on public.key_settings for select using(true);
+drop policy if exists admin_logs_staff_read on public.admin_logs; create policy admin_logs_staff_read on public.admin_logs for select to authenticated using(public.is_staff(auth.uid()));
+drop policy if exists admin_logs_staff_insert on public.admin_logs; create policy admin_logs_staff_insert on public.admin_logs for insert to authenticated with check(public.is_staff(auth.uid()) and admin_id=auth.uid());
+drop policy if exists key_checks_staff_read on public.key_checks; create policy key_checks_staff_read on public.key_checks for select to authenticated using(public.is_staff(auth.uid()));
+drop policy if exists key_requests_own_read on public.key_requests; create policy key_requests_own_read on public.key_requests for select to authenticated using(auth.uid()=user_id or public.is_staff(auth.uid()));
