@@ -127,12 +127,21 @@ function Dashboard() {
         <Tile icon={Flag} label="Open reports" value={s['reports']} pending={!stats.data} />
       </div>
 
-      <div className="glass rounded-3xl border border-border/60 p-3 shadow-[0_16px_50px_-35px_hsl(var(--primary)/.4)] sm:p-4"><div className="mb-3 flex items-center justify-between px-1"><div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-primary">Admin controls</p><p className="text-xs text-muted-foreground">Jump directly into management tools.</p></div><Gauge size={16} className="text-muted-foreground" /></div><div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        {QUICK.map((q) => (
-          <Link key={q.to} to={q.to} className="glass admin-stat-tile group flex min-h-24 flex-col items-center justify-center gap-2 rounded-2xl border border-border/60 p-3 text-center text-xs font-semibold transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:bg-primary/[.04] hover:text-primary">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110"><q.icon size={17} /></span>{q.label}
-          </Link>
-        ))}
+      <div className="glass rounded-3xl border border-border/60 p-3 shadow-[0_16px_50px_-35px_hsl(var(--primary)/.4)] sm:p-4">
+        <div className="mb-3 flex items-center justify-between px-1">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[.18em] text-primary">Admin controls</p>
+            <p className="text-xs text-muted-foreground">Jump directly into management tools.</p>
+          </div>
+          <Gauge size={16} className="text-muted-foreground" />
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          {QUICK.map((q) => (
+            <Link key={q.to} to={q.to} className="glass admin-stat-tile group flex min-h-24 flex-col items-center justify-center gap-2 rounded-2xl border border-border/60 p-3 text-center text-xs font-semibold transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:bg-primary/[.04] hover:text-primary">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110"><q.icon size={17} /></span>{q.label}
+            </Link>
+          ))}
+        </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
