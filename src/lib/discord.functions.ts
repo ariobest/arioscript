@@ -3,14 +3,14 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const API = "https://discord.com/api/v10";
-const input = z.object({ guildId: z.string().regex(/^\\d{17,20}$/) });
-const channelInput = input.extend({ channelId: z.string().regex(/^\\d{17,20}$/) });
+const input = z.object({ guildId: z.string().regex(/^\d{17,20}$/) });
+const channelInput = input.extend({ channelId: z.string().regex(/^\d{17,20}$/) });
 const embedInput = channelInput.extend({
   content: z.string().max(2000).optional(),
   title: z.string().max(256).optional(),
   description: z.string().max(4096).optional(),
   color: z.number().int().min(0).max(0xffffff).default(0x5865f2),
-  messageId: z.string().regex(/^\\d{17,20}$/).optional(),
+  messageId: z.string().regex(/^\d{17,20}$/).optional(),
 });
 
 async function discord(path: string, init: RequestInit = {}) {
@@ -82,7 +82,7 @@ export const editDiscordEmbed = createServerFn({ method: "POST" })
 
 export const deleteDiscordMessage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator(data => channelInput.extend({ messageId: z.string().regex(/^\\d{17,20}$/) }).parse(data))
+  .validator(data => channelInput.extend({ messageId: z.string().regex(/^\d{17,20}$/) }).parse(data))
   .handler(async ({ data, context }) => {
     const { data: isAdmin, error } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
     if (error || !isAdmin) throw new Error("Administrator access required.");
