@@ -3,13 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   Search, Shuffle, Sparkles, Flame, Clock, Download, Eye, Copy, Gamepad2, LayoutGrid,
-  Users, Terminal, Heart,
+  Heart,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getCategories, getGames, getStats, getTrending, listScripts } from "@/lib/queries";
+import { getCategories, getGames, getTrending, listScripts } from "@/lib/queries";
 import { ScriptGrid } from "@/components/site/ScriptCard";
 import { DynamicIcon } from "@/components/site/DynamicIcon";
-import { compact } from "@/lib/format";
 import type { Script } from "@/lib/types";
 import { useSettings } from "@/components/site/Layout";
 
@@ -52,7 +51,6 @@ function Home() {
   const { data: settings } = useSettings();
   const sections = Array.isArray(settings?.homepage_sections) ? settings.homepage_sections : ["featured", "trending", "recent", "downloads", "views", "copies", "games", "categories"];
 
-  const stats = useQuery({ queryKey: ["stats"], queryFn: getStats });
   const featured = useQuery({ queryKey: ["s", "featured"], queryFn: () => listScripts({ featured: true, limit: 8 }) });
   const trending = useQuery({ queryKey: ["s", "trending"], queryFn: () => getTrending(8) });
   const recent = useQuery({ queryKey: ["s", "newest"], queryFn: () => listScripts({ sort: "newest", limit: 8 }) });
@@ -82,14 +80,7 @@ function Home() {
     navigate({ to: "/scripts", search: { q: q || undefined } as never });
   }
 
-  const statTiles = [
-    { label: "Scripts", value: stats.data?.scripts, icon: Terminal },
-    { label: "Members", value: stats.data?.users, icon: Users },
-    { label: "Views", value: stats.data?.views, icon: Eye },
-    { label: "Downloads", value: stats.data?.downloads, icon: Download },
-    { label: "Copies", value: stats.data?.copies, icon: Copy },
-    { label: "Favorites", value: stats.data?.favorites, icon: Heart },
-  ];
+
 
   return (
     <div className="pb-10">
@@ -97,7 +88,7 @@ function Home() {
        <section className="mx-auto max-w-7xl px-4 pt-9 sm:pt-20" style={settings?.hero_image_url ? { backgroundImage: `linear-gradient(to bottom, transparent, var(--background)), url("${settings.hero_image_url.replace(/["\\]/g, "")}")`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}>
         <div className="fade-up mx-auto max-w-3xl text-center">
           <span className="chip mx-auto text-primary">
-            <Sparkles size={12} /> {stats.data?.online ?? 0} members online now
+            <Sparkles size={12} /> Premium script library
           </span>
           <h1 className="hero-title mt-6 font-display text-[2.6rem] font-black uppercase leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl">
             <span className="hero-title-text" data-text={settings?.site_name ?? "ARIO SCRIPTS"}>{settings?.site_name ?? "ARIO SCRIPTS"}</span>
@@ -145,15 +136,6 @@ function Home() {
           </div>
         ) : null}
 
-        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {statTiles.map((s) => (
-            <div key={s.label} className="glass rounded-2xl p-4">
-              <s.icon size={15} className="text-primary" />
-              <p className="mt-2 font-display text-xl font-bold">{stats.isError ? "—" : stats.isLoading ? "…" : compact(s.value ?? 0)}</p>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
-            </div>
-          ))}
-        </div>
       </section>
 
        {sections.includes("featured") && <Section title="Featured Scripts" icon={Sparkles} to="/scripts">
