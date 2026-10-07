@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  Shield, LayoutDashboard, Terminal, Users, Award, Flag, Megaphone, Settings, ScrollText, BarChart3, Lock, Mail, KeyRound, Images, Bot, Palette, Code2,
+  Shield, LayoutDashboard, Terminal, Users, Award, Flag, Megaphone, Settings, ScrollText, BarChart3, Lock, Mail, KeyRound, Images, Bot, Palette, Code2, MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +19,7 @@ const LINKS = [
   { to: "/admin/keys", label: "Keys", icon: KeyRound },
   { to: "/admin/assistant", label: "Script assistant", icon: Bot },
   { to: "/admin/studio", label: "Dev studio", icon: Code2 },
+  { to: "/admin/discord", label: "Discord control", icon: MessageSquare },
   { to: "/admin/themes", label: "Themes", icon: Palette },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/badges", label: "Badges", icon: Award },
