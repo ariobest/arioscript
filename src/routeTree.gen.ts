@@ -236,6 +236,8 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof FavoritesRoute
   '/keys': typeof KeysRoute
   '/leaderboards': typeof LeaderboardsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/assistant': typeof AdminAssistantRoute
@@ -269,6 +271,8 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/api-docs': typeof ApiDocsRoute
   '/api/v1/scripts': typeof ApiV1ScriptsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
   '/keys': typeof KeysRoute
@@ -347,6 +351,8 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/keys'
     | '/leaderboards'
+    | '/forgot-password'
+    | '/reset-password'
     | '/admin/analytics'
     | '/admin/announcements'
     | '/admin/assistant'
@@ -380,6 +386,8 @@ export interface FileRouteTypes {
     | '/settings'
     | '/api-docs'
     | '/api/v1/scripts'
+    | '/forgot-password'
+    | '/reset-password'
     | '/auth'
     | '/favorites'
     | '/keys'
