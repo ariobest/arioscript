@@ -36,14 +36,21 @@ export const getDiscordStatus = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: isAdmin, error } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
     if (error || !isAdmin) throw new Error("Administrator access required.");
-    const [guild, channels] = await Promise.all([
+    const [guild, channels, roles] = await Promise.all([
       discord(`/guilds/${data.guildId}?with_counts=true`),
       discord(`/guilds/${data.guildId}/channels`),
+      discord(`/guilds/${data.guildId}/roles`),
     ]);
-    const textChannels = (channels as Array<{ id: string; name: string; type: number }>).filter(c => c.type === 0);
+    const allChannels = channels as Array<{ id: string; name: string; type: number; parent_id?: string | null; position?: number }>;
+    const textChannels = allChannels.filter(c => c.type === 0);
+    const voiceChannels = allChannels.filter(c => c.type === 2);
+    const categories = allChannels.filter(c => c.type === 4);
     return {
-      guild: guild as { id: string; name: string; icon?: string | null; approximate_member_count?: number; approximate_presence_count?: number },
-      channels: textChannels.map(c => ({ id: c.id, name: c.name })),
+      guild: guild as { id: string; name: string; icon?: string | null; description?: string | null; owner_id?: string; verification_level?: number; premium_tier?: number; features?: string[]; approximate_member_count?: number; approximate_presence_count?: number },
+      channels: textChannels.map(c => ({ id: c.id, name: c.name, parentId: c.parent_id ?? null, position: c.position ?? 0 })),
+      voiceChannels: voiceChannels.map(c => ({ id: c.id, name: c.name, parentId: c.parent_id ?? null, position: c.position ?? 0 })),
+      categories: categories.map(c => ({ id: c.id, name: c.name, position: c.position ?? 0 })),
+      roles: (roles as Array<{ id: string; name: string; color: number; position: number; managed: boolean }>).filter(r => !r.managed).map(r => ({ id: r.id, name: r.name, color: r.color, position: r.position })),
     };
   });
 
@@ -81,4 +88,39 @@ export const deleteDiscordMessage = createServerFn({ method: "POST" })
     if (error || !isAdmin) throw new Error("Administrator access required.");
     await discord(`/channels/${data.channelId}/messages/${data.messageId}`, { method: "DELETE" });
     return { ok: true };
+  });
+
+
+const jsonPayload = z.object({
+  guildId: z.string().regex(/^\d{17,20}$/),
+  channelId: z.string().regex(/^\d{17,20}$/),
+  messageId: z.string().regex(/^\d{17,20}$/).optional(),
+  payload: z.record(z.string(), z.unknown()),
+});
+
+async function assertAdmin(context: any) {
+  const { data: isAdmin, error } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+  if (error || !isAdmin) throw new Error("Administrator access required.");
+}
+
+export const sendDiscordJson = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator(data => jsonPayload.omit({ messageId: true }).parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const payload = data.payload;
+    if (typeof payload.content === "string" && payload.content.length > 2000) throw new Error("Discord content is limited to 2000 characters.");
+    if (Array.isArray(payload.embeds) && payload.embeds.length > 10) throw new Error("Discord allows up to 10 embeds per message.");
+    return await discord(`/channels/${data.channelId}/messages`, { method: "POST", body: JSON.stringify(payload) });
+  });
+
+export const editDiscordJson = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator(data => jsonPayload.required({ messageId: true }).parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const payload = data.payload;
+    if (typeof payload.content === "string" && payload.content.length > 2000) throw new Error("Discord content is limited to 2000 characters.");
+    if (Array.isArray(payload.embeds) && payload.embeds.length > 10) throw new Error("Discord allows up to 10 embeds per message.");
+    return await discord(`/channels/${data.channelId}/messages/${data.messageId}`, { method: "PATCH", body: JSON.stringify(payload) });
   });
