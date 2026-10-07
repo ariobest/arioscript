@@ -27,6 +27,8 @@ function DiscordControl() {
   const [json, setJson] = useState(JSON.stringify(DEFAULT_JSON, null, 2));
   const [mode, setMode] = useState<"builder" | "json">("builder");
   const [busy, setBusy] = useState(false);
+  const [channelSearch, setChannelSearch] = useState("");
+  const [template, setTemplate] = useState("announcement");
 
   const load = useServerFn(getDiscordStatus);
   const send = useServerFn(sendDiscordEmbed);
@@ -42,6 +44,33 @@ function DiscordControl() {
 
   function syncBuilderToJson() {
     setJson(JSON.stringify({ content, embeds: [{ title: title || undefined, description: description || undefined, color: parseInt(color.replace("#", ""), 16) }] }, null, 2));
+  }
+
+  const visibleChannels = useMemo(() => {
+    const q = channelSearch.trim().toLowerCase();
+    return (status?.channels ?? []).filter((ch: any) => !q || ch.name.toLowerCase().includes(q));
+  }, [status, channelSearch]);
+
+  function applyTemplate(name: string) {
+    const templates: Record<string, any> = {
+      announcement: { content: "", embeds: [{ title: "📢 ARIO Announcement", description: "Write your announcement here.", color: 5793266, footer: { text: "ARIO SCRIPTS" } }] },
+      update: { content: "", embeds: [{ title: "🚀 ARIO Update", description: "A new update is now available.", color: 5793266, fields: [{ name: "What's new?", value: "• New features\n• Improvements\n• Bug fixes" }], footer: { text: "ARIO SCRIPTS • Update" } }] },
+      maintenance: { content: "", embeds: [{ title: "🔧 Maintenance", description: "The service is temporarily under maintenance.", color: 15158332, footer: { text: "ARIO SCRIPTS" } }] },
+      release: { content: "", embeds: [{ title: "✨ New Release", description: "A new script release is live.", color: 3066993, fields: [{ name: "Supported game", value: "MM2" }, { name: "Status", value: "🟢 Active" }] }] },
+    };
+    setTemplate(name);
+    setJson(JSON.stringify(templates[name] ?? templates.announcement, null, 2));
+    toast.success("Template loaded");
+  }
+
+  function formatJson() {
+    if (!jsonState.value) return toast.error("Fix the JSON first.");
+    setJson(JSON.stringify(jsonState.value, null, 2));
+  }
+
+  function minifyJson() {
+    if (!jsonState.value) return toast.error("Fix the JSON first.");
+    setJson(JSON.stringify(jsonState.value));
   }
 
   function syncJsonToBuilder() {
@@ -129,9 +158,9 @@ function DiscordControl() {
             <div className="rounded-2xl border border-border/60 bg-background/20 p-4"><p className="text-xs text-muted-foreground">Categories</p><p className="mt-1 text-xl font-bold">{status.categories.length}</p></div>
             <div className="rounded-2xl border border-border/60 bg-background/20 p-4"><p className="text-xs text-muted-foreground">Roles</p><p className="mt-1 text-xl font-bold">{status.roles.length}</p></div>
           </div>
-          <div className="mt-4 max-h-72 space-y-1 overflow-y-auto pr-1">
+          <input value={channelSearch} onChange={e=>setChannelSearch(e.target.value)} placeholder="Search channels…" className="input-base mt-4" /><div className="mt-3 max-h-72 space-y-1 overflow-y-auto pr-1">
             {status.categories.map((cat: any) => <div key={cat.id} className="mt-2 rounded-xl bg-primary/5 px-3 py-2 text-xs font-bold text-primary">⌄ {cat.name}</div>)}
-            {status.channels.map((ch: any) => <button key={ch.id} onClick={()=>setChannelId(ch.id)} className={"flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs transition " + (channelId===ch.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary")}><Hash size={13}/>{ch.name}</button>)}
+            {visibleChannels.map((ch: any) => <button key={ch.id} onClick={()=>setChannelId(ch.id)} className={"flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs transition " + (channelId===ch.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary")}><Hash size={13}/>{ch.name}</button>)}
             {status.voiceChannels.map((ch: any) => <div key={ch.id} className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs text-muted-foreground"><Volume2 size={13}/>{ch.name}</div>)}
           </div>
           <div className="mt-4 flex flex-wrap gap-2">{status.roles.slice(0, 12).map((role: any)=><span key={role.id} className="chip text-xs">@{role.name}</span>)}</div>
@@ -152,7 +181,7 @@ function DiscordControl() {
         <div className="mt-4 grid gap-5 xl:grid-cols-2">
           <div>
             <div className="grid gap-3 sm:grid-cols-2"><label className="text-xs font-semibold text-muted-foreground">Channel<select value={channelId} onChange={e=>setChannelId(e.target.value)} className="input-base mt-1"><option value="">Select a channel</option>{status?.channels.map((c: any)=><option key={c.id} value={c.id}>#{c.name}</option>)}</select></label><label className="text-xs font-semibold text-muted-foreground">Message ID<input value={messageId} onChange={e=>setMessageId(e.target.value)} placeholder="For edit/delete" className="input-base mt-1"/></label></div>
-            {mode === "builder" ? <><input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Embed title" className="input-base mt-3"/><textarea value={description} onChange={e=>setDescription(e.target.value)} rows={6} placeholder="Embed description…" className="input-base mt-3 resize-y"/><div className="mt-3 grid grid-cols-[1fr_auto] gap-3"><input value={content} onChange={e=>setContent(e.target.value)} placeholder="Optional message content" className="input-base"/><input type="color" value={color} onChange={e=>setColor(e.target.value)} className="h-11 w-14 rounded-xl border border-border bg-transparent p-1"/></div></> : <><textarea value={json} onChange={e=>setJson(e.target.value)} rows={16} spellCheck={false} className="input-base mt-3 min-h-[360px] resize-y font-mono text-xs"/><p className={"mt-2 text-xs " + (jsonState.error ? "text-destructive" : "text-emerald-400")}>{jsonState.error || "Valid JSON payload"}</p></>}
+            <div className="mb-3 flex flex-wrap gap-2">{["announcement","update","maintenance","release"].map(t=><button key={t} onClick={()=>applyTemplate(t)} className={"chip cursor-pointer " + (template===t ? "border-primary/40 text-primary" : "")}>{t}</button>)}</div>{mode === "builder" ? <><input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Embed title" className="input-base mt-3"/><textarea value={description} onChange={e=>setDescription(e.target.value)} rows={6} placeholder="Embed description…" className="input-base mt-3 resize-y"/><div className="mt-3 grid grid-cols-[1fr_auto] gap-3"><input value={content} onChange={e=>setContent(e.target.value)} placeholder="Optional message content" className="input-base"/><input type="color" value={color} onChange={e=>setColor(e.target.value)} className="h-11 w-14 rounded-xl border border-border bg-transparent p-1"/></div></> : <><textarea value={json} onChange={e=>setJson(e.target.value)} rows={16} spellCheck={false} className="input-base mt-3 min-h-[360px] resize-y font-mono text-xs"/><div className="mt-2 flex gap-2"><button onClick={formatJson} className="btn btn-ghost text-xs">Format</button><button onClick={minifyJson} className="btn btn-ghost text-xs">Minify</button></div><p className={"mt-2 text-xs " + (jsonState.error ? "text-destructive" : "text-emerald-400")}>{jsonState.error || "Valid JSON payload"}</p></>}
             <div className="mt-4 flex flex-wrap gap-2"><button onClick={()=>void (mode==="json" ? jsonAction("send") : action("send"))} disabled={busy} className="btn btn-primary"><Send size={14}/>Send</button><button onClick={()=>void (mode==="json" ? jsonAction("edit") : action("edit"))} disabled={busy} className="btn btn-ghost"><Check size={14}/>Edit</button><button onClick={()=>void action("delete")} disabled={busy} className="btn btn-ghost text-destructive"><Trash2 size={14}/>Delete</button><button onClick={()=>copyText(mode==="json" ? json : JSON.stringify({content,embeds:[{title,description,color:parseInt(color.replace("#",""),16)}]},null,2))} className="btn btn-ghost"><Copy size={14}/>Copy JSON</button></div>
           </div>
           <div className="rounded-3xl border border-border/60 bg-[#0b0d14] p-5">
