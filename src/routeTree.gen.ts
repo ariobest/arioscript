@@ -15,6 +15,7 @@ import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ApiDocsRouteImport } from './routes/api-docs'
 import { Route as ApiV1ScriptsRouteImport } from './routes/api/v1/scripts'
+import { Route as ApiV1ScriptsSlugRouteImport } from './routes/api/v1/scripts.$slug'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -58,6 +59,7 @@ const NotificationsRoute = NotificationsRouteImport.update({ id: '/notifications
 const SettingsRoute = SettingsRouteImport.update({ id: '/settings', path: '/settings', getParentRoute: () => rootRouteImport } as any)
 const ApiDocsRoute = ApiDocsRouteImport.update({ id: '/api-docs', path: '/api-docs', getParentRoute: () => rootRouteImport } as any)
 const ApiV1ScriptsRoute = ApiV1ScriptsRouteImport.update({ id: '/api/v1/scripts', path: '/api/v1/scripts', getParentRoute: () => rootRouteImport } as any)
+const ApiV1ScriptsSlugRoute = ApiV1ScriptsSlugRouteImport.update({ id: '/api/v1/scripts/$slug', path: '/api/v1/scripts/$slug', getParentRoute: () => rootRouteImport } as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -226,6 +228,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/api-docs': typeof ApiDocsRoute
   '/api/v1/scripts': typeof ApiV1ScriptsRoute
+  '/api/v1/scripts/$slug': typeof ApiV1ScriptsSlugRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
@@ -442,6 +445,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   ApiDocsRoute: typeof ApiDocsRoute
   ApiV1ScriptsRoute: typeof ApiV1ScriptsRoute
+  ApiV1ScriptsSlugRoute: typeof ApiV1ScriptsSlugRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   FavoritesRoute: typeof FavoritesRoute
@@ -465,6 +469,7 @@ declare module '@tanstack/react-router' {
     '/settings': { id: '/settings', path: '/settings', fullPath: '/settings', preLoaderRoute: typeof SettingsRouteImport, parentRoute: typeof rootRouteImport }
     '/api-docs': { id: '/api-docs', path: '/api-docs', fullPath: '/api-docs', preLoaderRoute: typeof ApiDocsRouteImport, parentRoute: typeof rootRouteImport }
     '/api/v1/scripts': { id: '/api/v1/scripts', path: '/api/v1/scripts', fullPath: '/api/v1/scripts', preLoaderRoute: typeof ApiV1ScriptsRouteImport, parentRoute: typeof rootRouteImport }
+    '/api/v1/scripts/$slug': { id: '/api/v1/scripts/$slug', path: '/api/v1/scripts/$slug', fullPath: '/api/v1/scripts/$slug', preLoaderRoute: typeof ApiV1ScriptsSlugRouteImport, parentRoute: typeof rootRouteImport }
     '/': {
       id: '/'
       path: '/'
@@ -732,6 +737,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   ApiDocsRoute: ApiDocsRoute,
   ApiV1ScriptsRoute: ApiV1ScriptsRoute,
+  ApiV1ScriptsSlugRoute: ApiV1ScriptsSlugRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
