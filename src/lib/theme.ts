@@ -6,6 +6,7 @@ export const THEMES = [
   "coral", "peach", "ruby", "wine", "magenta", "orchid", "lavender", "periwinkle",
   "ocean", "marine", "sky", "lagoon", "forest", "jade", "olive", "citrus",
   "bronze", "copper", "pearl", "silver",
+  "sapphire", "electric", "plasma", "arctic", "voltage", "holographic", "toxic", "amethyst", "deepsea", "royalice",
 ] as const;
 
 export type Theme = (typeof THEMES)[number];
