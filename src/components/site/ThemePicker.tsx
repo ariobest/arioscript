@@ -51,7 +51,7 @@ export function ThemePicker() {
             {(["dark", "light"] as const).map((value) => <button key={value} onClick={() => { setMode(value); applyMode(value); }} className={`btn flex-1 !py-1.5 capitalize ${mode === value ? "btn-primary" : "btn-ghost"}`}>{value === "dark" ? <Moon size={13} /> : <Sun size={13} />}{value}</button>)}
           </div>
           <p className="mb-1 px-1 text-xs font-semibold text-muted-foreground">Background</p>
-          <div className="mb-3 flex gap-1 rounded-lg bg-secondary p-1">
+          <div className="mb-3 flex flex-wrap gap-2 rounded-lg bg-secondary p-2">
             {(["glow", "grid", "particles", "aurora", "waves", "matrix", "plain"] as const).map(value => <button key={value} onClick={() => { setBackdrop(value); applyBackdrop(value); }} className={`btn min-w-0 !px-1 !py-1.5 text-xs capitalize ${backdrop === value ? "btn-primary" : "btn-ghost"}`}>{value}</button>)}
           </div>
           <div className="mb-3 rounded-xl bg-secondary p-2">
