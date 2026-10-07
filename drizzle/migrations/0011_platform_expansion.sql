@@ -53,3 +53,21 @@ create index if not exists script_versions_created_by_fk_idx on public.script_ve
 create index if not exists script_versions_script_fk_idx on public.script_versions(script_id);
 create index if not exists user_badges_assigned_by_fk_idx on public.user_badges(assigned_by);
 create index if not exists user_badges_badge_fk_idx on public.user_badges(badge_id);
+
+-- RLS performance hardening
+ drop policy if exists fav_read on public.favorites; create policy fav_read on public.favorites for select to authenticated using((select auth.uid())=user_id);
+ drop policy if exists fav_insert on public.favorites; create policy fav_insert on public.favorites for insert to authenticated with check((select auth.uid())=user_id);
+ drop policy if exists fav_delete on public.favorites; create policy fav_delete on public.favorites for delete to authenticated using((select auth.uid())=user_id);
+ drop policy if exists notif_read on public.notifications; create policy notif_read on public.notifications for select to authenticated using((select auth.uid())=user_id);
+ drop policy if exists notif_update on public.notifications; create policy notif_update on public.notifications for update to authenticated using((select auth.uid())=user_id) with check((select auth.uid())=user_id);
+ drop policy if exists api_read on public.developer_api_keys; create policy api_read on public.developer_api_keys for select to authenticated using((select auth.uid())=user_id);
+ drop policy if exists api_insert on public.developer_api_keys; create policy api_insert on public.developer_api_keys for insert to authenticated with check((select auth.uid())=user_id);
+ drop policy if exists api_update on public.developer_api_keys; create policy api_update on public.developer_api_keys for update to authenticated using((select auth.uid())=user_id) with check((select auth.uid())=user_id);
+ drop policy if exists activity_read on public.activity_events; create policy activity_read on public.activity_events for select to authenticated using((select auth.uid())=user_id);
+ drop policy if exists activity_insert on public.activity_events; create policy activity_insert on public.activity_events for insert to authenticated with check((select auth.uid())=user_id);
+ drop policy if exists reports_read on public.reports; create policy reports_read on public.reports for select to authenticated using((select auth.uid())=user_id or public.is_staff((select auth.uid())));
+ drop policy if exists reports_insert on public.reports; create policy reports_insert on public.reports for insert to authenticated with check((select auth.uid())=user_id);
+ drop policy if exists versions_staff_insert on public.script_versions; create policy versions_staff_insert on public.script_versions for insert to authenticated with check(public.is_staff((select auth.uid())));
+ drop policy if exists events_staff on public.script_events; create policy events_staff on public.script_events for select to authenticated using(public.is_staff((select auth.uid())));
+ drop policy if exists admin_logs_staff_read on public.admin_logs; create policy admin_logs_staff_read on public.admin_logs for select to authenticated using(public.is_staff((select auth.uid())));
+ drop policy if exists admin_logs_staff_insert on public.admin_logs; create policy admin_logs_staff_insert on public.admin_logs for insert to authenticated with check(public.is_staff((select auth.uid())) and admin_id=(select auth.uid()));
