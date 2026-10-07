@@ -91,8 +91,10 @@ function Home() {
           <span className="chip mx-auto text-primary">
             <Sparkles size={12} /> Premium script library
           </span>
-          <h1 className="hero-title mt-6 font-display text-[2.6rem] font-black uppercase leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl">
-            <span className="hero-title-text" data-text={settings?.site_name ?? SITE_BRAND.name}>{settings?.site_name ?? SITE_BRAND.name}</span>
+          <h1 className="hero-title mt-6 font-display font-black tracking-tight">
+            <span className="hero-kicker">THE SCRIPT LIBRARY</span>
+            <span className="hero-title-text hero-title-main" data-text={settings?.site_name ?? SITE_BRAND.name}>{settings?.site_name ?? SITE_BRAND.name}</span>
+            <span className="hero-title-sub">Premium Lua scripts. <span>Fast to find.</span> Easy to use.</span>
           </h1>
           <div className="hero-title-line mx-auto mt-4" aria-hidden />
           <p className="mx-auto mt-4 max-w-xl text-sm text-muted-foreground sm:text-base">
