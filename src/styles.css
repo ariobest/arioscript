@@ -609,28 +609,40 @@ img, video, iframe { max-width: 100%; }
 .auth-cat-wrap {
   display: flex;
   justify-content: center;
-  perspective: 700px;
+  perspective: 800px;
   transform-origin: center;
-  animation: auth-cat-idle 3.2s ease-in-out infinite;
-  transition: transform .45s cubic-bezier(.22,.8,.25,1), filter .45s ease;
+  animation: auth-cat-float 2.4s ease-in-out infinite;
+  transition: transform .55s cubic-bezier(.22,.8,.25,1), filter .45s ease;
 }
 .auth-cat {
   transform-origin: center;
-  transition: transform .55s cubic-bezier(.22,.8,.25,1), filter .45s ease;
+  transition: transform .6s cubic-bezier(.22,.8,.25,1), filter .45s ease;
+  animation: auth-cat-breathe 1.8s ease-in-out infinite;
 }
 .auth-cat-away {
-  animation: none;
-  transform: translateX(8px) rotateY(180deg) rotateZ(-4deg) scale(.96);
-  filter: saturate(.75) brightness(.9);
+  animation: auth-cat-turn-away .65s cubic-bezier(.22,.8,.25,1) forwards;
+  filter: saturate(.7) brightness(.88);
 }
 .auth-cat-away .auth-cat {
-  transform: scaleX(-1);
+  animation: none;
+  transform: rotateY(180deg) rotateZ(-7deg) scale(.96);
 }
-@keyframes auth-cat-idle {
-  0%, 100% { transform: translateY(0) rotateZ(0); }
-  50% { transform: translateY(-5px) rotateZ(2deg); }
+@keyframes auth-cat-float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotateZ(-2deg); }
+  25% { transform: translate3d(-5px, -8px, 0) rotateZ(2deg); }
+  50% { transform: translate3d(0, -13px, 0) rotateZ(4deg); }
+  75% { transform: translate3d(5px, -7px, 0) rotateZ(-1deg); }
+}
+@keyframes auth-cat-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+@keyframes auth-cat-turn-away {
+  0% { transform: translateX(0) rotateZ(0) scale(1); }
+  45% { transform: translateX(12px) rotateZ(5deg) scale(1.02); }
+  100% { transform: translateX(10px) rotateY(180deg) rotateZ(-7deg) scale(.96); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .auth-cat-wrap { animation: none; transition: none; }
+  .auth-cat-wrap, .auth-cat { animation: none; }
   .auth-cat { transition: none; }
 }
