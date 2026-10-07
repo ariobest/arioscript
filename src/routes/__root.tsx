@@ -8,7 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Toaster } from "sonner";
+import { Toaster, toast } from "sonner";
 import { installUISounds, playSound } from "@/lib/sounds";
 
 import appCss from "../styles.css?url";
@@ -128,7 +128,24 @@ function RootComponent() {
       if (changes.some(change => [...change.addedNodes].some(node => node instanceof Element && (node.matches('[data-sonner-toast]') || node.querySelector('[data-sonner-toast]'))))) playSound("notification");
     });
     const host = document.querySelector('[data-sonner-toaster]');
-    if (host) observer.observe(host, { childList: true, subtree: true });
+    if (host) {
+      observer.observe(host, { childList: true, subtree: true });
+      const dismissOnClick = (event: Event) => {
+        const target = event.target as Element | null;
+        if (!target || target.closest("button")) return;
+        const notification = target.closest("[data-sonner-toast]") as HTMLElement | null;
+        const id = notification?.getAttribute("data-sonner-toast");
+        if (!notification || !id) return;
+        notification.classList.add("ario-toast-clicked");
+        window.setTimeout(() => toast.dismiss(id), 240);
+      };
+      host.addEventListener("click", dismissOnClick);
+      return () => {
+        cleanup();
+        observer.disconnect();
+        host.removeEventListener("click", dismissOnClick);
+      };
+    }
     return () => { cleanup(); observer.disconnect(); };
   }, []);
 
@@ -141,7 +158,7 @@ function RootComponent() {
         </SiteLayout>
         <RouteProgress />
         <Welcome />
-        <Toaster theme={mode} position="top-center" visibleToasts={3} closeButton richColors toastOptions={{ className: "ario-toast", duration: 4000 }} />
+        <Toaster theme={mode} position="top-center" visibleToasts={3} richColors toastOptions={{ className: "ario-toast", duration: 4000, closeButton: false }} />
       </AuthProvider>
     </QueryClientProvider>
   );
