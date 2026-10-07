@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Users, Terminal, Eye, Download, Copy, Heart, Flag, Wifi, Activity, KeyRound, Plus, Bot, Palette, Settings, Megaphone, ShieldCheck, Zap, Trophy,
+  Users, Terminal, Eye, Download, Copy, Heart, Flag, Wifi, Activity, KeyRound, Plus, Bot, Palette, Settings, Megaphone, ShieldCheck, Zap, Trophy, RefreshCw, Clock,
 } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,8 +48,10 @@ function Tile({ icon: Icon, label, value, pending }: { icon: React.ElementType; 
 }
 
 function Dashboard() {
+  const queryClient = useQueryClient();
+  const [range, setRange] = useState<7 | 30 | 90>(30);
   const stats = useAdminStats();
-  const ts = useTimeseries(30);
+  const ts = useTimeseries(range);
 
   const activity = useQuery({
     queryKey: ["recent_activity"],
@@ -74,12 +76,42 @@ function Dashboard() {
     },
   });
   const o = ov.data;
+  const refreshing = stats.isFetching || ts.isFetching || ov.isFetching || activity.isFetching;
+  const lastUpdated = Math.max(stats.dataUpdatedAt, ts.dataUpdatedAt, ov.dataUpdatedAt, activity.dataUpdatedAt);
+
+  async function refreshDashboard() {
+    await queryClient.invalidateQueries({ queryKey: ["admin_stats"] });
+    await queryClient.invalidateQueries({ queryKey: ["admin_ts"] });
+    await queryClient.invalidateQueries({ queryKey: ["admin_overview"] });
+    await queryClient.invalidateQueries({ queryKey: ["recent_activity"] });
+  }
 
   return (
     <div className="min-w-0 space-y-5 sm:space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold">Dashboard</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Live numbers straight from the database.</p>
+      <div className="glass relative overflow-hidden rounded-2xl p-4 sm:p-5">
+        <div className="absolute -right-20 -top-24 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"><Activity size={15} /></span>
+              <div>
+                <h1 className="font-display text-2xl font-bold">Admin Dashboard</h1>
+                <p className="mt-0.5 text-sm text-muted-foreground">Live operational overview from your database.</p>
+              </div>
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/30 px-2.5 py-1">
+                <span className={`h-1.5 w-1.5 rounded-full ${refreshing ? "animate-pulse bg-primary" : "bg-success"}`} />
+                {refreshing ? "Updating data…" : "Live"}
+              </span>
+              {lastUpdated > 0 && <span className="inline-flex items-center gap-1"><Clock size={11} /> Updated {new Date(lastUpdated).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>}
+            </div>
+          </div>
+          <button type="button" onClick={refreshDashboard} disabled={refreshing} className="btn btn-ghost inline-flex w-full shrink-0 items-center justify-center gap-2 sm:w-auto">
+            <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
+            {refreshing ? "Refreshing…" : "Refresh data"}
+          </button>
+        </div>
       </div>
 
         {stats.isError && <p className="text-sm text-destructive">Statistics could not be loaded. Please try again.</p>}
@@ -137,7 +169,19 @@ function Dashboard() {
       </div>
 
       <div className="glass min-w-0 overflow-hidden rounded-2xl p-3 sm:p-5">
-        <h2 className="mb-4 font-display font-semibold">Last 30 days</h2>
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-display font-semibold">Traffic overview</h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">Views, downloads and copies over the selected period.</p>
+          </div>
+          <div className="flex rounded-xl border border-border bg-background/30 p-1">
+            {[7, 30, 90].map((days) => (
+              <button key={days} type="button" onClick={() => setRange(days as 7 | 30 | 90)} className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${range === days ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"}`}>
+                {days}d
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="h-56 min-w-0 sm:h-64">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={ts.data ?? []}>
