@@ -11,14 +11,15 @@ import { ScriptGrid } from "@/components/site/ScriptCard";
 import { DynamicIcon } from "@/components/site/DynamicIcon";
 import type { Script } from "@/lib/types";
 import { useSettings } from "@/components/site/Layout";
+import { SITE_BRAND, siteTitle } from "@/lib/brand";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ARIO SCRIPTS — Premium Lua Script Database" },
-      { name: "description", content: "Browse featured, trending and most downloaded Lua scripts. Curated, verified and always up to date." },
-      { property: "og:title", content: "ARIO SCRIPTS — Premium Lua Script Database" },
-      { property: "og:description", content: "Browse featured, trending and most downloaded Lua scripts. Curated, verified and always up to date." },
+      { title: siteTitle() },
+      { name: "description", content: SITE_BRAND.description },
+      { property: "og:title", content: siteTitle() },
+      { property: "og:description", content: SITE_BRAND.description },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -91,11 +92,11 @@ function Home() {
             <Sparkles size={12} /> Premium script library
           </span>
           <h1 className="hero-title mt-6 font-display text-[2.6rem] font-black uppercase leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl">
-            <span className="hero-title-text" data-text={settings?.site_name ?? "ARIO SCRIPTS"}>{settings?.site_name ?? "ARIO SCRIPTS"}</span>
+            <span className="hero-title-text" data-text={settings?.site_name ?? SITE_BRAND.name}>{settings?.site_name ?? SITE_BRAND.name}</span>
           </h1>
           <div className="hero-title-line mx-auto mt-4" aria-hidden />
           <p className="mx-auto mt-4 max-w-xl text-sm text-muted-foreground sm:text-base">
-            {settings?.description ?? "A curated database of premium Lua scripts. Every script is hand-checked, versioned and kept working."}
+            {settings?.description ?? SITE_BRAND.description}
           </p>
 
           <form onSubmit={search} className="relative mx-auto mt-8 grid max-w-xl grid-cols-[minmax(0,1fr)_auto] gap-2 sm:block">
