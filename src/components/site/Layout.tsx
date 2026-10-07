@@ -3,7 +3,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Terminal, Search, Menu, X, Heart, LogIn, LogOut, Shield, Trophy, Gamepad2, LayoutGrid, User,
    MessageCircle, Youtube, Send, Github, ExternalLink,
-  KeyRound,
+  KeyRound, Bell, Code2, LayoutDashboard, Settings,
 } from "lucide-react";
 import { ThemePicker } from "./ThemePicker";
 import catLogo from "@/assets/ario-logo.png.asset.json";
@@ -19,6 +19,7 @@ const NAV = [
   { to: "/categories", label: "Categories", icon: LayoutGrid },
   { to: "/leaderboards", label: "Leaderboards", icon: Trophy },
   { to: "/keys", label: "Get Key", icon: KeyRound },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
 ] as const;
 
 export function useSettings() {
@@ -112,6 +113,8 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             <ThemePicker />
             {user ? (
               <>
+                <Link to="/dashboard" className="btn btn-ghost h-9 w-9 !p-0" aria-label="Dashboard"><LayoutDashboard size={16} /></Link>
+                <Link to="/notifications" className="btn btn-ghost h-9 w-9 !p-0" aria-label="Notifications"><Bell size={16} /></Link>
                 <Link to="/favorites" className="btn btn-ghost h-9 w-9 !p-0" aria-label="Favorites">
                   <Heart size={16} />
                 </Link>
