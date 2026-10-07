@@ -40,8 +40,8 @@ export function useTimeseries(days: number) {
 
 function Tile({ icon: Icon, label, value, pending }: { icon: React.ElementType; label: string; value?: number; pending?: boolean }) {
   return (
-    <div className="glass admin-stat-tile min-w-0 rounded-2xl p-3.5 sm:p-4">
-      <div className="grid h-8 w-8 place-items-center rounded-xl bg-primary/10 text-primary"><Icon size={15} /></div>
+    <div className="glass admin-stat-tile group relative min-w-0 overflow-hidden rounded-2xl border border-border/60 p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_12px_40px_-20px_hsl(var(--primary)/.45)] sm:p-4">
+      <div className="absolute -right-5 -top-5 h-16 w-16 rounded-full bg-primary/10 blur-2xl transition-opacity group-hover:opacity-100" /><div className="relative grid h-9 w-9 place-items-center rounded-xl border border-primary/15 bg-primary/10 text-primary"><Icon size={15} /></div>
       <p className="mt-3 truncate font-display text-xl font-bold">{pending ? "—" : compact(value ?? 0)}</p>
       <p className="truncate text-xs text-muted-foreground">{label}</p>
     </div>
@@ -89,14 +89,14 @@ function Dashboard() {
 
   return (
     <div className="min-w-0 space-y-5 sm:space-y-6">
-      <div className="glass relative overflow-hidden rounded-2xl p-4 sm:p-5">
+      <div className="glass relative overflow-hidden rounded-3xl border border-border/70 p-5 shadow-[0_18px_60px_-35px_hsl(var(--primary)/.5)] sm:p-6">
         <div className="absolute -right-20 -top-24 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"><Activity size={15} /></span>
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-primary/15 bg-primary/10 text-primary shadow-[0_0_24px_hsl(var(--primary)/.18)]"><Activity size={16} /></span>
               <div>
-                <h1 className="font-display text-2xl font-bold">Admin Dashboard</h1>
+                <div className="flex flex-wrap items-center gap-2"><h1 className="font-display text-2xl font-bold tracking-tight">Admin Dashboard</h1><span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">Control</span></div>
                 <p className="mt-0.5 text-sm text-muted-foreground">Live operational overview from your database.</p>
               </div>
             </div>
@@ -108,7 +108,7 @@ function Dashboard() {
               {lastUpdated > 0 && <span className="inline-flex items-center gap-1"><Clock size={11} /> Updated {new Date(lastUpdated).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>}
             </div>
           </div>
-          <button type="button" onClick={refreshDashboard} disabled={refreshing} className="btn btn-ghost inline-flex w-full shrink-0 items-center justify-center gap-2 sm:w-auto">
+          <button type="button" onClick={refreshDashboard} disabled={refreshing} className="btn btn-ghost inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl border border-border/70 bg-background/30 sm:w-auto">
             <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
             {refreshing ? "Refreshing…" : "Refresh data"}
           </button>
@@ -127,16 +127,16 @@ function Dashboard() {
         <Tile icon={Flag} label="Open reports" value={s['reports']} pending={!stats.data} />
       </div>
 
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {QUICK.map((q) => (
-          <Link key={q.to} to={q.to} className="glass admin-stat-tile flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-2xl p-3 text-center text-xs font-semibold transition-transform hover:-translate-y-0.5 hover:text-primary">
-            <q.icon size={18} className="text-primary" /> {q.label}
+          <Link key={q.to} to={q.to} className="glass admin-stat-tile group flex min-h-24 flex-col items-center justify-center gap-2 rounded-2xl border border-border/60 p-3 text-center text-xs font-semibold transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:bg-primary/[.04] hover:text-primary">
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110"><q.icon size={17} /></span>{q.label}
           </Link>
         ))}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="glass rounded-2xl p-4 sm:p-5">
+        <div className="glass rounded-2xl border border-border/60 p-4 shadow-[0_12px_40px_-30px_hsl(var(--primary)/.35)] sm:p-5">
           <div className="mb-3 flex items-center gap-2"><ShieldCheck size={15} className="text-primary" /><h2 className="font-display font-semibold">System status</h2></div>
           <ul className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
             <Status label="Key system" ok={!!o?.key_system} on="Online" off="Off" />
@@ -169,7 +169,7 @@ function Dashboard() {
         </div>
       </div>
 
-      <div className="glass min-w-0 overflow-hidden rounded-2xl p-3 sm:p-5">
+      <div className="glass min-w-0 overflow-hidden rounded-3xl border border-border/60 p-3 shadow-[0_18px_60px_-35px_hsl(var(--primary)/.45)] sm:p-5">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="font-display font-semibold">Traffic overview</h2>
