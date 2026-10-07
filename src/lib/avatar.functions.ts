@@ -6,7 +6,7 @@ const input = z.object({ image: z.string().max(7_000_000).regex(/^data:image\/(p
 
 export const uploadModeratedAvatar = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) => input.parse(data))
+  .validator((data) => input.parse(data))
   .handler(async ({ data, context }) => {
     const { userId, supabase } = context;
     const { data: profile, error: profileError } = await supabase.from("profiles").select("is_banned, is_disabled").eq("id", userId).single();
