@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Mail, Lock, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,17 +18,32 @@ function AuthPage() {
   const [username, setUsername] = useState("");
   const [busy, setBusy] = useState(false);
   const [passwordFocus, setPasswordFocus] = useState(false);
+  const alreadySignedInNotified = useRef(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const { data: settings } = useSettings();
   const registrationOpen = settings?.registration_enabled !== false;
 
   useEffect(() => {
-    if (user) navigate({ to: "/" });
+    if (!user || alreadySignedInNotified.current) return;
+
+    alreadySignedInNotified.current = true;
+    toast.info("You are already signed in.");
+    navigate({ to: "/" });
   }, [user, navigate]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (user) {
+      if (!alreadySignedInNotified.current) {
+        alreadySignedInNotified.current = true;
+        toast.info("You are already signed in.");
+      }
+      navigate({ to: "/" });
+      return;
+    }
+
     setBusy(true);
     try {
       if (mode === "signup") {
