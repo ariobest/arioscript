@@ -37,3 +37,19 @@ revoke all on function public.grant_owner_admin() from public;
 revoke all on function public.handle_new_user() from public;
 revoke all on function public.snapshot_script_version() from public;
 revoke all on function public.sync_favorite_count() from public;
+
+-- Performance hardening for platform tables
+create index if not exists activity_events_entity_idx on public.activity_events(entity_type,entity_id,created_at desc);
+create index if not exists activity_events_user_fk_idx on public.activity_events(user_id);
+create index if not exists admin_logs_admin_fk_idx on public.admin_logs(admin_id);
+create index if not exists developer_api_keys_user_fk_idx on public.developer_api_keys(user_id);
+create index if not exists favorites_script_fk_idx on public.favorites(script_id);
+create index if not exists notifications_user_fk_idx on public.notifications(user_id);
+create index if not exists reports_script_fk_idx on public.reports(script_id);
+create index if not exists reports_user_fk_idx on public.reports(user_id);
+create index if not exists script_events_script_fk_idx on public.script_events(script_id);
+create index if not exists script_events_user_fk_idx on public.script_events(user_id);
+create index if not exists script_versions_created_by_fk_idx on public.script_versions(created_by);
+create index if not exists script_versions_script_fk_idx on public.script_versions(script_id);
+create index if not exists user_badges_assigned_by_fk_idx on public.user_badges(assigned_by);
+create index if not exists user_badges_badge_fk_idx on public.user_badges(badge_id);
