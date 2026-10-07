@@ -67,7 +67,7 @@ function AuthPage() {
   return (
     <div className="mx-auto flex max-w-md flex-col px-4 py-16">
       <div className="glass fade-up rounded-2xl p-7">
-        <img src={logo.url} alt="ARIO SCRIPTS logo" className="mx-auto h-16 w-16 object-contain drop-shadow-lg" />
+        <div className={`auth-cat-wrap ${passwordFocus ? "auth-cat-away" : ""}`} aria-hidden="true"><img src={logo.url} alt="" className="auth-cat mx-auto h-16 w-16 object-contain drop-shadow-lg" /></div>
         <h1 className="mt-4 text-center font-display text-xl font-bold">
           {mode === "signin" ? "Sign in to ARIO SCRIPTS" : "Create your account"}
         </h1>
