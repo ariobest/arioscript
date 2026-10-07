@@ -114,7 +114,10 @@ function AuthPage() {
           <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
         </div>
 
-        <div className="grid gap-2 sm:grid-cols-2">\n          <button onClick={() => void google()} className="btn btn-ghost w-full">Continue with Google</button>\n          <button onClick={() => void discord()} className="btn btn-ghost w-full"><MessageCircle size={15} /> Continue with Discord</button>\n        </div>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <button onClick={() => void google()} className="btn btn-ghost w-full">Continue with Google</button>
+          <button onClick={() => void discord()} className="btn btn-ghost w-full"><MessageCircle size={15} /> Continue with Discord</button>
+        </div>
 
         <p className="mt-5 text-center text-xs text-muted-foreground">
           {mode === "signin" ? registrationOpen ? "No account yet?" : "Registration is currently closed." : "Already registered?"}{" "}
