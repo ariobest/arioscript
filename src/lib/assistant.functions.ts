@@ -12,7 +12,7 @@ const message = z.object({
 
 const input = z.object({
   messages: z.array(message).min(1).max(20),
-  model: z.enum(["openai/gpt-6-astra", "anthropic/claude-fable-5-1", "anthropic/claude-sonnet-5", "anthropic/claude-opus-5-5"]),
+  model: z.enum(["openai/gpt-6-astra", "anthropic/claude-haiku-4-5", "anthropic/claude-sonnet-4-5", "anthropic/claude-opus-4-1"]),
   library: z.enum(["windui", "rayfield", "orion"]),
 });
 
