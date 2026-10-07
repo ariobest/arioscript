@@ -32,3 +32,8 @@ drop policy if exists admin_logs_staff_read on public.admin_logs; create policy 
 drop policy if exists admin_logs_staff_insert on public.admin_logs; create policy admin_logs_staff_insert on public.admin_logs for insert to authenticated with check(public.is_staff(auth.uid()) and admin_id=auth.uid());
 drop policy if exists key_checks_staff_read on public.key_checks; create policy key_checks_staff_read on public.key_checks for select to authenticated using(public.is_staff(auth.uid()));
 drop policy if exists key_requests_own_read on public.key_requests; create policy key_requests_own_read on public.key_requests for select to authenticated using(auth.uid()=user_id or public.is_staff(auth.uid()));
+
+revoke all on function public.grant_owner_admin() from public;
+revoke all on function public.handle_new_user() from public;
+revoke all on function public.snapshot_script_version() from public;
+revoke all on function public.sync_favorite_count() from public;
