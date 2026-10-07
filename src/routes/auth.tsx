@@ -18,7 +18,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState(false);\n  const [passwordFocus, setPasswordFocus] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const { data: settings } = useSettings();
@@ -88,7 +88,7 @@ function AuthPage() {
           </div>
           <div className="relative">
             <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="input-base !pl-9" />
+            <input type="password" required minLength={6} value={password} onFocus={() => setPasswordFocus(true)} onBlur={() => setPasswordFocus(false)} onChange={(e) => { setPassword(e.target.value); setPasswordFocus(e.target.value.length > 0); }} placeholder="Password" className="input-base !pl-9" />
           </div>
           <button disabled={busy} className="btn btn-primary w-full">
             {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
