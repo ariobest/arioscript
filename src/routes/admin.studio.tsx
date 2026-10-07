@@ -11,6 +11,7 @@ import {
 import { toast } from "sonner";
 import { generateScript } from "@/lib/assistant.functions";
 import { CodeViewer } from "@/components/site/CodeViewer";
+import { KeySystemStudio } from "@/components/admin/KeySystemStudio";
 
 export const Route = createFileRoute("/admin/studio")({
   head: () => ({
@@ -57,6 +58,7 @@ function Studio() {
   const [model, setModel] = useState<(typeof MODELS)[number]["id"]>("anthropic/claude-sonnet-4-5");
   const [library, setLibrary] = useState<(typeof LIBRARIES)[number]>("windui");
   const [prompt, setPrompt] = useState("");
+  const [panel, setPanel] = useState<"icons" | "script" | "key">("script");
   const [busy, setBusy] = useState(false);
   const [code, setCode] = useState("");
   const ask = useServerFn(generateScript);
@@ -103,7 +105,14 @@ function Studio() {
         </div>
       </header>
 
-      <div className="grid gap-5 xl:grid-cols-[.9fr_1.1fr]">
+      <div className="glass flex flex-wrap gap-2 rounded-2xl p-2">
+        <button onClick={() => setPanel("script")} className={"btn " + (panel === "script" ? "btn-primary" : "btn-ghost")}><Sparkles size={14}/> Script maker</button>
+        <button onClick={() => setPanel("key")} className={"btn " + (panel === "key" ? "btn-primary" : "btn-ghost")}><KeyRound size={14}/> Key system maker</button>
+        <button onClick={() => setPanel("icons")} className={"btn " + (panel === "icons" ? "btn-primary" : "btn-ghost")}><Palette size={14}/> Icon studio</button>
+      </div>
+
+      {panel === "key" && <KeySystemStudio />}
+      {panel !== "key" && <div className="grid gap-5 xl:grid-cols-[.9fr_1.1fr]">
         <section className="glass rounded-3xl p-4 sm:p-5">
           <div className="flex items-center gap-2">
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary"><Palette size={16} /></span>
@@ -150,7 +159,7 @@ function Studio() {
           </button>
           {code && <div className="mt-4"><CodeViewer code={code} filename={`ario-${library}-generated.lua`} /></div>}
         </section>
-      </div>
+      </div>}
     </div>
   );
 }
