@@ -259,6 +259,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/notifications': typeof NotificationsRoute
+  '/settings': typeof SettingsRoute
+  '/api-docs': typeof ApiDocsRoute
+  '/api/v1/scripts': typeof ApiV1ScriptsRoute
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
   '/keys': typeof KeysRoute
@@ -327,6 +332,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dashboard'
+    | '/notifications'
+    | '/settings'
+    | '/api-docs'
+    | '/api/v1/scripts'
     | '/admin'
     | '/auth'
     | '/favorites'
@@ -360,6 +370,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/dashboard'
+    | '/notifications'
+    | '/settings'
+    | '/api-docs'
+    | '/api/v1/scripts'
     | '/auth'
     | '/favorites'
     | '/keys'
