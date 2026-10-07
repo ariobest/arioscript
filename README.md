@@ -1,4 +1,4 @@
-# Ario Script Hub
+# Ario Scripts Hub
 
 Build a modern, premium dark website called "ARIO SCRIPTS".
 
