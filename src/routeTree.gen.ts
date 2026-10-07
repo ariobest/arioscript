@@ -29,6 +29,8 @@ import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminThemesRouteImport } from './routes/admin.themes'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminStudioRouteImport } from './routes/admin.studio'
+import { Route as AdminDiscordRouteImport } from './routes/admin.discord'
 import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as GamesIndexRouteImport } from './routes/games.index'
@@ -134,6 +136,16 @@ const AdminThemesRoute = AdminThemesRouteImport.update({
   path: '/themes',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminStudioRoute = AdminStudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDiscordRoute = AdminDiscordRouteImport.update({
+  id: '/discord',
+  path: '/discord',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -205,6 +217,12 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/themes': typeof AdminThemesRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/studio': typeof AdminStudioRoute
+  '/admin/discord': typeof AdminDiscordRoute
+  '/admin/studio': typeof AdminStudioRoute
+  '/admin/discord': typeof AdminDiscordRoute
+  '/admin/studio': typeof AdminStudioRoute
+  '/admin/discord': typeof AdminDiscordRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/games/$game': typeof GamesGameRoute
   '/raw/$slug': typeof RawSlugRoute
@@ -300,6 +318,8 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/themes'
     | '/admin/users'
+    | '/admin/studio'
+    | '/admin/discord'
     | '/categories/$slug'
     | '/games/$game'
     | '/raw/$slug'
@@ -526,6 +546,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminThemesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/studio': {
+      id: '/admin/studio'
+      path: '/studio'
+      fullPath: '/admin/studio'
+      preLoaderRoute: typeof AdminStudioRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/discord': {
+      id: '/admin/discord'
+      path: '/discord'
+      fullPath: '/admin/discord'
+      preLoaderRoute: typeof AdminDiscordRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -613,6 +647,8 @@ interface AdminRouteChildren {
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminThemesRoute: typeof AdminThemesRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminStudioRoute: typeof AdminStudioRoute
+  AdminDiscordRoute: typeof AdminDiscordRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -630,6 +666,8 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSettingsRoute: AdminSettingsRoute,
   AdminThemesRoute: AdminThemesRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminStudioRoute: AdminStudioRoute,
+  AdminDiscordRoute: AdminDiscordRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
