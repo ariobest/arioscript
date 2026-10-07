@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Mail, Lock, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/useAuth";
 import { useSettings } from "@/components/site/Layout";
 
@@ -55,13 +54,17 @@ function AuthPage() {
   }
 
   async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    if (result.error) {
-      toast.error("Google sign-in failed");
-      return;
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+      if (error) throw error;
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Google sign-in failed");
     }
-    if (result.redirected) return;
-    navigate({ to: "/" });
   }
 
   return (
