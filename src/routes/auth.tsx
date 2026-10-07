@@ -26,7 +26,6 @@ function AuthPage() {
 
   useEffect(() => {
     if (!user || alreadySignedInNotified.current) return;
-
     alreadySignedInNotified.current = true;
     toast.info("You are already signed in.");
     navigate({ to: "/" });
@@ -34,7 +33,6 @@ function AuthPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-
     if (user) {
       if (!alreadySignedInNotified.current) {
         alreadySignedInNotified.current = true;
@@ -94,6 +92,15 @@ function AuthPage() {
             <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input type="password" required minLength={6} value={password} onFocus={() => setPasswordFocus(true)} onBlur={() => setPasswordFocus(false)} onChange={(e) => { setPassword(e.target.value); setPasswordFocus(e.target.value.length > 0); }} placeholder="Password" className="input-base !pl-9" />
           </div>
+
+          {mode === "signin" && (
+            <div className="flex justify-end">
+              <button type="button" onClick={() => navigate({ to: "/forgot-password" })} className="text-xs font-semibold text-primary hover:underline">
+                Forgot password?
+              </button>
+            </div>
+          )}
+
           <button disabled={busy} className="btn btn-primary w-full">
             {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
           </button>
