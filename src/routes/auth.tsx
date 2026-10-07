@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Mail, Lock, User as UserIcon, MessageCircle } from "lucide-react";
+import { Mail, Lock, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -53,32 +53,6 @@ function AuthPage() {
     }
   }
 
-  async function discord() {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "discord",
-        options: { redirectTo: window.location.origin },
-      });
-      if (error) throw error;
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Discord sign-in failed");
-    }
-  }
-
-  async function google() {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin,
-        },
-      });
-      if (error) throw error;
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Google sign-in failed");
-    }
-  }
-
   return (
     <div className="mx-auto flex max-w-md flex-col px-4 py-16">
       <div className="glass fade-up rounded-2xl p-7">
@@ -109,15 +83,6 @@ function AuthPage() {
             {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
           </button>
         </form>
-
-        <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
-        </div>
-
-        <div className="grid gap-2 sm:grid-cols-2">
-          <button onClick={() => void google()} className="btn btn-ghost w-full">Continue with Google</button>
-          <button onClick={() => void discord()} className="btn btn-ghost w-full"><MessageCircle size={15} /> Continue with Discord</button>
-        </div>
 
         <p className="mt-5 text-center text-xs text-muted-foreground">
           {mode === "signin" ? registrationOpen ? "No account yet?" : "Registration is currently closed." : "Already registered?"}{" "}
