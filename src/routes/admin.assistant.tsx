@@ -21,13 +21,13 @@ export const Route = createFileRoute("/admin/assistant")({
 });
 
 type Msg = { role: "user" | "assistant"; content: string };
-type Model = "openai/gpt-6-astra" | "anthropic/claude-fable-5-1" | "anthropic/claude-sonnet-5" | "anthropic/claude-opus-5-5";
+type Model = "openai/gpt-6-astra" | "anthropic/claude-haiku-4-5" | "anthropic/claude-sonnet-4-5" | "anthropic/claude-opus-4-1";
 type Library = "windui" | "rayfield" | "orion";
 const MODELS: { id: Model; label: string }[] = [
   { id: "openai/gpt-6-astra", label: "GPT-6 Astra" },
-  { id: "anthropic/claude-fable-5-1", label: "Claude Fable 5.1" },
-  { id: "anthropic/claude-sonnet-5", label: "Claude Sonnet 5" },
-  { id: "anthropic/claude-opus-5-5", label: "Claude Opus 5.5" },
+  { id: "anthropic/claude-haiku-4-5", label: "Claude Haiku 4.5" },
+  { id: "anthropic/claude-sonnet-4-5", label: "Claude Sonnet 4.5" },
+  { id: "anthropic/claude-opus-4-1", label: "Claude Opus 4.1" },
 ];
 
 const PRESETS = [
@@ -48,7 +48,7 @@ function Assistant() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [prompt, setPrompt] = useState("");
   const [busy, setBusy] = useState(false);
-  const [model, setModel] = useState<Model>("openai/gpt-6-astra");
+  const [model, setModel] = useState<Model>("anthropic/claude-sonnet-4-5");
   const [library, setLibrary] = useState<Library>("windui");
   const ask = useServerFn(generateScript);
   const endRef = useRef<HTMLDivElement>(null);
