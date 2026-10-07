@@ -13,11 +13,11 @@ export type Theme = (typeof THEMES)[number];
 const KEY = "ario-theme";
 const MODE_KEY = "ario-mode";
 const BACKDROP_KEY = "ario-backdrop";
-export type Backdrop = "glow" | "grid" | "plain";
+export type Backdrop = "glow" | "grid" | "plain" | "particles" | "aurora" | "waves" | "matrix";
 export function getBackdrop(): Backdrop {
   if (typeof window === "undefined") return "glow";
   const value = localStorage.getItem(BACKDROP_KEY);
-  return value === "grid" || value === "plain" ? value : "glow";
+  return ["glow", "grid", "plain", "particles", "aurora", "waves", "matrix"].includes(value ?? "") ? value as Backdrop : "glow";
 }
 export function applyBackdrop(value: Backdrop) {
   if (typeof document === "undefined") return;
