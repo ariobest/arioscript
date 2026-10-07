@@ -165,6 +165,14 @@
 }
 html[data-backdrop="plain"] body { background-image: none !important; }
 html[data-backdrop="grid"] body { background-image: linear-gradient(color-mix(in oklab, var(--primary) 7%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in oklab, var(--primary) 7%, transparent) 1px, transparent 1px) !important; background-size: 36px 36px; }
+html[data-backdrop="particles"] body { background-image: radial-gradient(circle at 10% 20%, color-mix(in oklab, var(--primary) 18%, transparent) 0 1px, transparent 2px), radial-gradient(circle at 30% 70%, color-mix(in oklab, var(--accent) 16%, transparent) 0 1px, transparent 2px), radial-gradient(circle at 70% 30%, color-mix(in oklab, var(--primary) 16%, transparent) 0 1px, transparent 2px), radial-gradient(circle at 90% 80%, color-mix(in oklab, var(--accent) 14%, transparent) 0 1px, transparent 2px) !important; background-size: 140px 140px, 190px 190px, 230px 230px, 170px 170px; animation: particleBackdrop 16s linear infinite; }
+html[data-backdrop="aurora"] body { background-image: radial-gradient(45rem 28rem at 15% 0%, color-mix(in oklab, var(--primary) 28%, transparent), transparent 70%), radial-gradient(40rem 26rem at 85% 10%, color-mix(in oklab, var(--accent) 24%, transparent), transparent 70%), radial-gradient(35rem 24rem at 50% 90%, color-mix(in oklab, var(--primary) 18%, transparent), transparent 70%) !important; background-size: 140% 140%; animation: auroraBackdrop 12s ease-in-out infinite alternate; }
+html[data-backdrop="waves"] body { background-image: repeating-radial-gradient(ellipse at 50% 120%, transparent 0 70px, color-mix(in oklab, var(--primary) 8%, transparent) 71px 72px), linear-gradient(135deg, color-mix(in oklab, var(--primary) 8%, transparent), transparent 45%) !important; background-size: 100% 100%, 200% 200%; animation: wavesBackdrop 14s ease-in-out infinite alternate; }
+html[data-backdrop="matrix"] body { background-image: linear-gradient(color-mix(in oklab, var(--primary) 8%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in oklab, var(--primary) 5%, transparent) 1px, transparent 1px), radial-gradient(circle at 50% -10%, color-mix(in oklab, var(--primary) 22%, transparent), transparent 55%) !important; background-size: 24px 24px, 24px 24px, 100% 100%; animation: matrixBackdrop 9s linear infinite; }
+@keyframes particleBackdrop { to { background-position: 140px 90px, -190px 120px, 230px -80px, -170px 100px; } }
+@keyframes auroraBackdrop { from { background-position: 0% 0%; filter: saturate(1); } to { background-position: 100% 60%; filter: saturate(1.25); } }
+@keyframes wavesBackdrop { from { background-position: 0 0, 0 0; } to { background-position: 0 20px, 60px -40px; } }
+@keyframes matrixBackdrop { to { background-position: 0 24px, 24px 0, 0 0; } }
 
 @utility glass {
   background: linear-gradient(160deg, color-mix(in oklab, var(--card) 78%, transparent), color-mix(in oklab, var(--background) 74%, transparent));
