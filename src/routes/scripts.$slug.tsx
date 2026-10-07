@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
-  BadgeCheck, Copy, Download, Eye, Flag, Heart, Share2, Star, Tag, Clock, Gamepad2, ArrowLeft,
+  BadgeCheck, Copy, Download, Eye, Flag, Heart, Share2, Star, Tag, Clock, Gamepad2, ArrowLeft, History,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,6 +42,8 @@ function ScriptPage() {
       return data as unknown as Script | null;
     },
   });
+
+  const versions = useQuery({ queryKey: ["script-versions", script.data?.id], enabled: !!script.data?.id, queryFn: async () => { const { data, error } = await (supabase as any).from("script_versions").select("id,version,changelog,created_at").eq("script_id", script.data!.id).order("created_at", { ascending: false }).limit(20); if (error) throw error; return data ?? []; } });
 
   const fav = useQuery({
     queryKey: ["fav", script.data?.id, user?.id],
@@ -192,6 +194,8 @@ function ScriptPage() {
             <h2 className="mb-3 font-display text-lg font-semibold">Loader</h2>
             <CodeViewer code={loaderCommand(s.raw_loader_url)} filename={`${s.slug}-loader.lua`} downloadEnabled={s.download_enabled} onCopy={() => { void recordEvent(s.id, "copy").then(() => { void qc.invalidateQueries({ queryKey: ["script", slug] }); void qc.invalidateQueries({ queryKey: ["stats"] }); }).catch(() => toast.error("Copy count could not be updated")); toast.success("Loader copied to clipboard"); }} onDownload={() => { void recordEvent(s.id, "download").then(() => { void qc.invalidateQueries({ queryKey: ["script", slug] }); void qc.invalidateQueries({ queryKey: ["stats"] }); }).catch(() => toast.error("Download count could not be updated")); }} />
           </div>}
+
+          {versions.data?.length ? <section className="glass rounded-2xl p-5"><div className="flex items-center gap-2"><History size={16} className="text-primary"/><h2 className="font-display text-lg font-semibold">Version history</h2></div><div className="mt-4 space-y-2">{versions.data.map((v:any)=><div key={v.id} className="flex items-center gap-3 rounded-xl border border-border p-3"><span className="chip text-primary">v{v.version}</span><div className="min-w-0 flex-1"><p className="text-sm font-medium">{v.changelog||"Version update"}</p><p className="text-xs text-muted-foreground">{new Date(v.created_at).toLocaleString()}</p></div></div>)}</div></section> : null}
 
           {s.code && <CodeViewer
             code={s.code}
