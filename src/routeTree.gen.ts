@@ -227,6 +227,8 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof NotificationsRoute
   '/settings': typeof SettingsRoute
   '/api-docs': typeof ApiDocsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/api/v1/scripts': typeof ApiV1ScriptsRoute
   '/api/v1/scripts/$slug': typeof ApiV1ScriptsSlugRoute
   '/admin': typeof AdminRouteWithChildren
@@ -444,6 +446,8 @@ export interface RootRouteChildren {
   NotificationsRoute: typeof NotificationsRoute
   SettingsRoute: typeof SettingsRoute
   ApiDocsRoute: typeof ApiDocsRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ApiV1ScriptsRoute: typeof ApiV1ScriptsRoute
   ApiV1ScriptsSlugRoute: typeof ApiV1ScriptsSlugRoute
   AdminRoute: typeof AdminRouteWithChildren
@@ -470,6 +474,8 @@ declare module '@tanstack/react-router' {
     '/api-docs': { id: '/api-docs', path: '/api-docs', fullPath: '/api-docs', preLoaderRoute: typeof ApiDocsRouteImport, parentRoute: typeof rootRouteImport }
     '/api/v1/scripts': { id: '/api/v1/scripts', path: '/api/v1/scripts', fullPath: '/api/v1/scripts', preLoaderRoute: typeof ApiV1ScriptsRouteImport, parentRoute: typeof rootRouteImport }
     '/api/v1/scripts/$slug': { id: '/api/v1/scripts/$slug', path: '/api/v1/scripts/$slug', fullPath: '/api/v1/scripts/$slug', preLoaderRoute: typeof ApiV1ScriptsSlugRouteImport, parentRoute: typeof rootRouteImport }
+    '/forgot-password': { id: '/forgot-password', path: '/forgot-password', fullPath: '/forgot-password', preLoaderRoute: typeof ForgotPasswordRouteImport, parentRoute: typeof rootRouteImport }
+    '/reset-password': { id: '/reset-password', path: '/reset-password', fullPath: '/reset-password', preLoaderRoute: typeof ResetPasswordRouteImport, parentRoute: typeof rootRouteImport }
     '/': {
       id: '/'
       path: '/'
