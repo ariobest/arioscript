@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { THEMES, applyTheme, applyMode } from "@/lib/theme";
+import { SITE_BRAND } from "@/lib/brand";
 
 const NAV = [
   { to: "/scripts", label: "Scripts", icon: Terminal },
@@ -80,7 +81,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           <Link to="/" className="flex min-w-0 items-center gap-2">
              <img src={catLogo.url} alt="" className="h-9 w-9 shrink-0 object-contain drop-shadow-[0_0_10px_var(--primary)]" />
              <span className="min-w-0 truncate font-display text-sm font-bold tracking-tight sm:text-base">
-              {settings?.site_name ?? "ARIO SCRIPTS"}
+              {settings?.site_name ?? SITE_BRAND.name}
             </span>
           </Link>
 
@@ -167,10 +168,10 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             <span className="grid h-8 w-8 place-items-center rounded-xl bg-primary/15 text-primary">
               <Terminal size={16} />
             </span>
-            <span className="font-display font-bold">{settings?.site_name ?? "ARIO SCRIPTS"}</span>
+            <span className="font-display font-bold">{settings?.site_name ?? SITE_BRAND.name}</span>
           </Link>
           <p className="max-w-md text-sm text-muted-foreground">
-            {settings?.description ?? "A curated, admin-managed script database."}
+            {settings?.description ?? SITE_BRAND.description}
           </p>
           <div className="flex gap-2">
             {settings?.discord_url && (
@@ -188,7 +189,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             {settings?.other_social_url && <a href={settings.other_social_url} target="_blank" rel="noreferrer" className="btn btn-ghost h-9 w-9 !p-0" aria-label="Other social link"><ExternalLink size={16} /></a>}
           </div>
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} {settings?.site_name ?? "ARIO SCRIPTS"}. Scripts are curated by our team.
+            © {new Date().getFullYear()} {settings?.site_name ?? SITE_BRAND.name}. Scripts are curated by our team.
           </p>
         </div>
       </footer>
