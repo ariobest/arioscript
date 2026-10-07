@@ -45,12 +45,12 @@ export function ThemePicker() {
       </button>
       {open && (
         <div className="glass appearance-panel fade-up fixed inset-x-4 top-16 z-50 rounded-2xl p-3 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-64">
-          <div className="mb-3 flex gap-1 rounded-lg bg-secondary p-1">
+          <div className="mb-3 grid grid-cols-4 gap-1 rounded-lg bg-secondary p-1">
             {(["dark", "light"] as const).map((value) => <button key={value} onClick={() => { setMode(value); applyMode(value); }} className={`btn flex-1 !py-1.5 capitalize ${mode === value ? "btn-primary" : "btn-ghost"}`}>{value === "dark" ? <Moon size={13} /> : <Sun size={13} />}{value}</button>)}
           </div>
           <p className="mb-1 px-1 text-xs font-semibold text-muted-foreground">Background</p>
           <div className="mb-3 flex gap-1 rounded-lg bg-secondary p-1">
-            {(["glow", "grid", "plain"] as const).map(value => <button key={value} onClick={() => { setBackdrop(value); applyBackdrop(value); }} className={`btn min-w-0 flex-1 !px-1 !py-1.5 text-xs capitalize ${backdrop === value ? "btn-primary" : "btn-ghost"}`}>{value}</button>)}
+            {(["glow", "grid", "particles", "aurora", "waves", "matrix", "plain"] as const).map(value => <button key={value} onClick={() => { setBackdrop(value); applyBackdrop(value); }} className={`btn min-w-0 !px-1 !py-1.5 text-xs capitalize ${backdrop === value ? "btn-primary" : "btn-ghost"}`}>{value}</button>)}
           </div>
           <button onClick={() => { setSoundsEnabled(!soundOn); setSoundOn(!soundOn); }} className="btn btn-ghost mb-3 w-full justify-start text-xs" aria-label={soundOn ? "Mute UI sounds" : "Enable UI sounds"}>{soundOn ? <Volume2 size={14} /> : <VolumeX size={14} />} UI sounds {soundOn ? "on" : "off"}</button>
           <p className="mb-2 px-1 text-xs font-semibold text-muted-foreground">50 themes</p>
