@@ -252,6 +252,13 @@ html[data-backdrop="matrix"] body { background-image: linear-gradient(color-mix(
 @keyframes arrivalLabel { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .welcome-flight *, .welcome-flight::before, .welcome-flight::after { animation: none !important; } .welcome-rocket { transform: rotate(-45deg); } }
 
+/* Theme-adaptive logo */
+.ario-theme-logo { transition: filter .55s ease, transform .55s ease, opacity .35s ease; filter: drop-shadow(0 0 10px color-mix(in oklab, var(--primary) 75%, transparent)); }
+[data-theme="royal"] .ario-theme-logo { filter: hue-rotate(8deg) saturate(1.35) drop-shadow(0 0 12px color-mix(in oklab, var(--primary) 85%, transparent)); }
+[data-theme="neon"] .ario-theme-logo, [data-theme="matrix"] .ario-theme-logo { filter: saturate(1.65) brightness(1.08) drop-shadow(0 0 14px color-mix(in oklab, var(--primary) 90%, transparent)); }
+[data-theme="mono"] .ario-theme-logo, [data-theme="silver"] .ario-theme-logo, [data-theme="pearl"] .ario-theme-logo { filter: grayscale(1) brightness(1.35) drop-shadow(0 0 10px color-mix(in oklab, var(--primary) 60%, transparent)); }
+[data-theme="blood"] .ario-theme-logo, [data-theme="crimson"] .ario-theme-logo, [data-theme="ruby"] .ario-theme-logo { filter: saturate(1.7) hue-rotate(-18deg) drop-shadow(0 0 13px color-mix(in oklab, var(--primary) 85%, transparent)); }
+
 /* Theme switching */
 .theme-transition, .theme-transition *, .theme-transition *::before, .theme-transition *::after {
   transition: background-color .5s ease, border-color .5s ease, color .4s ease, box-shadow .5s ease, fill .4s ease !important;
