@@ -291,6 +291,58 @@ img, video, iframe { max-width: 100%; }
 .mobile-action { display: flex; min-width: 0; min-height: 3.25rem; flex-direction: column; align-items: center; justify-content: center; gap: .2rem; border-radius: .75rem; color: var(--muted-foreground); font-size: .625rem; font-weight: 700; transition: background-color .2s ease, color .2s ease, transform .2s ease; }
 .mobile-action:active { transform: scale(.96); background: color-mix(in oklab, var(--primary) 10%, transparent); }
 .mobile-action-primary { background: var(--primary); color: var(--primary-foreground); }
+.ario-toast[data-sonner-toast] {
+  width: min(420px, calc(100vw - 2rem)) !important;
+  min-height: 58px;
+  border-radius: 16px !important;
+  padding: 13px 42px 13px 15px !important;
+}
+.ario-toast[data-sonner-toast] [data-title] {
+  font-size: .9rem;
+  line-height: 1.25;
+}
+.ario-toast[data-sonner-toast] [data-description] {
+  margin-top: 3px;
+  font-size: .78rem;
+  line-height: 1.35;
+}
+.ario-toast[data-sonner-toast] [data-close-button] {
+  width: 30px !important;
+  height: 30px !important;
+  top: 50% !important;
+  right: 9px !important;
+  transform: translateY(-50%) !important;
+  border-radius: 9px !important;
+  background: color-mix(in oklab, var(--foreground) 7%, transparent) !important;
+  border: 1px solid var(--border) !important;
+}
+.ario-toast[data-sonner-toast] [data-button] {
+  min-height: 36px;
+  border-radius: 10px;
+}
+@media (max-width: 639px) {
+  [data-sonner-toaster] {
+    width: 100% !important;
+    padding-inline: .75rem !important;
+  }
+  [data-sonner-toaster][data-y-position="top"] {
+    top: max(4rem, env(safe-area-inset-top)) !important;
+  }
+  [data-sonner-toaster][data-y-position="bottom"] {
+    bottom: max(.75rem, env(safe-area-inset-bottom)) !important;
+  }
+  .ario-toast[data-sonner-toast] {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 56px;
+    border-radius: 15px !important;
+    padding: 12px 43px 12px 14px !important;
+  }
+  .ario-toast[data-sonner-toast] [data-icon] {
+    margin-right: 2px;
+  }
+}
+
 @media (max-width: 639px) {
   .btn { min-height: 2.5rem; }
   .glass table { font-size: .8125rem; }
