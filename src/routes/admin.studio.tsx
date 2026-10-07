@@ -113,7 +113,7 @@ function Studio() {
 
       {panel === "key" && <KeySystemStudio />}
       {panel !== "key" && <div className="grid gap-5 xl:grid-cols-[.9fr_1.1fr]">
-        <section className="glass rounded-3xl p-4 sm:p-5">
+        {panel === "icons" && <section className="glass rounded-3xl p-4 sm:p-5">
           <div className="flex items-center gap-2">
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary"><Palette size={16} /></span>
             <div><h2 className="font-display font-semibold">Icon studio</h2><p className="text-xs text-muted-foreground">Pick an icon and copy ready-to-use code.</p></div>
