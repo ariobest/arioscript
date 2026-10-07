@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Mail, Lock, User as UserIcon } from "lucide-react";
+import { Mail, Lock, User as UserIcon, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -53,6 +53,18 @@ function AuthPage() {
     }
   }
 
+  async function discord() {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "discord",
+        options: { redirectTo: window.location.origin },
+      });
+      if (error) throw error;
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Discord sign-in failed");
+    }
+  }
+
   async function google() {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -102,7 +114,7 @@ function AuthPage() {
           <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
         </div>
 
-        <button onClick={() => void google()} className="btn btn-ghost w-full">Continue with Google</button>
+        <div className="grid gap-2 sm:grid-cols-2">\n          <button onClick={() => void google()} className="btn btn-ghost w-full">Continue with Google</button>\n          <button onClick={() => void discord()} className="btn btn-ghost w-full"><MessageCircle size={15} /> Continue with Discord</button>\n        </div>
 
         <p className="mt-5 text-center text-xs text-muted-foreground">
           {mode === "signin" ? registrationOpen ? "No account yet?" : "Registration is currently closed." : "Already registered?"}{" "}
