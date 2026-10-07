@@ -146,7 +146,7 @@ async function runAstra(key: string, system: string, messages: z.infer<typeof me
 
 export const generateScript = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) => input.parse(data))
+  .validator((data) => input.parse(data))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: isAdmin, error: roleError } = await supabase.rpc("has_role", {
