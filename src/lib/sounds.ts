@@ -1,12 +1,13 @@
-export type SoundKind = "click" | "toggle" | "tab" | "notification" | "open" | "close";
+export type SoundKind = "click" | "toggle" | "tab" | "notification" | "open" | "close" | "success" | "error" | "copy" | "theme";
 const KEY = "ario-ui-sounds";
+const VOLUME_KEY = "ario-ui-volume";
 let audio: AudioContext | null = null;
 
 export function soundsEnabled() {
   return typeof window !== "undefined" && localStorage.getItem(KEY) === "on";
 }
 
-export function setSoundsEnabled(enabled: boolean) {
+export function getSoundVolume() {\n  if (typeof window === "undefined") return 0.45;\n  const value = Number(localStorage.getItem(VOLUME_KEY));\n  return Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0.45;\n}\n\nexport function setSoundVolume(value: number) {\n  const next = Math.min(1, Math.max(0, value));\n  localStorage.setItem(VOLUME_KEY, String(next));\n  window.dispatchEvent(new Event("ario-appearance"));\n}\n\nexport function setSoundsEnabled(enabled: boolean) {
   localStorage.setItem(KEY, enabled ? "on" : "off");
   window.dispatchEvent(new Event("ario-appearance"));
   if (enabled) playSound("toggle", true);
@@ -19,7 +20,7 @@ export function playSound(kind: SoundKind, force = false) {
     if (audio.state === "suspended") void audio.resume();
     const now = audio.currentTime;
     const notes: Record<SoundKind, [number, number]> = {
-      click: [490, 660], toggle: [440, 820], tab: [360, 560], notification: [700, 1040], open: [420, 760], close: [680, 360],
+      click: [490, 660], toggle: [440, 820], tab: [360, 560], notification: [700, 1040], open: [420, 760], close: [680, 360], success: [620, 920], error: [260, 180], copy: [560, 840], theme: [430, 780],
     };
     const [first, second] = notes[kind];
     for (const [i, frequency] of [first, second].entries()) {
@@ -28,7 +29,7 @@ export function playSound(kind: SoundKind, force = false) {
       oscillator.type = "sine";
       oscillator.frequency.setValueAtTime(frequency, now + i * 0.055);
       gain.gain.setValueAtTime(0.0001, now + i * 0.055);
-      gain.gain.exponentialRampToValueAtTime(0.025, now + i * 0.055 + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.045 * getSoundVolume(), now + i * 0.055 + 0.008);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.055 + 0.095);
       oscillator.connect(gain).connect(audio.destination);
       oscillator.start(now + i * 0.055);
