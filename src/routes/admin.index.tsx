@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Users, Terminal, Eye, Download, Copy, Heart, Flag, Wifi, Activity, KeyRound, Plus, Bot, Palette, Settings, Megaphone, ShieldCheck, Zap, Trophy, RefreshCw, Clock,
+  Users, Terminal, Eye, Download, Copy, Heart, Flag, Wifi, Activity, KeyRound, Plus, Bot, Palette, Settings, Megaphone, ShieldCheck, Zap, Trophy, RefreshCw, Clock, ArrowUpRight, Server, Gauge, CircleDot,
 } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
@@ -127,7 +127,7 @@ function Dashboard() {
         <Tile icon={Flag} label="Open reports" value={s['reports']} pending={!stats.data} />
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="glass rounded-3xl border border-border/60 p-3 shadow-[0_16px_50px_-35px_hsl(var(--primary)/.4)] sm:p-4"><div className="mb-3 flex items-center justify-between px-1"><div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-primary">Admin controls</p><p className="text-xs text-muted-foreground">Jump directly into management tools.</p></div><Gauge size={16} className="text-muted-foreground" /></div><div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {QUICK.map((q) => (
           <Link key={q.to} to={q.to} className="glass admin-stat-tile group flex min-h-24 flex-col items-center justify-center gap-2 rounded-2xl border border-border/60 p-3 text-center text-xs font-semibold transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:bg-primary/[.04] hover:text-primary">
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110"><q.icon size={17} /></span>{q.label}
@@ -137,7 +137,7 @@ function Dashboard() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="glass rounded-2xl border border-border/60 p-4 shadow-[0_12px_40px_-30px_hsl(var(--primary)/.35)] sm:p-5">
-          <div className="mb-3 flex items-center gap-2"><ShieldCheck size={15} className="text-primary" /><h2 className="font-display font-semibold">System status</h2></div>
+          <div className="mb-4 flex items-center gap-2"><span className="grid h-8 w-8 place-items-center rounded-xl bg-primary/10 text-primary"><ShieldCheck size={15} /></span><div><h2 className="font-display font-semibold">System status</h2><p className="text-[11px] text-muted-foreground">Core services at a glance</p></div><span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2 py-1 text-[10px] font-bold text-success"><CircleDot size={10} /> MONITORING</span></div>
           <ul className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
             <Status label="Key system" ok={!!o?.key_system} on="Online" off="Off" />
             <Status label="Maintenance" ok={!o?.maintenance} on="Site live" off="Maintenance on" />
@@ -154,10 +154,10 @@ function Dashboard() {
           </div>
         </div>
         <div className="glass rounded-2xl p-4 sm:p-5">
-          <div className="mb-3 flex items-center gap-2"><Trophy size={15} className="text-primary" /><h2 className="font-display font-semibold">Top scripts</h2></div>
+          <div className="mb-4 flex items-center gap-2"><span className="grid h-8 w-8 place-items-center rounded-xl bg-primary/10 text-primary"><Trophy size={15} /></span><div><h2 className="font-display font-semibold">Top scripts</h2><p className="text-[11px] text-muted-foreground">Highest activity right now</p></div><ArrowUpRight size={15} className="ml-auto text-muted-foreground" /></div>
           <ol className="space-y-1.5 text-sm">
             {(o?.top_scripts ?? []).map((t, i) => (
-              <li key={t.id} className="grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-2 rounded-xl px-2 py-2 hover:bg-secondary">
+              <li key={t.id} className="group grid grid-cols-[1.75rem_minmax(0,1fr)_auto] items-center gap-2 rounded-xl border border-transparent px-2 py-2.5 transition-all hover:border-border hover:bg-secondary/70">
                 <span className="font-mono text-xs text-muted-foreground">#{i + 1}</span>
                 <Link to="/scripts/$slug" params={{ slug: t.slug }} className="truncate font-medium hover:text-primary">{t.name}</Link>
                 <span className="flex gap-2 font-mono text-xs text-muted-foreground"><span className="flex items-center gap-0.5"><Eye size={11} />{compact(t.views)}</span><span className="flex items-center gap-0.5"><Copy size={11} />{compact(t.copies)}</span></span>
@@ -170,7 +170,7 @@ function Dashboard() {
       </div>
 
       <div className="glass min-w-0 overflow-hidden rounded-3xl border border-border/60 p-3 shadow-[0_18px_60px_-35px_hsl(var(--primary)/.45)] sm:p-5">
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div className="hidden" />
           <div>
             <h2 className="font-display font-semibold">Traffic overview</h2>
             <p className="mt-0.5 text-xs text-muted-foreground">Views, downloads and copies over the selected period.</p>
@@ -212,7 +212,7 @@ function Dashboard() {
         </div>
         <ul className="space-y-1.5 text-sm">
           {(activity.data ?? []).map((a) => (
-            <li key={a.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl px-2 py-2 hover:bg-secondary">
+            <li key={a.id} className="group grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-transparent px-2 py-2.5 transition-all hover:border-border hover:bg-secondary/60"><span className="grid h-7 w-7 place-items-center rounded-lg bg-primary/10 text-primary"><Server size={12} /></span>
               <span className="min-w-0 flex-1 truncate">
                 <span className="font-semibold text-primary">{(a as { profiles?: { username?: string } }).profiles?.username ?? "admin"}</span>{" "}
                 {a.action} {a.details ? `· ${a.details}` : ""}
