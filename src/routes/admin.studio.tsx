@@ -157,7 +157,11 @@ function Studio() {
             {busy ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
             {busy ? "Generating with AI…" : "Generate Lua"}
           </button>
-          {code && <div className="mt-4"><CodeViewer code={code} filename={`ario-${library}-generated.lua`} /></div>}
+          <div className="mt-4 rounded-2xl border border-border/60 bg-[#090b12] p-4">
+            <div className="flex items-center justify-between"><div className="flex items-center gap-2"><Eye size={14} className="text-primary"/><p className="text-xs font-semibold">Live script preview</p></div><span className="chip text-[10px]">{library} • {model.split("/").pop()}</span></div>
+            <pre className="mt-3 max-h-64 overflow-auto rounded-xl bg-black/30 p-3 text-[11px] leading-5 text-white/70">{code || "-- Generated Lua preview will appear here."}</pre>
+          </div>
+          {code && <div className="mt-4"><CodeViewer code={code} filename={"ario-" + library + "-generated.lua"} /></div>}
         </section>}
       </div>}
     </div>
