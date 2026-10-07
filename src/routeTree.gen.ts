@@ -219,10 +219,6 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/admin/studio': typeof AdminStudioRoute
   '/admin/discord': typeof AdminDiscordRoute
-  '/admin/studio': typeof AdminStudioRoute
-  '/admin/discord': typeof AdminDiscordRoute
-  '/admin/studio': typeof AdminStudioRoute
-  '/admin/discord': typeof AdminDiscordRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/games/$game': typeof GamesGameRoute
   '/raw/$slug': typeof RawSlugRoute
