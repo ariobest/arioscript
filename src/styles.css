@@ -604,3 +604,33 @@ img, video, iframe { max-width: 100%; }
     transition: none !important;
   }
 }
+
+/* ===== Login cat animation ===== */
+.auth-cat-wrap {
+  display: flex;
+  justify-content: center;
+  perspective: 700px;
+  transform-origin: center;
+  animation: auth-cat-idle 3.2s ease-in-out infinite;
+  transition: transform .45s cubic-bezier(.22,.8,.25,1), filter .45s ease;
+}
+.auth-cat {
+  transform-origin: center;
+  transition: transform .55s cubic-bezier(.22,.8,.25,1), filter .45s ease;
+}
+.auth-cat-away {
+  animation: none;
+  transform: translateX(8px) rotateY(180deg) rotateZ(-4deg) scale(.96);
+  filter: saturate(.75) brightness(.9);
+}
+.auth-cat-away .auth-cat {
+  transform: scaleX(-1);
+}
+@keyframes auth-cat-idle {
+  0%, 100% { transform: translateY(0) rotateZ(0); }
+  50% { transform: translateY(-5px) rotateZ(2deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-cat-wrap { animation: none; transition: none; }
+  .auth-cat { transition: none; }
+}
