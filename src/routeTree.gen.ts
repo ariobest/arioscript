@@ -236,8 +236,6 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof FavoritesRoute
   '/keys': typeof KeysRoute
   '/leaderboards': typeof LeaderboardsRoute
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/reset-password': typeof ResetPasswordRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/assistant': typeof AdminAssistantRoute
