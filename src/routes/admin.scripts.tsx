@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {
-  Plus, Pencil, Trash2, Archive, Star, BadgeCheck, Eye, EyeOff, X, BarChart3, Upload,
+  Plus, Pencil, Trash2, Archive, Star, BadgeCheck, Eye, EyeOff, X, BarChart3, Upload, History, RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,6 +34,7 @@ function AdminScripts() {
   const qc = useQueryClient();
   const [draft, setDraft] = useState<Draft | null>(null);
   const [statsFor, setStatsFor] = useState<Script | null>(null);
+  const [versionsFor, setVersionsFor] = useState<Script | null>(null);
   const [search, setSearch] = useState("");
   const [copiedLoader, setCopiedLoader] = useState(false);
 
@@ -46,6 +47,8 @@ function AdminScripts() {
       return (data ?? []) as unknown as Script[];
     },
   });
+
+  const versions = useQuery({ queryKey: ["script_versions_admin", versionsFor?.id], enabled: !!versionsFor, queryFn: async () => { const { data, error } = await supabase.from("script_versions").select("id, version, code, raw_loader_url, changelog, created_at").eq("script_id", versionsFor!.id).order("created_at", { ascending: false }); if (error) throw error; return data ?? []; } });
 
   const analytics = useQuery({
     queryKey: ["script_analytics", statsFor?.id],
@@ -178,7 +181,7 @@ function AdminScripts() {
                 <td className="px-4 py-3 text-xs text-muted-foreground">{timeAgo(s.updated_at)}</td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-1">
-                    <button title="Analytics" onClick={() => setStatsFor(s)} className="btn btn-ghost !p-1.5"><BarChart3 size={14} /></button>
+                    <button title="Analytics" onClick={() => setStatsFor(s)} className="btn btn-ghost !p-1.5"><BarChart3 size={14} /></button><button title="Version history" onClick={() => setVersionsFor(s)} className="btn btn-ghost !p-1.5"><History size={14} /></button>
                     {s.raw_loader_url && validRawLoaderUrl(s.raw_loader_url) && <button title="Copy loader" onClick={async () => { try { await navigator.clipboard.writeText(loaderCommand(s.raw_loader_url!)); toast.success("Loader copied"); } catch { toast.error("Could not copy loader"); } }} className="btn btn-ghost !p-1.5"><CopyIcon size={14} /></button>}
                     {s.raw_loader_url && validRawLoaderUrl(s.raw_loader_url) && <a title="Open raw loader" href={s.raw_loader_url} target="_blank" rel="noreferrer" className="btn btn-ghost !p-1.5"><ExternalLink size={14} /></a>}
                     <button title="Feature" onClick={() => void patch(s, { featured: !s.featured }, s.featured ? "unfeatured script" : "featured script")} className="btn btn-ghost !p-1.5"><Star size={14} /></button>
@@ -197,6 +200,19 @@ function AdminScripts() {
           </tbody>
         </table>
       </div>
+
+      {versionsFor && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4" onClick={() => setVersionsFor(null)}>
+          <div className="glass max-h-[80vh] w-full max-w-2xl overflow-auto rounded-2xl p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center gap-2"><div><h2 className="font-display font-semibold">{versionsFor.name} · Version history</h2><p className="text-xs text-muted-foreground">Snapshots and changelogs saved for this script.</p></div><button onClick={() => setVersionsFor(null)} className="btn btn-ghost ml-auto !p-1.5"><X size={14}/></button></div>
+            <div className="mt-4 space-y-2">
+              {(versions.data ?? []).map(v => <div key={v.id} className="rounded-xl border border-border bg-background/30 p-3"><div className="flex items-center gap-2"><span className="font-mono font-semibold">v{v.version}</span><span className="text-[10px] text-muted-foreground">{timeAgo(v.created_at)}</span><button className="btn btn-ghost ml-auto !p-1.5" title="Rollback" onClick={async()=>{if(!confirm("Rollback "+versionsFor.name+" to v"+v.version+"?"))return;const {error}=await supabase.from("scripts").update({code:v.code,version:v.version,raw_loader_url:v.raw_loader_url}).eq("id",versionsFor.id);if(error)toast.error(error.message);else{toast.success("Rolled back to v"+v.version);setVersionsFor(null);refresh();}}}><RotateCcw size={14}/></button></div>{v.changelog&&<p className="mt-2 text-xs text-muted-foreground">{v.changelog}</p>}<details className="mt-2"><summary className="cursor-pointer text-[10px] text-primary">Preview snapshot</summary><pre className="mt-2 max-h-32 overflow-auto rounded-lg bg-black/30 p-2 text-[10px]">{v.code || v.raw_loader_url || "No code"}</pre></details></div>)}
+              {versions.isLoading && <p className="text-sm text-muted-foreground">Loading versions…</p>}
+              {!versions.isLoading && !(versions.data ?? []).length && <p className="py-8 text-center text-sm text-muted-foreground">No version snapshots yet.</p>}
+            </div>
+          </div>
+        </div>
+      )}
 
       {statsFor && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4" onClick={() => setStatsFor(null)}>
