@@ -91,7 +91,8 @@ function AuthPage() {
         <h1 className="mt-4 text-center font-display text-xl font-bold">
           {mode === "signin" ? "Sign in to ARIO SCRIPTS" : "Create your account"}
         </h1>
-        <div className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary">Secure authentication</div>\n        <p className="mt-3 text-center text-sm text-muted-foreground">
+        <div className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary">Secure authentication</div>
+        <p className="mt-3 text-center text-sm text-muted-foreground">
           Save favorites, report scripts and earn badges.
         </p>
 
