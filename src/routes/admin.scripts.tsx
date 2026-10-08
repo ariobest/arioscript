@@ -179,6 +179,8 @@ function AdminScripts() {
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-1">
                     <button title="Analytics" onClick={() => setStatsFor(s)} className="btn btn-ghost !p-1.5"><BarChart3 size={14} /></button>
+                    {s.raw_loader_url && validRawLoaderUrl(s.raw_loader_url) && <button title="Copy loader" onClick={async () => { try { await navigator.clipboard.writeText(loaderCommand(s.raw_loader_url!)); toast.success("Loader copied"); } catch { toast.error("Could not copy loader"); } }} className="btn btn-ghost !p-1.5"><CopyIcon size={14} /></button>}
+                    {s.raw_loader_url && validRawLoaderUrl(s.raw_loader_url) && <a title="Open raw loader" href={s.raw_loader_url} target="_blank" rel="noreferrer" className="btn btn-ghost !p-1.5"><ExternalLink size={14} /></a>}
                     <button title="Feature" onClick={() => void patch(s, { featured: !s.featured }, s.featured ? "unfeatured script" : "featured script")} className="btn btn-ghost !p-1.5"><Star size={14} /></button>
                     <button title="Verify" onClick={() => void patch(s, { verified: !s.verified }, s.verified ? "unverified script" : "verified script")} className="btn btn-ghost !p-1.5"><BadgeCheck size={14} /></button>
                     <button title="Publish" onClick={() => void patch(s, { published: !s.published }, s.published ? "unpublished script" : "published script")} className="btn btn-ghost !p-1.5">{s.published ? <Eye size={14} /> : <EyeOff size={14} />}</button>
