@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  Shield, LayoutDashboard, Terminal, Users, Award, Flag, Megaphone, Settings, ScrollText, BarChart3, Lock, Mail, KeyRound, Images, Bot, Palette, Code2, MessageSquare, Search, ChevronRight, Activity, Zap, Menu, X,
+  Shield, LayoutDashboard, Terminal, Users, Award, Flag, Megaphone, Settings, ScrollText, BarChart3, Lock, Mail, KeyRound, Images, Bot, Palette, Code2, MessageSquare, ChevronRight, Activity, Zap, Menu, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -106,7 +106,9 @@ function AdminLayout() {
         <div key={group.label}>
           {(!collapsed || mobile) && <p className="px-3 pb-1 text-[9px] font-bold uppercase tracking-[.2em] text-muted-foreground/60">{group.label}</p>}
           <div className="space-y-1">
-            {group.links.map(l => (
+            {group.links.map(l => {
+              const Icon = l.icon;
+              return (
               <Link
                 key={l.to}
                 to={l.to}
@@ -116,11 +118,12 @@ function AdminLayout() {
                 className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted-foreground transition-all hover:bg-secondary/70 hover:text-foreground"
                 title={collapsed && !mobile ? l.label : undefined}
               >
-                <l.icon size={16} className="shrink-0" />
+                <Icon size={17} strokeWidth={1.9} className="shrink-0 transition-transform duration-200 group-hover:scale-[1.06]" aria-hidden="true" />
                 {(!collapsed || mobile) && <span className="truncate">{l.label}</span>}
                 {(!collapsed || mobile) && <ChevronRight size={13} className="ml-auto opacity-0 transition-opacity group-hover:opacity-60" />}
               </Link>
-            ))}
+              );
+            })}
           </div>
         </div>
       ))}
