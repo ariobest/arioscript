@@ -322,6 +322,7 @@ getKeyButton.Activated:Connect(function()
 end)
 
 local mainGui
+local rebuildPlayersUI
 
 local function openMain()
     if mainGui then return end
@@ -617,7 +618,7 @@ local function openMain()
     dropLayout.Padding = UDim.new(0, 4)
     dropLayout.Parent = dropdownFrame
 
-    local function rebuildPlayers(list)
+    rebuildPlayersUI = function(list)
         for _, child in dropdownFrame:GetChildren() do
             if child:IsA("TextButton") then child:Destroy() end
         end
@@ -818,16 +819,8 @@ status.OnClientEvent:Connect(function(kind, message)
     elseif kind == "error" then
         toast(tostring(message), false)
     elseif kind == "players" and type(message) == "table" then
-        -- Find the dropdown only after the main panel exists.
-        if mainGui then
-            local page = mainGui:FindFirstChild("Teleport", true)
-            if page then
-                for _, frame in page:GetChildren() do
-                    if frame:IsA("Frame") and frame.Visible == false then
-                        -- no-op; player list is rebuilt through the local UI closure
-                    end
-                end
-            end
+        if rebuildPlayersUI then
+            rebuildPlayersUI(message)
         end
     end
 end)
