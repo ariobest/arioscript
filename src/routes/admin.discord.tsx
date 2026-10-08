@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import { Activity, Bot, Check, Code2, Copy, Eye, Hash, MessageSquare, RefreshCw, Send, Server, Shield, Trash2, Users, Volume2, Wifi } from "lucide-react";
+import { Activity, Bot, Check, Code2, Copy, Eye, Hash, MessageSquare, RefreshCw, Send, Server, Shield, Trash2, Users, Volume2, Wifi, Pin, History, Search, Megaphone, Settings2 } from "lucide-react";
 import { toast } from "sonner";
-import { deleteDiscordMessage, editDiscordEmbed, editDiscordJson, getDiscordStatus, sendDiscordEmbed, sendDiscordJson } from "@/lib/discord.functions";
+import { deleteDiscordMessage, editDiscordEmbed, editDiscordJson, getDiscordStatus, sendDiscordEmbed, sendDiscordJson, getDiscordMessages, pinDiscordMessage } from "@/lib/discord.functions";
 
 export const Route = createFileRoute("/admin/discord")({
   head: () => ({ meta: [{ title: "Discord Control — ARIO SCRIPTS" }, { name: "description", content: "Private ARIO Discord server control center." }] }),
@@ -29,6 +29,9 @@ function DiscordControl() {
   const [busy, setBusy] = useState(false);
   const [channelSearch, setChannelSearch] = useState("");
   const [template, setTemplate] = useState("announcement");
+  const [messages, setMessages] = useState<any[]>([]);
+  const [messageSearch, setMessageSearch] = useState("");
+  const [historyBusy, setHistoryBusy] = useState(false);
 
   const load = useServerFn(getDiscordStatus);
   const send = useServerFn(sendDiscordEmbed);
@@ -36,6 +39,8 @@ function DiscordControl() {
   const remove = useServerFn(deleteDiscordMessage);
   const sendJson = useServerFn(sendDiscordJson);
   const editJson = useServerFn(editDiscordJson);
+  const loadMessages = useServerFn(getDiscordMessages);
+  const pinMessage = useServerFn(pinDiscordMessage);
 
   const jsonState = useMemo(() => {
     try { return { value: JSON.parse(json), error: "" }; }
@@ -45,6 +50,11 @@ function DiscordControl() {
   function syncBuilderToJson() {
     setJson(JSON.stringify({ content, embeds: [{ title: title || undefined, description: description || undefined, color: parseInt(color.replace("#", ""), 16) }] }, null, 2));
   }
+
+  const visibleMessages = useMemo(() => {
+    const q = messageSearch.trim().toLowerCase();
+    return messages.filter((m: any) => !q || String(m.content ?? "").toLowerCase().includes(q) || String(m.author?.username ?? "").toLowerCase().includes(q));
+  }, [messages, messageSearch]);
 
   const visibleChannels = useMemo(() => {
     const q = channelSearch.trim().toLowerCase();
@@ -147,6 +157,45 @@ function DiscordControl() {
           <div className="admin-stat-tile glass rounded-2xl p-4"><Wifi size={16} className="text-primary"/><p className="mt-3 text-lg font-bold">{status.guild.approximate_presence_count ?? "—"}</p><p className="text-xs text-muted-foreground">Online</p></div>
           <div className="admin-stat-tile glass rounded-2xl p-4"><Shield size={16} className="text-primary"/><p className="mt-3 text-lg font-bold">{status.guild.premium_tier ?? 0}</p><p className="text-xs text-muted-foreground">Boost level</p></div>
         </div>}
+      </section>
+
+      {status && <section className="glass rounded-3xl p-4 sm:p-5">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2"><History size={17} className="text-primary"/><h2 className="font-display font-semibold">Message center</h2></div>
+          <span className="chip text-[10px]">{messages.length} loaded</span>
+          <button
+            onClick={async () => {
+              if (!channelId) return toast.error("Choose a channel first.");
+              setHistoryBusy(true);
+              try {
+                const result = await loadMessages({ data: { guildId, channelId, limit: 30 } });
+                setMessages(Array.isArray(result) ? result : []);
+                toast.success("Message history loaded");
+              } catch (e) { toast.error(e instanceof Error ? e.message : "Could not load messages."); }
+              finally { setHistoryBusy(false); }
+            }}
+            disabled={historyBusy || !channelId}
+            className="btn btn-primary ml-auto"
+          ><RefreshCw size={14} className={historyBusy ? "animate-spin" : ""}/> Load history</button>
+        </div>
+        <div className="mt-4 flex items-center gap-2">
+          <Search size={14} className="text-muted-foreground"/>
+          <input value={messageSearch} onChange={e=>setMessageSearch(e.target.value)} placeholder="Search loaded messages…" className="input-base"/>
+        </div>
+        <div className="mt-3 max-h-72 space-y-2 overflow-y-auto pr-1">
+          {visibleMessages.map((m: any) => (
+            <div key={m.id} className="rounded-2xl border border-border/50 bg-background/20 p-3">
+              <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1"><p className="truncate text-xs font-semibold">{m.author?.global_name || m.author?.username || "Unknown user"}</p><p className="text-[10px] text-muted-foreground">{m.id}</p></div>
+                {m.pinned && <span className="chip text-[9px]"><Pin size={10}/> Pinned</span>}
+                <button onClick={async()=>{try{await pinMessage({data:{guildId,channelId,messageId:m.id,pinned:!m.pinned}});setMessages(prev=>prev.map(x=>x.id===m.id?{...x,pinned:!m.pinned}:x));toast.success(m.pinned?"Message unpinned":"Message pinned")}catch(e){toast.error(e instanceof Error?e.message:"Pin action failed.")}}} className="rounded-xl border border-border/50 p-2 text-muted-foreground hover:text-primary" title={m.pinned?"Unpin":"Pin"}><Pin size={13}/></button>
+                <button onClick={()=>{setMessageId(m.id);setDescription(m.embeds?.[0]?.description ?? m.content ?? "");setTitle(m.embeds?.[0]?.title ?? "");toast.success("Message selected")}} className="rounded-xl border border-border/50 p-2 text-muted-foreground hover:text-primary" title="Use message"><Settings2 size={13}/></button>
+              </div>
+              <p className="mt-2 line-clamp-3 whitespace-pre-wrap text-xs text-muted-foreground">{m.content || m.embeds?.[0]?.description || "Embed / attachment message"}</p>
+            </div>
+          ))}
+          {!visibleMessages.length && <div className="rounded-2xl border border-dashed border-border p-8 text-center text-xs text-muted-foreground">Load a channel's recent messages to manage them here.</div>}
+        </div>
       </section>
 
       {status && <section className="grid gap-5 xl:grid-cols-[1fr_1fr]">
