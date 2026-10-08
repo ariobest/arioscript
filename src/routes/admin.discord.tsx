@@ -217,7 +217,7 @@ function DiscordControl() {
           ))}
           {!visibleMessages.length && <div className="rounded-2xl border border-dashed border-border p-8 text-center text-xs text-muted-foreground">Load a channel's recent messages to manage them here.</div>}
         </div>
-      </section>
+      </section>}
 
       {status && <section className="grid gap-5 xl:grid-cols-[1fr_1fr]">
         <div className="glass rounded-3xl p-4 sm:p-5">
