@@ -8,12 +8,20 @@ export type SoundKind =
   | "success"
   | "error"
   | "copy"
-  | "theme";
+  | "theme"
+  | "hover"
+  | "press"
+  | "success2"
+  | "warning"
+  | "unlock"
+  | "delete"
+  | "navigate";
 
 const KEY = "ario-ui-sounds";
 const VOLUME_KEY = "ario-ui-volume";
 
 let audio: AudioContext | null = null;
+let lastHoverAt = 0;
 
 export function soundsEnabled() {
   return typeof window !== "undefined" && localStorage.getItem(KEY) === "on";
@@ -70,6 +78,13 @@ export function playSound(kind: SoundKind, force = false) {
       error: [260, 180],
       copy: [560, 840],
       theme: [430, 780],
+      hover: [420, 470],
+      press: [220, 300],
+      success2: [520, 760],
+      warning: [310, 250],
+      unlock: [520, 1040],
+      delete: [240, 150],
+      navigate: [390, 590],
     };
 
     const [first, second] = notes[kind];
@@ -77,26 +92,57 @@ export function playSound(kind: SoundKind, force = false) {
     for (const [i, frequency] of [first, second].entries()) {
       const oscillator = audio.createOscillator();
       const gain = audio.createGain();
+      const start = now + i * 0.055;
 
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(frequency, now + i * 0.055);
+      oscillator.type = kind === "error" || kind === "delete" ? "triangle" : "sine";
+      oscillator.frequency.setValueAtTime(frequency, start);
 
-      gain.gain.setValueAtTime(0.0001, now + i * 0.055);
+      gain.gain.setValueAtTime(0.0001, start);
       gain.gain.exponentialRampToValueAtTime(
-        0.045 * getSoundVolume(),
-        now + i * 0.055 + 0.008,
+        0.075 * getSoundVolume(),
+        start + 0.008,
       );
-      gain.gain.exponentialRampToValueAtTime(
-        0.0001,
-        now + i * 0.055 + 0.095,
-      );
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.095);
 
       oscillator.connect(gain).connect(audio.destination);
-      oscillator.start(now + i * 0.055);
-      oscillator.stop(now + i * 0.055 + 0.1);
+      oscillator.start(start);
+      oscillator.stop(start + 0.1);
     }
   } catch {
     // Sound is optional when browser audio is unavailable.
+  }
+}
+
+function getInteractive(target: EventTarget | null) {
+  if (!(target instanceof Element)) return null;
+
+  const control = target.closest(
+    'button, a, [role="button"], [role="tab"], [role="switch"], summary',
+  );
+
+  if (!control || control.matches(":disabled, [aria-disabled='true']")) {
+    return null;
+  }
+
+  // Keep actual editable/copyable content fully usable.
+  if (
+    control.closest(
+      'input, textarea, pre, code, [contenteditable="true"], [data-allow-copy="true"]',
+    )
+  ) {
+    return null;
+  }
+
+  return control;
+}
+
+function vibrate(duration = 8) {
+  try {
+    if ("vibrate" in navigator) {
+      navigator.vibrate(duration);
+    }
+  } catch {
+    // Haptics are optional.
   }
 }
 
@@ -143,11 +189,61 @@ export function installUISounds() {
     }
   };
 
+  const onPointerOver = (event: PointerEvent) => {
+    if (event.pointerType !== "mouse") return;
+
+    const control = getInteractive(event.target);
+    if (!control) return;
+
+    const now = performance.now();
+    if (now - lastHoverAt < 70) return;
+
+    lastHoverAt = now;
+    playSound("hover");
+  };
+
+  const onPointerDown = (event: PointerEvent) => {
+    if (event.pointerType !== "touch" && event.pointerType !== "pen") return;
+
+    const control = getInteractive(event.target);
+    if (!control) return;
+
+    playSound("press");
+    vibrate(8);
+  };
+
+  const onContextMenu = (event: MouseEvent) => {
+    const control = getInteractive(event.target);
+    if (!control) return;
+
+    // Prevent long-press/right-click menus on UI controls, while
+    // preserving copy/select everywhere users actually edit or copy text.
+    event.preventDefault();
+  };
+
+  const onSelectStart = (event: Event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+
+    const control = getInteractive(target);
+    if (control) {
+      event.preventDefault();
+    }
+  };
+
   document.addEventListener("click", onClick);
   document.addEventListener("change", onChange);
+  document.addEventListener("pointerover", onPointerOver, { passive: true });
+  document.addEventListener("pointerdown", onPointerDown, { passive: true });
+  document.addEventListener("contextmenu", onContextMenu);
+  document.addEventListener("selectstart", onSelectStart);
 
   return () => {
     document.removeEventListener("click", onClick);
     document.removeEventListener("change", onChange);
+    document.removeEventListener("pointerover", onPointerOver);
+    document.removeEventListener("pointerdown", onPointerDown);
+    document.removeEventListener("contextmenu", onContextMenu);
+    document.removeEventListener("selectstart", onSelectStart);
   };
 }
