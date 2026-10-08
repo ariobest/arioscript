@@ -327,7 +327,7 @@ local rebuildPlayersUI
 local function openMain()
     if mainGui then return end
 
-    tween(verifyGui, TweenInfo.new(0.25, Enum.EasingStyle.Quint), {
+    tween(verifyGui, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {
         Size = UDim2.new(0.9, 0, 0, 250),
         BackgroundTransparency = 1,
     })
@@ -338,77 +338,118 @@ local function openMain()
         end
     end
 
-    task.wait(0.28)
+    task.wait(0.3)
     verifyGui:Destroy()
 
+    -- ARIO COMMAND CENTER
     mainGui = Instance.new("Frame")
     mainGui.Name = "AdminPanel"
     mainGui.AnchorPoint = Vector2.new(0.5, 0.5)
-    mainGui.Position = UDim2.fromScale(0.5, 0.56)
-    mainGui.Size = UDim2.new(0.94, 0, 0.72, 0)
-    mainGui.BackgroundColor3 = Color3.fromRGB(11, 14, 23)
-    mainGui.BackgroundTransparency = 0.04
+    mainGui.Position = UDim2.fromScale(0.5, 0.54)
+    mainGui.Size = UDim2.new(0.94, 0, 0.78, 0)
+    mainGui.BackgroundColor3 = Color3.fromRGB(7, 10, 18)
+    mainGui.BackgroundTransparency = 0.02
     mainGui.Parent = gui
-    corner(mainGui, 14)
-    stroke(mainGui, theme, 0.45)
-    gradient(mainGui, Color3.fromRGB(21, 26, 40), Color3.fromRGB(11, 14, 23), 90)
+    corner(mainGui, 20)
+    stroke(mainGui, theme, 0.55)
+    gradient(mainGui, Color3.fromRGB(15, 22, 38), Color3.fromRGB(5, 8, 15), 135)
 
     local sizeConstraint = Instance.new("UISizeConstraint")
-    sizeConstraint.MaxSize = Vector2.new(700, 470)
-    sizeConstraint.MinSize = Vector2.new(320, 330)
+    sizeConstraint.MaxSize = Vector2.new(920, 600)
+    sizeConstraint.MinSize = Vector2.new(330, 360)
     sizeConstraint.Parent = mainGui
+
+    local shadow = Instance.new("Frame")
+    shadow.Name = "Glow"
+    shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+    shadow.Position = UDim2.fromScale(0.5, 0.5)
+    shadow.Size = UDim2.new(1, 18, 1, 18)
+    shadow.BackgroundColor3 = theme
+    shadow.BackgroundTransparency = 0.94
+    shadow.ZIndex = 0
+    shadow.Parent = mainGui
+    corner(shadow, 24)
 
     local top = Instance.new("Frame")
     top.BackgroundTransparency = 1
-    top.Size = UDim2.new(1, -20, 0, 58)
-    top.Position = UDim2.fromOffset(10, 8)
+    top.Size = UDim2.new(1, -34, 0, 68)
+    top.Position = UDim2.fromOffset(17, 10)
+    top.ZIndex = 5
     top.Parent = mainGui
 
-    local title = label(top, "ARIO ADMIN SUITE", 17, Color3.fromRGB(248,250,252), Enum.Font.GothamBold)
-    title.Position = UDim2.fromOffset(10, 4)
-    title.Size = UDim2.fromOffset(210, 24)
+    local brandDot = Instance.new("Frame")
+    brandDot.Size = UDim2.fromOffset(42, 42)
+    brandDot.Position = UDim2.fromOffset(2, 11)
+    brandDot.BackgroundColor3 = theme
+    brandDot.Parent = top
+    corner(brandDot, 13)
+    gradient(brandDot, theme, Color3.fromRGB(255,255,255), 135)
 
-    local version = label(top, "v2.4 PRO", 10, theme, Enum.Font.GothamBold)
-    version.Position = UDim2.fromOffset(11, 29)
-    version.Size = UDim2.fromOffset(100, 18)
+    local brand = label(brandDot, "A", 22, Color3.fromRGB(255,255,255), Enum.Font.GothamBlack)
+    brand.TextXAlignment = Enum.TextXAlignment.Center
+    brand.Size = UDim2.fromScale(1,1)
+
+    local title = label(top, "ARIO COMMAND", 18, Color3.fromRGB(248,250,252), Enum.Font.GothamBlack)
+    title.Position = UDim2.fromOffset(56, 9)
+    title.Size = UDim2.new(1, -250, 0, 24)
+
+    local subtitle = label(top, "ADMIN CONTROL CENTER  •  VERIFIED", 9, theme, Enum.Font.GothamBold)
+    subtitle.Position = UDim2.fromOffset(57, 35)
+    subtitle.Size = UDim2.new(1, -250, 0, 16)
+
+    local online = Instance.new("Frame")
+    online.Size = UDim2.fromOffset(88, 30)
+    online.Position = UDim2.new(1, -175, 0, 17)
+    online.BackgroundColor3 = Color3.fromRGB(10, 35, 31)
+    online.Parent = top
+    corner(online, 10)
+    local onlineDot = Instance.new("Frame")
+    onlineDot.Size = UDim2.fromOffset(7,7)
+    onlineDot.Position = UDim2.fromOffset(11,12)
+    onlineDot.BackgroundColor3 = Color3.fromRGB(52,211,153)
+    onlineDot.Parent = online
+    corner(onlineDot, 5)
+    local onlineText = label(online, "ONLINE", 9, Color3.fromRGB(167,243,208), Enum.Font.GothamBold)
+    onlineText.Position = UDim2.fromOffset(25,0)
+    onlineText.Size = UDim2.new(1,-25,1,0)
 
     local avatar = Instance.new("ImageLabel")
-    avatar.BackgroundColor3 = Color3.fromRGB(21,26,40)
+    avatar.BackgroundColor3 = Color3.fromRGB(20,28,45)
     avatar.Size = UDim2.fromOffset(38,38)
-    avatar.Position = UDim2.new(1, -126, 0, 5)
+    avatar.Position = UDim2.new(1, -82, 0, 13)
     avatar.Parent = top
     corner(avatar, 12)
-
     safe(function()
-        local image = Players:GetUserThumbnailAsync(
-            player.UserId,
-            Enum.ThumbnailType.HeadShot,
-            Enum.ThumbnailSize.Size100x100
-        )
+        local image = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
         avatar.Image = image
     end)
 
-    local minimize = button(top, "-", UDim2.fromOffset(34, 34))
-    minimize.Position = UDim2.new(1, -82, 0, 7)
-
-    local close = button(top, "×", UDim2.fromOffset(34, 34))
-    close.Position = UDim2.new(1, -42, 0, 7)
+    local minimize = button(top, "—", UDim2.fromOffset(32,32))
+    minimize.Position = UDim2.new(1, -40, 0, 16)
+    minimize.TextSize = 15
 
     makeDraggable(mainGui, top)
 
+    local line = Instance.new("Frame")
+    line.Size = UDim2.new(1, -34, 0, 1)
+    line.Position = UDim2.fromOffset(17, 77)
+    line.BackgroundColor3 = Color3.fromRGB(35,48,72)
+    line.BackgroundTransparency = 0.35
+    line.Parent = mainGui
+
     local sidebar = Instance.new("Frame")
-    sidebar.BackgroundColor3 = Color3.fromRGB(8, 11, 18)
-    sidebar.BackgroundTransparency = 0.12
-    sidebar.Size = UDim2.new(0, 138, 1, -76)
-    sidebar.Position = UDim2.fromOffset(10, 68)
+    sidebar.BackgroundColor3 = Color3.fromRGB(9, 14, 24)
+    sidebar.BackgroundTransparency = 0.05
+    sidebar.Size = UDim2.new(0, 166, 1, -101)
+    sidebar.Position = UDim2.fromOffset(17, 88)
     sidebar.Parent = mainGui
-    corner(sidebar, 12)
-    stroke(sidebar, theme, 0.8)
+    corner(sidebar, 16)
+    stroke(sidebar, theme, 0.82)
 
     local content = Instance.new("Frame")
     content.BackgroundTransparency = 1
-    content.Size = UDim2.new(1, -168, 1, -76)
-    content.Position = UDim2.fromOffset(158, 68)
+    content.Size = UDim2.new(1, -200, 1, -101)
+    content.Position = UDim2.fromOffset(191, 88)
     content.Parent = mainGui
 
     local pages = {}
@@ -423,7 +464,8 @@ local function openMain()
         page.Size = UDim2.fromScale(1,1)
         page.CanvasSize = UDim2.fromOffset(0,0)
         page.AutomaticCanvasSize = Enum.AutomaticSize.Y
-        page.ScrollBarThickness = 3
+        page.ScrollBarThickness = 2
+        page.ScrollBarImageColor3 = theme
         page.Visible = false
         page.Parent = content
 
@@ -433,32 +475,48 @@ local function openMain()
         layout.Parent = page
 
         local padding = Instance.new("UIPadding")
-        padding.PaddingTop = UDim.new(0, 4)
-        padding.PaddingRight = UDim.new(0, 4)
-        padding.PaddingBottom = UDim.new(0, 8)
+        padding.PaddingTop = UDim.new(0, 2)
+        padding.PaddingRight = UDim.new(0, 6)
+        padding.PaddingBottom = UDim.new(0, 10)
         padding.Parent = page
 
         pages[name] = page
         return page
     end
 
-    local function tab(name, text, page)
-        local b = button(sidebar, text, UDim2.new(1, -16, 0, 38))
-        b.Position = UDim2.fromOffset(8, 0)
+    local function tab(name, text, page, icon)
+        local holder = Instance.new("Frame")
+        holder.BackgroundTransparency = 1
+        holder.Size = UDim2.new(1, -16, 0, 46)
+        holder.Parent = sidebar
+
+        local b = button(holder, text, UDim2.new(1,0,1,0))
+        b.Position = UDim2.fromOffset(0,0)
         b.TextXAlignment = Enum.TextXAlignment.Left
-        b.TextSize = 12
-        table.insert(tabs, b)
+        b.TextSize = 11
+        b.Text = "   " .. icon .. "   " .. text
+
+        local indicator = Instance.new("Frame")
+        indicator.Size = UDim2.fromOffset(3, 22)
+        indicator.Position = UDim2.new(1, -3, 0.5, -11)
+        indicator.BackgroundColor3 = theme
+        indicator.BackgroundTransparency = 1
+        indicator.Parent = b
+        corner(indicator, 3)
+
+        tabs[#tabs+1] = {button=b, page=page, indicator=indicator}
 
         b.Activated:Connect(function()
             for _, t in tabs do
-                t.BackgroundColor3 = Color3.fromRGB(21,26,40)
+                t.button.BackgroundColor3 = Color3.fromRGB(14,20,32)
+                t.button.TextColor3 = Color3.fromRGB(135,148,170)
+                t.indicator.BackgroundTransparency = 1
             end
-            b.BackgroundColor3 = Color3.fromRGB(30,38,58)
+            b.BackgroundColor3 = Color3.fromRGB(24,35,56)
+            b.TextColor3 = Color3.fromRGB(248,250,252)
+            indicator.BackgroundTransparency = 0
 
-            for _, p in pages do
-                p.Visible = false
-            end
-
+            for _, p in pages do p.Visible = false end
             page.Visible = true
             currentPage = page
         end)
@@ -473,38 +531,63 @@ local function openMain()
     local themePage = createPage("Themes")
 
     local sideLayout = Instance.new("UIListLayout")
-    sideLayout.Padding = UDim.new(0, 7)
+    sideLayout.Padding = UDim.new(0, 6)
     sideLayout.Parent = sidebar
     sideLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
     sideLayout.VerticalAlignment = Enum.VerticalAlignment.Top
 
-    local spacer = Instance.new("Frame")
-    spacer.Size = UDim2.fromOffset(1, 5)
-    spacer.BackgroundTransparency = 1
-    spacer.Parent = sidebar
+    local sideTop = Instance.new("Frame")
+    sideTop.Size = UDim2.new(1,-16,0,46)
+    sideTop.BackgroundTransparency = 1
+    sideTop.Parent = sidebar
 
-    tab("Player", "  PLAYER", playerPage)
-    tab("Teleport", "  TELEPORT", teleportPage)
-    tab("Visuals", "  VISUALS", visualsPage)
-    tab("Server", "  SERVER", serverPage)
-    tab("Themes", "  THEMES", themePage)
+    local navTitle = label(sideTop, "NAVIGATION", 9, Color3.fromRGB(90,106,132), Enum.Font.GothamBold)
+    navTitle.Position = UDim2.fromOffset(4,15)
+    navTitle.Size = UDim2.new(1,-8,1,0)
 
-    local function section(parent, titleText, subtitle)
+    tab("Player", "PLAYER", playerPage, "●")
+    tab("Teleport", "TELEPORT", teleportPage, "↗")
+    tab("Visuals", "VISUALS", visualsPage, "◈")
+    tab("Server", "SERVER", serverPage, "⌁")
+    tab("Themes", "THEMES", themePage, "✦")
+
+    local sideFooter = Instance.new("Frame")
+    sideFooter.BackgroundColor3 = Color3.fromRGB(13,19,31)
+    sideFooter.Size = UDim2.new(1,-16,0,62)
+    sideFooter.Parent = sidebar
+    corner(sideFooter, 12)
+    stroke(sideFooter, theme, 0.88)
+
+    local foot1 = label(sideFooter, "ACCESS", 8, Color3.fromRGB(90,106,132), Enum.Font.GothamBold)
+    foot1.Position = UDim2.fromOffset(10,8)
+    foot1.Size = UDim2.new(1,-20,0,14)
+    local foot2 = label(sideFooter, "LICENSE VERIFIED", 10, Color3.fromRGB(167,243,208), Enum.Font.GothamBold)
+    foot2.Position = UDim2.fromOffset(10,25)
+    foot2.Size = UDim2.new(1,-20,0,16)
+
+    local function section(parent, titleText, subtitleText)
         local card = Instance.new("Frame")
-        card.BackgroundColor3 = Color3.fromRGB(21,26,40)
-        card.BackgroundTransparency = 0.18
-        card.Size = UDim2.new(1, -8, 0, 74)
+        card.BackgroundColor3 = Color3.fromRGB(12,18,30)
+        card.BackgroundTransparency = 0.02
+        card.Size = UDim2.new(1,-6,0,82)
         card.Parent = parent
-        corner(card, 12)
-        stroke(card, theme, 0.82)
+        corner(card, 15)
+        stroke(card, theme, 0.88)
+
+        local accent = Instance.new("Frame")
+        accent.Size = UDim2.fromOffset(3,40)
+        accent.Position = UDim2.fromOffset(13,18)
+        accent.BackgroundColor3 = theme
+        accent.Parent = card
+        corner(accent, 3)
 
         local t = label(card, titleText, 14, Color3.fromRGB(248,250,252), Enum.Font.GothamBold)
-        t.Position = UDim2.fromOffset(14, 10)
-        t.Size = UDim2.new(1, -28, 0, 20)
+        t.Position = UDim2.fromOffset(27,12)
+        t.Size = UDim2.new(1,-42,0,21)
 
-        local s = label(card, subtitle or "", 11, Color3.fromRGB(148,163,184))
-        s.Position = UDim2.fromOffset(14, 34)
-        s.Size = UDim2.new(1, -28, 0, 30)
+        local s = label(card, subtitleText or "", 10, Color3.fromRGB(123,139,164))
+        s.Position = UDim2.fromOffset(27,36)
+        s.Size = UDim2.new(1,-42,0,34)
         s.TextWrapped = true
 
         return card
@@ -512,266 +595,247 @@ local function openMain()
 
     local function toggleRow(parent, text, default, callback)
         local row = Instance.new("Frame")
-        row.BackgroundColor3 = Color3.fromRGB(21,26,40)
-        row.BackgroundTransparency = 0.18
-        row.Size = UDim2.new(1, -8, 0, 50)
+        row.BackgroundColor3 = Color3.fromRGB(12,18,30)
+        row.Size = UDim2.new(1,-6,0,54)
         row.Parent = parent
-        corner(row, 10)
+        corner(row, 13)
+        stroke(row, Color3.fromRGB(39,53,78), 0.55)
 
-        local l = label(row, text, 12, Color3.fromRGB(248,250,252))
-        l.Position = UDim2.fromOffset(14, 0)
-        l.Size = UDim2.new(1, -80, 1, 0)
+        local l = label(row, text, 11, Color3.fromRGB(226,232,240), Enum.Font.GothamSemibold)
+        l.Position = UDim2.fromOffset(15,0)
+        l.Size = UDim2.new(1,-92,1,0)
 
-        local b = button(row, default and "ON" or "OFF", UDim2.fromOffset(58, 32))
-        b.Position = UDim2.new(1, -68, 0.5, -16)
-        b.BackgroundColor3 = default and Color3.fromRGB(30, 90, 70) or Color3.fromRGB(30,38,58)
+        local b = button(row, default and "ON" or "OFF", UDim2.fromOffset(62,32))
+        b.Position = UDim2.new(1,-76,0.5,-16)
+        b.BackgroundColor3 = default and Color3.fromRGB(21,76,61) or Color3.fromRGB(20,29,45)
+        b.TextSize = 9
 
         local state = default
         b.Activated:Connect(function()
             state = not state
             b.Text = state and "ON" or "OFF"
-            b.BackgroundColor3 = state and Color3.fromRGB(30,90,70) or Color3.fromRGB(30,38,58)
+            b.BackgroundColor3 = state and Color3.fromRGB(21,76,61) or Color3.fromRGB(20,29,45)
             callback(state)
         end)
-
         return row
     end
 
     local function numberRow(parent, text, value, minValue, maxValue, callback)
         local row = Instance.new("Frame")
-        row.BackgroundColor3 = Color3.fromRGB(21,26,40)
-        row.BackgroundTransparency = 0.18
-        row.Size = UDim2.new(1, -8, 0, 58)
+        row.BackgroundColor3 = Color3.fromRGB(12,18,30)
+        row.Size = UDim2.new(1,-6,0,58)
         row.Parent = parent
-        corner(row, 10)
+        corner(row, 13)
+        stroke(row, Color3.fromRGB(39,53,78), 0.55)
 
-        local l = label(row, text, 12, Color3.fromRGB(248,250,252))
-        l.Position = UDim2.fromOffset(14, 0)
-        l.Size = UDim2.new(0.5, 0, 1, 0)
+        local l = label(row, text, 11, Color3.fromRGB(226,232,240), Enum.Font.GothamSemibold)
+        l.Position = UDim2.fromOffset(15,0)
+        l.Size = UDim2.new(0.55,0,1,0)
 
         local box = Instance.new("TextBox")
         box.Text = tostring(value)
         box.ClearTextOnFocus = false
         box.TextColor3 = Color3.fromRGB(248,250,252)
-        box.TextSize = 12
-        box.Font = Enum.Font.GothamSemibold
-        box.BackgroundColor3 = Color3.fromRGB(11,14,23)
-        box.Size = UDim2.fromOffset(72, 34)
-        box.Position = UDim2.new(1, -86, 0.5, -17)
+        box.TextSize = 11
+        box.Font = Enum.Font.GothamBold
+        box.BackgroundColor3 = Color3.fromRGB(7,11,19)
+        box.Size = UDim2.fromOffset(78,34)
+        box.Position = UDim2.new(1,-94,0.5,-17)
         box.Parent = row
-        corner(box, 8)
-        stroke(box, theme, 0.75)
+        corner(box, 10)
+        stroke(box, theme, 0.72)
 
         local function commit()
             local n = tonumber(box.Text)
-            if not n or not math.isfinite(n) then
-                box.Text = tostring(value)
-                return
-            end
-            value = math.clamp(n, minValue, maxValue)
+            if not n or not math.isfinite(n) then box.Text=tostring(value); return end
+            value = math.clamp(n,minValue,maxValue)
             box.Text = tostring(math.floor(value))
             callback(value)
         end
-
         box.FocusLost:Connect(commit)
-
         return row
     end
 
     numberRow(playerPage, "WalkSpeed", 16, 0, 100, function(value)
-        command:FireServer("SetWalkSpeed", {value = value})
+        command:FireServer("SetWalkSpeed", {value=value})
     end)
-
     numberRow(playerPage, "JumpPower", 50, 0, 150, function(value)
-        command:FireServer("SetJumpPower", {value = value})
+        command:FireServer("SetJumpPower", {value=value})
     end)
-
     toggleRow(playerPage, "Infinite Jump", false, function(enabled)
-        command:FireServer("SetInfiniteJump", {enabled = enabled})
+        command:FireServer("SetInfiniteJump", {enabled=enabled})
     end)
-
     toggleRow(playerPage, "Fly Mode", false, function(enabled)
-        command:FireServer("SetFly", {enabled = enabled, speed = 50})
+        command:FireServer("SetFly", {enabled=enabled, speed=50})
     end)
-
     toggleRow(playerPage, "Noclip", false, function(enabled)
-        command:FireServer("SetNoclip", {enabled = enabled})
+        command:FireServer("SetNoclip", {enabled=enabled})
     end)
+    section(playerPage, "PLAYER CONTROL", "Movement permissions are validated by the server. Your verified license remains active for this session.")
 
-    section(playerPage, "Player Controls", "All privileged movement changes are sent to the server and require admin + verified license status.")
-
-    section(teleportPage, "Player Teleport", "Choose a player from the live server list and request a server-authorized teleport.")
-
-    local playerDropdown = button(teleportPage, "SELECT PLAYER", UDim2.new(1, -8, 0, 42))
-    local teleportButton = button(teleportPage, "TELEPORT TO PLAYER", UDim2.new(1, -8, 0, 42))
+    section(teleportPage, "PLAYER TELEPORT", "Select an active player and use the server-authorized teleport command.")
+    local playerDropdown = button(teleportPage, "SELECT PLAYER", UDim2.new(1,-6,0,46))
+    local teleportButton = button(teleportPage, "TELEPORT TO PLAYER", UDim2.new(1,-6,0,46))
     local selectedPlayer
 
     local dropdownFrame = Instance.new("Frame")
     dropdownFrame.Visible = false
-    dropdownFrame.BackgroundColor3 = Color3.fromRGB(11,14,23)
-    dropdownFrame.Size = UDim2.new(1, -8, 0, 150)
+    dropdownFrame.BackgroundColor3 = Color3.fromRGB(8,13,22)
+    dropdownFrame.Size = UDim2.new(1,-6,0,150)
     dropdownFrame.Parent = teleportPage
-    corner(dropdownFrame, 10)
-    stroke(dropdownFrame, theme, 0.7)
+    corner(dropdownFrame, 13)
+    stroke(dropdownFrame, theme, 0.72)
 
     local dropLayout = Instance.new("UIListLayout")
-    dropLayout.Padding = UDim.new(0, 4)
+    dropLayout.Padding = UDim.new(0,4)
     dropLayout.Parent = dropdownFrame
 
     rebuildPlayersUI = function(list)
         for _, child in dropdownFrame:GetChildren() do
             if child:IsA("TextButton") then child:Destroy() end
         end
-
         for _, info in list do
             local b = button(dropdownFrame, info.displayName .. "  @" .. info.name, UDim2.new(1,-8,0,32))
             b.Position = UDim2.fromOffset(4,0)
             b.Activated:Connect(function()
-                selectedPlayer = info.name
-                playerDropdown.Text = info.displayName .. "  @" .. info.name
-                dropdownFrame.Visible = false
+                selectedPlayer=info.name
+                playerDropdown.Text=info.displayName .. "  @" .. info.name
+                dropdownFrame.Visible=false
             end)
         end
     end
 
     playerDropdown.Activated:Connect(function()
-        dropdownFrame.Visible = not dropdownFrame.Visible
+        dropdownFrame.Visible=not dropdownFrame.Visible
         command:FireServer("RequestPlayers")
     end)
-
     teleportButton.Activated:Connect(function()
         if selectedPlayer then
-            command:FireServer("TeleportToPlayer", {player = selectedPlayer})
+            command:FireServer("TeleportToPlayer",{player=selectedPlayer})
         else
-            toast("Select a player first.", false)
+            toast("Select a player first.",false)
         end
     end)
-
-    toggleRow(teleportPage, "Click-to-Teleport", false, function(enabled)
-        toast(enabled and "Click-to-Teleport enabled for your experience." or "Click-to-Teleport disabled.", true)
+    toggleRow(teleportPage,"Click-to-Teleport",false,function(enabled)
+        toast(enabled and "Click-to-Teleport enabled for your experience." or "Click-to-Teleport disabled.",true)
     end)
 
-    section(visualsPage, "Visual Tools", "These controls are UI hooks for your own game's server-authorized admin/visual systems.")
-
-    toggleRow(visualsPage, "Player ESP", false, function(enabled)
-        toast(enabled and "ESP requested." or "ESP disabled.", true)
+    section(visualsPage,"VISUAL TOOLS","These are presentation hooks for visual/admin systems in your own Roblox experience.")
+    toggleRow(visualsPage,"Player ESP",false,function(enabled)
+        toast(enabled and "ESP requested." or "ESP disabled.",true)
+    end)
+    toggleRow(visualsPage,"Name + Health Tags",false,function(enabled)
+        toast(enabled and "Name/health display enabled." or "Name/health display disabled.",true)
+    end)
+    toggleRow(visualsPage,"Tracers",false,function(enabled)
+        toast(enabled and "Tracers requested." or "Tracers disabled.",true)
     end)
 
-    toggleRow(visualsPage, "Name + Health Tags", false, function(enabled)
-        toast(enabled and "Name/health display enabled." or "Name/health display disabled.", true)
-    end)
+    section(serverPage,"SERVER OVERVIEW","Live connection information and server utilities.")
+    local stats = Instance.new("Frame")
+    stats.BackgroundTransparency=1
+    stats.Size=UDim2.new(1,-6,0,78)
+    stats.Parent=serverPage
 
-    toggleRow(visualsPage, "Tracers", false, function(enabled)
-        toast(enabled and "Tracers requested." or "Tracers disabled.", true)
-    end)
+    local statsLayout=Instance.new("UIGridLayout")
+    statsLayout.CellPadding=UDim2.fromOffset(8,0)
+    statsLayout.CellSize=UDim2.new(0.5,-4,1,0)
+    statsLayout.Parent=stats
 
-    section(serverPage, "Server Utilities", "Rejoin is server-authorized. Server-hop requires your own matchmaking/server-list service.")
+    local function statCard(titleText,valueText)
+        local c=Instance.new("Frame")
+        c.BackgroundColor3=Color3.fromRGB(12,18,30)
+        c.Parent=stats
+        corner(c,13)
+        stroke(c,Color3.fromRGB(39,53,78),0.55)
+        local t=label(c,titleText,8,Color3.fromRGB(90,106,132),Enum.Font.GothamBold)
+        t.Position=UDim2.fromOffset(12,10)
+        t.Size=UDim2.new(1,-24,0,14)
+        local v=label(c,valueText,15,Color3.fromRGB(248,250,252),Enum.Font.GothamBold)
+        v.Position=UDim2.fromOffset(12,30)
+        v.Size=UDim2.new(1,-24,0,26)
+        return v
+    end
 
-    local rejoin = button(serverPage, "REJOIN SERVER", UDim2.new(1,-8,0,42))
-    rejoin.Activated:Connect(function()
-        command:FireServer("Rejoin")
-    end)
+    local playerCount=statCard("PLAYERS",tostring(#Players:GetPlayers()))
+    local jobShort=string.sub(game.JobId,1,8)
+    local jobValue=statCard("JOB ID",jobShort)
 
-    local copyJob = button(serverPage, "COPY JOB ID", UDim2.new(1,-8,0,42))
+    local rejoin=button(serverPage,"REJOIN SERVER",UDim2.new(1,-6,0,44))
+    rejoin.Activated:Connect(function() command:FireServer("Rejoin") end)
+
+    local copyJob=button(serverPage,"COPY JOB ID",UDim2.new(1,-6,0,44))
     copyJob.Activated:Connect(function()
-        if copyText(game.JobId) then
-            toast("JobId copied.", true)
-        else
-            toast("JobId: " .. game.JobId, false)
-        end
+        if copyText(game.JobId) then toast("JobId copied.",true) else toast("JobId: "..game.JobId,false) end
     end)
 
-    local info = section(serverPage, "Live Server", "JobId: " .. game.JobId .. "\nPlayers: " .. tostring(#Players:GetPlayers()))
-
-    local ping = label(serverPage, "Ping: --", 12, Color3.fromRGB(148,163,184))
-    ping.Size = UDim2.new(1,-8,0,28)
-
-    local uptime = label(serverPage, "Uptime: 0s", 12, Color3.fromRGB(148,163,184))
-    uptime.Size = UDim2.new(1,-8,0,28)
-
-    local startedAt = os.clock()
+    local ping=label(serverPage,"Ping: --",10,Color3.fromRGB(123,139,164))
+    ping.Size=UDim2.new(1,-6,0,24)
+    local uptime=label(serverPage,"Uptime: 0s",10,Color3.fromRGB(123,139,164))
+    uptime.Size=UDim2.new(1,-6,0,24)
+    local startedAt=os.clock()
 
     addConnection(RunService.Heartbeat:Connect(function()
-        local elapsed = math.floor(os.clock() - startedAt)
-        uptime.Text = "Uptime: " .. tostring(elapsed) .. "s"
-
-        local ok, value = safe(function()
-            return player:GetNetworkPing() * 1000
-        end)
-        if ok and typeof(value) == "number" then
-            ping.Text = string.format("Ping: %d ms", math.floor(value))
-        end
+        uptime.Text="Uptime: "..tostring(math.floor(os.clock()-startedAt)).."s"
+        local ok,value=safe(function() return player:GetNetworkPing()*1000 end)
+        if ok and typeof(value)=="number" then ping.Text=string.format("Ping: %d ms",math.floor(value)) end
+        playerCount.Text=tostring(#Players:GetPlayers())
     end))
 
-    local hop = button(serverPage, "SERVER HOP", UDim2.new(1,-8,0,42))
+    local hop=button(serverPage,"SERVER HOP",UDim2.new(1,-6,0,44))
     hop.Activated:Connect(function()
-        toast("Server hop requires a server-list/matchmaking backend.", false)
+        toast("Server hop requires a server-list/matchmaking backend.",false)
     end)
 
-    section(themePage, "Accent Theme", "Changes the live ARIO accent without changing the fixed license/API configuration.")
-
-    local themeNames = {
-        {"Cyan", "CYAN NEON"},
-        {"Blue", "ROYAL BLUE"},
-        {"Crimson", "BLOOD CRIMSON"},
-        {"Emerald", "EMERALD MATRIX"},
-        {"Purple", "AMETHYST PURPLE"},
+    section(themePage,"ACCENT SYSTEM","Switch the Command Center accent without changing protected license/API configuration.")
+    local themeNames={
+        {"Cyan","CYAN NEON"},
+        {"Blue","ROYAL BLUE"},
+        {"Crimson","CRIMSON"},
+        {"Emerald","EMERALD"},
+        {"Purple","AMETHYST"},
     }
-
-    for _, item in themeNames do
-        local b = button(themePage, item[2], UDim2.new(1,-8,0,40))
+    for _,item in themeNames do
+        local b=button(themePage,item[2],UDim2.new(1,-6,0,42))
         b.Activated:Connect(function()
-            theme = themes[item[1]]
-            command:FireServer("SetTheme", {theme = item[1]})
-            toast("Theme changed to " .. item[2] .. ".", true)
+            theme=themes[item[1]]
+            command:FireServer("SetTheme",{theme=item[1]})
+            toast("Accent changed to "..item[2]..".",true)
         end)
     end
+    toggleRow(themePage,"Interface Sounds",true,function(enabled) soundEnabled=enabled end)
+    section(themePage,"PROTECTED CONFIGURATION","API validation and Get Key portal are compiled into the suite and cannot be edited from the panel.")
 
-    toggleRow(themePage, "Interface Sounds", true, function(enabled)
-        soundEnabled = enabled
-    end)
-
-    local fixed = section(themePage, "Protected Configuration", "API endpoint and Get Key portal are compiled into the suite and are not exposed as editable settings.\nAPI: /api/public/keys/validate\nPortal: /keys")
-
-    local closeConfirm = false
-
-    close.Activated:Connect(function()
-        if not closeConfirm then
-            closeConfirm = true
-            toast("Press close again to exit.", false)
-            task.delay(2, function() closeConfirm = false end)
-            return
-        end
-
-        disconnectAll()
-        gui:Destroy()
-    end)
-
+    local closeConfirm=false
     minimize.Activated:Connect(function()
-        minimized = not minimized
+        minimized=not minimized
         if minimized then
-            content.Visible = false
-            sidebar.Visible = false
-            mainGui.Size = UDim2.new(0, 300, 0, 68)
+            sidebar.Visible=false
+            content.Visible=false
+            line.Visible=false
+            mainGui.Size=UDim2.fromOffset(310,70)
         else
-            content.Visible = true
-            sidebar.Visible = true
-            mainGui.Size = UDim2.new(0.94, 0, 0.72, 0)
+            sidebar.Visible=true
+            content.Visible=true
+            line.Visible=true
+            mainGui.Size=UDim2.new(0.94,0,0.78,0)
         end
     end)
 
-    local firstTab = tabs[1]
-    if firstTab then
-        firstTab.BackgroundColor3 = Color3.fromRGB(30,38,58)
+    local first=tabs[1]
+    if first then
+        first.button.BackgroundColor3=Color3.fromRGB(24,35,56)
+        first.button.TextColor3=Color3.fromRGB(248,250,252)
+        first.indicator.BackgroundTransparency=0
     end
-    playerPage.Visible = true
-    currentPage = playerPage
+    playerPage.Visible=true
+    currentPage=playerPage
 
-    mainGui.Position = UDim2.fromScale(0.5, 0.62)
-    mainGui.BackgroundTransparency = 1
-    tween(mainGui, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {
-        Position = UDim2.fromScale(0.5, 0.5),
-        BackgroundTransparency = 0.04,
+    mainGui.Position=UDim2.fromScale(0.5,0.62)
+    mainGui.BackgroundTransparency=1
+    tween(mainGui,TweenInfo.new(0.4,Enum.EasingStyle.Quint),{
+        Position=UDim2.fromScale(0.5,0.5),
+        BackgroundTransparency=0.02,
     })
 
     command:FireServer("RequestPlayers")
