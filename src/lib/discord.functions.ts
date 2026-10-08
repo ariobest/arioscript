@@ -124,3 +124,27 @@ export const editDiscordJson = createServerFn({ method: "POST" })
     if (Array.isArray(payload.embeds) && payload.embeds.length > 10) throw new Error("Discord allows up to 10 embeds per message.");
     return await discord(`/channels/${data.channelId}/messages/${data.messageId}`, { method: "PATCH", body: JSON.stringify(payload) });
   });
+
+
+export const getDiscordMessages = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator(data => channelInput.extend({ limit: z.number().int().min(1).max(50).default(25) }).parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const messages = await discord(`/channels/${data.channelId}/messages?limit=${data.limit}`);
+    return messages;
+  });
+
+export const pinDiscordMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator(data => channelInput.extend({ messageId: z.string().regex(/^\d{17,20}$/), pinned: z.boolean() }).parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const path = `/channels/${data.channelId}/pins/${data.messageId}`;
+    if (data.pinned) {
+      await discord(path, { method: "PUT", body: JSON.stringify({}) });
+    } else {
+      await discord(path, { method: "DELETE" });
+    }
+    return { ok: true, pinned: data.pinned };
+  });
