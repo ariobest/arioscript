@@ -1,3 +1,4 @@
+import { lovable } from "@/integrations/lovable";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Mail, Lock, User as UserIcon } from "lucide-react";
