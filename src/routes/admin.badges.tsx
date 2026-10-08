@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { Plus, Pencil, Trash2, X, Search } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Plus, Pencil, Trash2, X, Search, ChevronDown, Check, Sparkles, Award, Crown, Shield, Star, Code2, Zap, Gem, Trophy, Flame, Heart, Rocket, Lock, Gift, Medal, CircleCheck } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { adminLog } from "@/lib/adminLog";
-import { DynamicIcon } from "@/components/site/DynamicIcon";
+import { CUSTOM_BADGE_ICONS, DynamicIcon } from "@/components/site/DynamicIcon";
 import type { Badge } from "@/lib/types";
 
 export const Route = createFileRoute("/admin/badges")({
@@ -22,6 +22,19 @@ function AdminBadges() {
   const [draft, setDraft] = useState<Partial<Badge> | null>(null);
   const [holdersOf, setHoldersOf] = useState<Badge | null>(null);
   const [userSearch, setUserSearch] = useState("");
+  const [iconOpen, setIconOpen] = useState(false);
+  const [iconSearch, setIconSearch] = useState("");
+
+  const lucideBadgeIcons = useMemo(() => [
+    ["Award", Award], ["Crown", Crown], ["Shield", Shield], ["Star", Star], ["Code2", Code2],
+    ["Zap", Zap], ["Gem", Gem], ["Trophy", Trophy], ["Flame", Flame], ["Heart", Heart],
+    ["Rocket", Rocket], ["Lock", Lock], ["Gift", Gift], ["Medal", Medal], ["CircleCheck", CircleCheck],
+    ["Sparkles", Sparkles],
+  ] as const, []);
+  const filteredLucideIcons = useMemo(() => {
+    const q = iconSearch.trim().toLowerCase();
+    return lucideBadgeIcons.filter(([name]) => !q || name.toLowerCase().includes(q));
+  }, [iconSearch, lucideBadgeIcons]);
 
   const badges = useQuery({
     queryKey: ["badges"],
@@ -121,7 +134,38 @@ function AdminBadges() {
             <div className="mt-4 space-y-3">
               <input className="input-base" placeholder="Badge name" value={draft.name ?? ""} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
               <input className="input-base" placeholder="Description" value={draft.description ?? ""} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
-              <input className="input-base" placeholder="Lucide icon name (e.g. Crown)" value={draft.icon ?? ""} onChange={(e) => setDraft({ ...draft, icon: e.target.value })} />
+              <div className="relative">
+                <p className="mb-1.5 text-xs font-semibold text-muted-foreground">Badge icon</p>
+                <button type="button" onClick={() => setIconOpen((v) => !v)} className="input-base flex w-full items-center gap-3 text-left">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary"><DynamicIcon name={draft.icon || "Award"} size={17} /></span>
+                  <span className="flex-1 truncate text-sm">{draft.icon || "Award"}</span>
+                  <ChevronDown size={15} className={"transition-transform " + (iconOpen ? "rotate-180" : "")} />
+                </button>
+                {iconOpen && (
+                  <div className="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded-2xl border border-border/70 bg-background/95 p-2 shadow-2xl backdrop-blur-xl">
+                    <div className="relative mb-2">
+                      <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      <input value={iconSearch} onChange={(e) => setIconSearch(e.target.value)} placeholder="Search Lucide icons…" className="input-base !pl-8" />
+                    </div>
+                    <p className="px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">ARIO custom</p>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {CUSTOM_BADGE_ICONS.map((name) => (
+                        <button key={name} type="button" onClick={() => { setDraft({ ...draft, icon: name }); setIconOpen(false); }} className={"flex items-center gap-2 rounded-xl px-2 py-2 text-xs hover:bg-primary/10 " + (draft.icon === name ? "bg-primary/10 text-primary" : "")}>
+                          <DynamicIcon name={name} size={16} /><span className="truncate">{name.replace("Ario", "")}</span>{draft.icon === name && <Check size={12} className="ml-auto" />}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="mt-2 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Lucide</p>
+                    <div className="grid max-h-44 grid-cols-3 gap-1.5 overflow-y-auto">
+                      {filteredLucideIcons.map(([name]) => (
+                        <button key={name} type="button" onClick={() => { setDraft({ ...draft, icon: name }); setIconOpen(false); }} className={"flex items-center gap-2 rounded-xl px-2 py-2 text-xs hover:bg-primary/10 " + (draft.icon === name ? "bg-primary/10 text-primary" : "")}>
+                          <DynamicIcon name={name} size={16} /><span className="truncate">{name}</span>{draft.icon === name && <Check size={12} className="ml-auto" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
               <div className="flex items-center gap-3">
                 <input type="color" value={draft.color ?? "#3b82f6"} onChange={(e) => setDraft({ ...draft, color: e.target.value })} className="h-10 w-16 rounded-lg border border-border bg-transparent" />
                 <span className="chip" style={{ color: draft.color, borderColor: (draft.color ?? "") + "55" }}>
