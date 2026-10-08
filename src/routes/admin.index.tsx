@@ -51,6 +51,9 @@ function Tile({ icon: Icon, label, value, pending }: { icon: React.ElementType; 
 function Dashboard() {
   const queryClient = useQueryClient();
   const [range, setRange] = useState<7 | 30 | 90>(30);
+  const [endpoint, setEndpoint] = useState("/api/v1/scripts");
+  const [apiResult, setApiResult] = useState("Ready");
+  const [apiBusy, setApiBusy] = useState(false);
   const stats = useAdminStats();
   const ts = useTimeseries(range);
 
@@ -78,6 +81,13 @@ function Dashboard() {
   });
   const o = ov.data;
   const refreshing = stats.isFetching || ts.isFetching || ov.isFetching || activity.isFetching;
+  const security = useQuery({ queryKey: ["admin_security_snapshot"], refetchInterval: 30_000, queryFn: async () => {
+    const [failed, users] = await Promise.all([
+      supabase.from("key_checks").select("id, ok, created_at").eq("ok", false).order("created_at", { ascending: false }).limit(8),
+      supabase.from("profiles").select("id, username, is_banned, is_disabled, last_seen").or("is_banned.eq.true,is_disabled.eq.true").limit(8),
+    ]);
+    return { failed: failed.data ?? [], users: users.data ?? [] };
+  }});
   const lastUpdated = Math.max(stats.dataUpdatedAt, ts.dataUpdatedAt, ov.dataUpdatedAt, activity.dataUpdatedAt);
 
   async function refreshDashboard() {
@@ -141,6 +151,24 @@ function Dashboard() {
               <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110"><q.icon size={17} /></span>{q.label}
             </Link>
           ))}
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="glass rounded-2xl border border-border/60 p-4 sm:p-5">
+          <div className="flex items-center gap-2"><span className="grid h-8 w-8 place-items-center rounded-xl bg-destructive/10 text-destructive"><ShieldCheck size={15}/></span><div><h2 className="font-display font-semibold">Security Center</h2><p className="text-[11px] text-muted-foreground">Recent failed validations and restricted accounts.</p></div><Link to="/admin/logs" className="ml-auto text-xs text-primary">Logs →</Link></div>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <div className="rounded-xl border border-border bg-background/30 p-3"><p className="font-mono text-xl font-bold text-destructive">{security.data?.failed.length ?? "—"}</p><p className="text-[11px] text-muted-foreground">Recent failed checks</p></div>
+            <div className="rounded-xl border border-border bg-background/30 p-3"><p className="font-mono text-xl font-bold">{security.data?.users.length ?? "—"}</p><p className="text-[11px] text-muted-foreground">Restricted users</p></div>
+          </div>
+          <div className="mt-3 space-y-1.5">{(security.data?.failed ?? []).slice(0,4).map(x => <div key={x.id} className="flex items-center justify-between rounded-lg bg-destructive/5 px-3 py-2 text-xs"><span className="text-destructive">Failed validation</span><span className="text-muted-foreground">{timeAgo(x.created_at)}</span></div>)}{!(security.data?.failed.length) && <p className="text-xs text-muted-foreground">No recent failed validations.</p>}</div>
+          <div className="mt-3 flex gap-2"><Link to="/admin/logs" className="btn btn-ghost flex-1">Admin activity</Link><Link to="/admin/users" className="btn btn-primary flex-1">Manage users</Link></div>
+        </div>
+        <div className="glass rounded-2xl border border-border/60 p-4 sm:p-5">
+          <div className="flex items-center gap-2"><span className="grid h-8 w-8 place-items-center rounded-xl bg-primary/10 text-primary"><Code2 size={15}/></span><div><h2 className="font-display font-semibold">Developer Tools</h2><p className="text-[11px] text-muted-foreground">Test public endpoints without exposing secrets.</p></div><Link to="/admin/studio" className="ml-auto text-xs text-primary">Studio →</Link></div>
+          <div className="mt-4 flex gap-2"><input className="input-base min-w-0 flex-1" value={endpoint} onChange={e=>setEndpoint(e.target.value)} placeholder="/api/v1/scripts"/><button className="btn btn-primary" disabled={apiBusy} onClick={async()=>{setApiBusy(true);setApiResult("Testing…");try{const url=new URL(endpoint,window.location.origin);const t=performance.now();const res=await fetch(url);const body=await res.text();setApiResult(`${res.status} • ${Math.round(performance.now()-t)}ms • ${body.slice(0,180)}`)}catch(e){setApiResult(e instanceof Error?e.message:"Request failed")}finally{setApiBusy(false)}}}>{apiBusy?"…":"Test"}</button></div>
+          <div className="mt-3 rounded-xl border border-border bg-background/30 p-3 font-mono text-[10px] leading-5 text-muted-foreground">{apiResult}</div>
+          <div className="mt-3 grid grid-cols-2 gap-2"><Link to="/api-docs" className="btn btn-ghost">API Docs</Link><Link to="/admin/settings" className="btn btn-ghost">Config status</Link></div>
         </div>
       </div>
 
