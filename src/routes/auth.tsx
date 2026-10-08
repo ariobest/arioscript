@@ -1,7 +1,6 @@
-import { lovable } from "@/integrations/lovable";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Mail, Lock, User as UserIcon } from "lucide-react";
+import { Mail, Lock, User as UserIcon, Chrome } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,6 +30,24 @@ function AuthPage() {
     toast.info("You are already signed in.");
     navigate({ to: "/" });
   }, [user, navigate]);
+
+  async function signInWithGoogle() {
+    if (user) {
+      navigate({ to: "/" });
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/auth` },
+      });
+      if (error) throw error;
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Google sign-in failed");
+      setBusy(false);
+    }
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -74,11 +91,17 @@ function AuthPage() {
         <h1 className="mt-4 text-center font-display text-xl font-bold">
           {mode === "signin" ? "Sign in to ARIO SCRIPTS" : "Create your account"}
         </h1>
-        <p className="mt-1 text-center text-sm text-muted-foreground">
+        <div className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary">Secure authentication</div>\n        <p className="mt-3 text-center text-sm text-muted-foreground">
           Save favorites, report scripts and earn badges.
         </p>
 
-        <form onSubmit={submit} className="mt-6 space-y-3">
+        <button type="button" onClick={signInWithGoogle} disabled={busy} className="btn btn-ghost w-full justify-center gap-2 border border-border/80 bg-card/70 hover:border-primary/40 hover:bg-primary/5">
+          <Chrome size={17} />
+          {busy ? "Connecting…" : "Continue with Google"}
+        </button>
+        <div className="my-5 flex items-center gap-3"><span className="h-px flex-1 bg-border" /><span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">or continue with email</span><span className="h-px flex-1 bg-border" /></div>
+
+        <form onSubmit={submit} className="space-y-3">
           {mode === "signup" && (
             <div className="relative">
               <UserIcon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
