@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { KeyRound, Copy, Ban, Trash2, CalendarPlus, Download, Plus, Search, Gamepad2 } from "lucide-react";
+import { KeyRound, Copy, Ban, Trash2, CalendarPlus, Download, Plus, Search, Gamepad2, History, ShieldCheck, Link2 } from "lucide-react";
 import { KEY_GUIS, buildKeyGui, type KeyGuiId } from "@/lib/keyGuis";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,9 +26,12 @@ function AdminKeys() {
   const [status, setStatus] = useState("all");
   const [sel, setSel] = useState<Set<string>>(new Set());
   const [gen, setGen] = useState({ type: "free", count: 1, hours: 24, maxUses: "", notes: "", username: "" });
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const settings = useQuery({ queryKey: ["key_settings_admin"], enabled: isAdmin, queryFn: async () => (await supabase.from("key_settings").select("*").eq("id", 1).single()).data });
   const stats = useQuery({ queryKey: ["key_stats"], enabled: isAdmin, queryFn: async () => { const { data, error } = await supabase.rpc("admin_key_stats"); if (error) throw error; return data as unknown as Stats; } });
+  const history = useQuery({ queryKey: ["key_usage_history"], enabled: isAdmin && historyOpen, queryFn: async () => { const { data, error } = await supabase.from("key_checks").select("id, ok, created_at").order("created_at", { ascending: false }).limit(100); if (error) throw error; return data ?? []; } });
+
   const list = useQuery({
     queryKey: ["admin_keys"], enabled: isAdmin,
     queryFn: async () => {
@@ -140,10 +143,11 @@ function AdminKeys() {
           {s && <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
             <label>Wait (seconds)<input className="input-base mt-1" type="number" defaultValue={s.wait_seconds} onBlur={e => void saveSettings({ wait_seconds: Number(e.target.value) })} /></label>
             <label>Free key hours<input className="input-base mt-1" type="number" defaultValue={s.free_hours} onBlur={e => void saveSettings({ free_hours: Number(e.target.value) })} /></label>
-            <label>Premium hours<input className="input-base mt-1" type="number" defaultValue={s.premium_hours} onBlur={e => void saveSettings({ premium_hours: Number(e.target.value) })} /></label>
+            <label>Premium hours<input className="input-base mt-1" type="number" defaultValue={s.premium_hours} onBlur={e => void saveSettings({ premium_hours: Number(e.target.value) })} /></label><label>Max active / user<input className="input-base mt-1" type="number" min={1} max={10} defaultValue={s.max_active_keys ?? 1} onBlur={e => void saveSettings({ max_active_keys: Math.min(10, Math.max(1, Number(e.target.value))) })} /></label>
           </div>}
-          <p className="mt-4 text-xs text-muted-foreground">Check a key from your Lua script:</p>
-          <code className="mt-1 block break-all rounded-lg bg-background/50 p-2 font-mono text-xs">{`local ok = game:HttpGet("${validateUrl}" .. key):find('"valid":true')`}</code>
+          <div className="mt-4 flex flex-wrap gap-2"><Button size="sm" variant="outline" onClick={() => void navigator.clipboard.writeText(validateUrl).then(() => toast.success("Validation URL copied"))}><Link2 size={14}/> Copy validation URL</Button><Button size="sm" variant="outline" onClick={() => setHistoryOpen(v => !v)}><History size={14}/> {historyOpen ? "Hide" : "View"} usage history</Button></div><p className="mt-4 text-xs text-muted-foreground">Check a key from your Lua script:</p>
+          <code className="mt-1 block break-all rounded-lg bg-background/50 p-2 font-mono text-xs">{`local ok = game:HttpGet("${validateUrl}" .. key)`}</code>
+          {historyOpen && <div className="mt-3 rounded-xl border border-border/60 bg-background/20 p-3"><div className="mb-2 flex items-center justify-between"><span className="text-xs font-semibold">Recent validation checks</span><span className="text-[10px] text-muted-foreground">Last 100</span></div><div className="grid max-h-40 grid-cols-2 gap-1.5 overflow-auto sm:grid-cols-4">{(history.data ?? []).map(h => <div key={h.id} className="rounded-lg border border-border/50 p-2 text-[10px]"><span className={h.ok ? "text-emerald-400" : "text-destructive"}>{h.ok ? "VALID" : "FAILED"}</span><span className="ml-2 text-muted-foreground">{new Date(h.created_at).toLocaleString()}</span></div>)}</div>{!history.isLoading && !(history.data ?? []).length && <p className="text-xs text-muted-foreground">No validation checks yet.</p>}</div>}
         </div>
       </div>
 
