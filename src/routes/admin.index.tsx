@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Users, Terminal, Eye, Download, Copy, Heart, Flag, Wifi, Activity, KeyRound, Plus, Bot, Palette, Settings, Megaphone, ShieldCheck, Zap, Trophy, RefreshCw, Clock, ArrowUpRight, Server, Gauge, CircleDot,
+  Users, Terminal, Eye, Download, Copy, Heart, Flag, Wifi, Activity, KeyRound, Plus, Bot, Palette, Settings, Megaphone, ShieldCheck, Zap, Trophy, Code2, RefreshCw, Clock, ArrowUpRight, Server, Gauge, CircleDot,
 } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
