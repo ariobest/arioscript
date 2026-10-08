@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  Shield, LayoutDashboard, Terminal, Users, Award, Flag, Megaphone, Settings, ScrollText, BarChart3, Lock, Mail, KeyRound, Images, Bot, Palette, Code2, MessageSquare,
+  Shield, LayoutDashboard, Terminal, Users, Award, Flag, Megaphone, Settings, ScrollText, BarChart3, Lock, Mail, KeyRound, Images, Bot, Palette, Code2, MessageSquare, Search, ChevronRight, Activity, Zap, Menu, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -75,51 +75,97 @@ function AdminLogin() {
 
 function AdminLayout() {
   const { user, isStaff, loading, profile } = useAuth();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
-  if (loading) return <div className="py-24 text-center text-sm text-muted-foreground">Checking permissions…</div>;
+  if (loading) return <div className="min-h-[60vh] grid place-items-center text-sm text-muted-foreground">Checking permissions…</div>;
   if (!user) return <AdminLogin />;
 
   if (!isStaff) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <Shield size={26} className="mx-auto text-destructive" />
+        <Shield size={30} className="mx-auto text-destructive" />
         <h1 className="mt-3 font-display text-xl font-semibold">Access denied</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Your account ({profile?.username}) is not an administrator.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">Your account ({profile?.username}) is not an administrator.</p>
         <Link to="/" className="btn btn-ghost mt-6">Back to site</Link>
       </div>
     );
   }
 
-  return (
-    <div className="admin-shell mx-auto flex max-w-7xl gap-6 px-3 py-4 sm:px-4 sm:py-8">
-      <aside className="glass hidden h-fit w-56 shrink-0 rounded-2xl p-3 lg:block lg:sticky lg:top-24">
-        <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Admin</p>
-        <nav className="space-y-0.5">
-          {LINKS.map((l) => (
-            <Link
-              key={l.to}
-              to={l.to}
-              activeOptions={{ exact: "exact" in l ? l.exact : false }}
-              activeProps={{ className: "flex items-center gap-2 rounded-xl px-3 py-2 text-sm bg-primary/15 text-primary" }}
-              className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-            >
-              <l.icon size={15} /> {l.label}
-            </Link>
-          ))}
-        </nav>
-      </aside>
+  const groups = [
+    { label: "Overview", links: LINKS.filter(x => ["/admin","/admin/analytics","/admin/logs"].includes(x.to)) },
+    { label: "Content", links: LINKS.filter(x => ["/admin/scripts","/admin/raw","/admin/keys","/admin/media","/admin/themes"].includes(x.to)) },
+    { label: "Tools", links: LINKS.filter(x => ["/admin/assistant","/admin/studio","/admin/discord"].includes(x.to)) },
+    { label: "Community", links: LINKS.filter(x => ["/admin/users","/admin/badges","/admin/reports","/admin/announcements"].includes(x.to)) },
+    { label: "System", links: LINKS.filter(x => x.to === "/admin/settings") },
+  ];
 
-      <div className="min-w-0 flex-1">
-        <div className="admin-mobile-nav glass sticky top-[4.5rem] z-30 -mx-1 mb-4 flex gap-1.5 overflow-x-auto rounded-2xl p-2 lg:hidden">
-          {LINKS.map((l) => (
-            <Link key={l.to} to={l.to} className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-transparent px-3 text-xs font-semibold text-muted-foreground" activeProps={{ className: "flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-primary/40 bg-primary/10 px-3 text-xs font-semibold text-primary" }}>
-              <l.icon size={14} className="shrink-0" /> {l.label}
-            </Link>
-          ))}
+  const Nav = ({ mobile = false }: { mobile?: boolean }) => (
+    <nav className="space-y-4">
+      {groups.map(group => (
+        <div key={group.label}>
+          {(!collapsed || mobile) && <p className="px-3 pb-1 text-[9px] font-bold uppercase tracking-[.2em] text-muted-foreground/60">{group.label}</p>}
+          <div className="space-y-1">
+            {group.links.map(l => (
+              <Link
+                key={l.to}
+                to={l.to}
+                activeOptions={{ exact: "exact" in l ? l.exact : false }}
+                onClick={() => setMobileOpen(false)}
+                activeProps={{ className: "group relative flex items-center gap-3 rounded-xl bg-primary/12 px-3 py-2.5 text-sm font-medium text-primary shadow-[inset_0_0_0_1px_hsl(var(--primary)/.16)]" }}
+                className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted-foreground transition-all hover:bg-secondary/70 hover:text-foreground"
+                title={collapsed && !mobile ? l.label : undefined}
+              >
+                <l.icon size={16} className="shrink-0" />
+                {(!collapsed || mobile) && <span className="truncate">{l.label}</span>}
+                {(!collapsed || mobile) && <ChevronRight size={13} className="ml-auto opacity-0 transition-opacity group-hover:opacity-60" />}
+              </Link>
+            ))}
+          </div>
         </div>
-        <Outlet />
+      ))}
+    </nav>
+  );
+
+  return (
+    <div className="min-h-[calc(100vh-4rem)] bg-[radial-gradient(circle_at_15%_10%,hsl(var(--primary)/.10),transparent_30%),radial-gradient(circle_at_90%_20%,hsl(220_80%_60%/.06),transparent_25%)]">
+      <div className="mx-auto flex max-w-[1500px] gap-4 px-3 py-4 sm:px-5 lg:gap-5 lg:py-6">
+        <aside className={"glass sticky top-20 hidden h-[calc(100vh-6rem)] shrink-0 flex-col rounded-3xl p-3 lg:flex " + (collapsed ? "w-[72px]" : "w-64")}>
+          <div className="mb-4 flex items-center gap-3 px-2">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/15 text-primary glow-ring"><Shield size={19}/></div>
+            {!collapsed && <div className="min-w-0"><p className="font-display text-sm font-bold">ARIO ADMIN</p><p className="text-[9px] uppercase tracking-widest text-primary">Control Center</p></div>}
+          </div>
+          <div className="mb-4 flex items-center gap-2 rounded-2xl border border-border/50 bg-background/25 p-2">
+            <Activity size={14} className="text-emerald-400"/>
+            {!collapsed && <span className="text-[10px] font-semibold text-muted-foreground">Systems operational</span>}
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto pr-1"><Nav /></div>
+          <button onClick={() => setCollapsed(v => !v)} className="mt-3 hidden items-center justify-center rounded-xl border border-border/50 bg-background/25 p-2 text-muted-foreground transition hover:text-foreground xl:flex">
+            {collapsed ? <ChevronRight size={15}/> : <ChevronRight size={15} className="rotate-180"/>}
+          </button>
+        </aside>
+
+        {mobileOpen && <button aria-label="Close menu" onClick={() => setMobileOpen(false)} className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden" />}
+        <aside className={"glass fixed inset-y-3 left-3 z-50 w-[280px] rounded-3xl p-4 shadow-2xl transition-transform lg:hidden " + (mobileOpen ? "translate-x-0" : "-translate-x-[120%]")}>
+          <div className="mb-5 flex items-center justify-between">
+            <div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/15 text-primary"><Shield size={18}/></div><div><p className="font-bold">ARIO ADMIN</p><p className="text-[9px] uppercase tracking-widest text-primary">Control Center</p></div></div>
+            <button onClick={() => setMobileOpen(false)} className="rounded-xl p-2 text-muted-foreground hover:bg-secondary"><X size={18}/></button>
+          </div>
+          <div className="overflow-y-auto"><Nav mobile /></div>
+        </aside>
+
+        <main className="min-w-0 flex-1">
+          <header className="glass mb-4 flex items-center gap-3 rounded-3xl px-4 py-3 sm:px-5">
+            <button onClick={() => setMobileOpen(true)} className="rounded-xl border border-border/50 bg-background/30 p-2 lg:hidden"><Menu size={18}/></button>
+            <div className="hidden h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary sm:grid"><Zap size={17}/></div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs font-semibold text-muted-foreground">Welcome back, <span className="text-foreground">{profile?.username || user.email?.split("@")[0] || "Admin"}</span></p>
+              <p className="text-[10px] uppercase tracking-[.18em] text-primary">Private administration environment</p>
+            </div>
+            <Link to="/" className="hidden rounded-xl border border-border/50 bg-background/30 px-3 py-2 text-xs font-semibold text-muted-foreground transition hover:text-foreground sm:block">View site</Link>
+          </header>
+          <Outlet />
+        </main>
       </div>
     </div>
   );
