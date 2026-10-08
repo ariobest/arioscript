@@ -124,6 +124,27 @@ function DiscordControl() {
     finally { setBusy(false); }
   }
 
+  async function togglePin(message: any) {
+    try {
+      await pinMessage({
+        data: {
+          guildId,
+          channelId,
+          messageId: message.id,
+          pinned: !message.pinned,
+        },
+      });
+      setMessages((prev) =>
+        prev.map((item) =>
+          item.id === message.id ? { ...item, pinned: !message.pinned } : item,
+        ),
+      );
+      toast.success(message.pinned ? "Message unpinned" : "Message pinned");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Pin action failed.");
+    }
+  }
+
   async function jsonAction(kind: "send" | "edit") {
     if (!jsonState.value) return toast.error("Fix the JSON syntax first.");
     if (!channelId) return toast.error("Choose a channel.");
@@ -188,7 +209,7 @@ function DiscordControl() {
               <div className="flex items-center gap-2">
                 <div className="min-w-0 flex-1"><p className="truncate text-xs font-semibold">{m.author?.global_name || m.author?.username || "Unknown user"}</p><p className="text-[10px] text-muted-foreground">{m.id}</p></div>
                 {m.pinned && <span className="chip text-[9px]"><Pin size={10}/> Pinned</span>}
-                <button onClick={async()=>{try{await pinMessage({data:{guildId,channelId,messageId:m.id,pinned:!m.pinned}});setMessages(prev=>prev.map(x=>x.id===m.id?{...x,pinned:!m.pinned}:x));toast.success(m.pinned?"Message unpinned":"Message pinned")}catch(e){toast.error(e instanceof Error?e.message:"Pin action failed.")}}} className="rounded-xl border border-border/50 p-2 text-muted-foreground hover:text-primary" title={m.pinned?"Unpin":"Pin"}><Pin size={13}/></button>
+                <button onClick={() => void togglePin(m)} className="rounded-xl border border-border/50 p-2 text-muted-foreground hover:text-primary" title={m.pinned ? "Unpin" : "Pin"}><Pin size={13}/></button>
                 <button onClick={()=>{setMessageId(m.id);setDescription(m.embeds?.[0]?.description ?? m.content ?? "");setTitle(m.embeds?.[0]?.title ?? "");toast.success("Message selected")}} className="rounded-xl border border-border/50 p-2 text-muted-foreground hover:text-primary" title="Use message"><Settings2 size={13}/></button>
               </div>
               <p className="mt-2 line-clamp-3 whitespace-pre-wrap text-xs text-muted-foreground">{m.content || m.embeds?.[0]?.description || "Embed / attachment message"}</p>
