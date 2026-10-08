@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Mail, Lock, User as UserIcon, Chrome, MessageCircle } from "lucide-react";
+import { Mail, Lock, User as UserIcon, Chrome } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -45,24 +45,6 @@ function AuthPage() {
       if (result?.error) throw result.error;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Google sign-in failed");
-      setBusy(false);
-    }
-  }
-
-  async function signInWithDiscord() {
-    if (user) {
-      navigate({ to: "/" });
-      return;
-    }
-    setBusy(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "discord",
-        options: { redirectTo: window.location.origin + "/auth" },
-      });
-      if (error) throw error;
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Discord sign-in failed");
       setBusy(false);
     }
   }
@@ -118,10 +100,6 @@ function AuthPage() {
           <button type="button" onClick={signInWithGoogle} disabled={busy} className="btn btn-ghost w-full justify-center gap-2 border border-border/80 bg-card/70 hover:border-primary/40 hover:bg-primary/5">
             <Chrome size={17} />
             Google
-          </button>
-          <button type="button" onClick={signInWithDiscord} disabled={busy} className="btn btn-ghost w-full justify-center gap-2 border border-border/80 bg-card/70 hover:border-primary/40 hover:bg-primary/5">
-            <MessageCircle size={17} />
-            Discord
           </button>
         </div>
         <div className="my-5 flex items-center gap-3"><span className="h-px flex-1 bg-border" /><span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">or continue with email</span><span className="h-px flex-1 bg-border" /></div>
