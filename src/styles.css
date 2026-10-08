@@ -752,3 +752,37 @@ body:has(.admin-stat-tile) [class*="border-border"] {
   45% { opacity: .92; transform: scale(.97) translateY(-3px); filter: blur(1px); }
   100% { opacity: 0; transform: scale(.82) translateY(-18px); filter: blur(7px); }
 }
+
+
+/* ===== ARIO admin mobile fit & responsive tables/forms ===== */
+.ario-admin-shell,
+.ario-admin-shell * { min-width: 0; }
+.ario-admin-main { width: 100%; max-width: 100%; }
+.ario-admin-main > * { max-width: 100%; }
+.ario-admin-main table { width: 100%; }
+.ario-admin-main :where(pre, code) { overflow-wrap: anywhere; }
+.ario-admin-main :where(input, select, textarea) { max-width: 100%; }
+.ario-admin-main :where(button, a) { touch-action: manipulation; }
+@media (max-width: 767px) {
+  .ario-admin-shell > div { gap: 0 !important; padding: .5rem !important; }
+  .ario-admin-main { width: 100%; overflow-x: clip; }
+  .ario-admin-main > header { gap: .5rem !important; padding: .65rem .75rem !important; border-radius: 1rem !important; }
+  .ario-admin-main > header p { overflow-wrap: anywhere; }
+  .ario-admin-main h1 { font-size: clamp(1.15rem, 5vw, 1.55rem); line-height: 1.25; }
+  .ario-admin-main h2 { font-size: clamp(1rem, 4.3vw, 1.25rem); line-height: 1.3; }
+  .ario-admin-main .glass { max-width: 100%; }
+  .ario-admin-main :where(.grid) { min-width: 0; }
+  .ario-admin-main :where(table) { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .ario-admin-main :where(th, td) { white-space: nowrap; }
+  .ario-admin-main :where(.flex.items-center, .flex.justify-between) { flex-wrap: wrap; }
+  .ario-admin-main :where(input, select, textarea) { font-size: 16px; }
+  .ario-admin-main :where(button, .btn) { min-height: 40px; }
+  .ario-admin-shell aside.fixed { width: min(300px, calc(100vw - 24px)) !important; max-height: calc(100dvh - 24px); overflow-y: auto; }
+}
+@media (max-width: 420px) {
+  .ario-admin-shell > div { padding: .35rem !important; }
+  .ario-admin-main > header { padding: .6rem !important; }
+  .ario-admin-main :where(.p-6, .p-7, .p-8) { padding: 1rem !important; }
+  .ario-admin-main :where(.gap-6, .gap-7, .gap-8) { gap: .75rem !important; }
+  .ario-admin-main :where(.text-3xl, .text-4xl) { font-size: 1.45rem; line-height: 1.25; }
+}
