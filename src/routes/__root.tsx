@@ -16,7 +16,6 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/hooks/useAuth";
 import { SiteLayout } from "@/components/site/Layout";
 import { applyTheme, getTheme, applyMode, getMode, applyMotion, getMotion, applyAccent, getAccent, applyMobileStyle, getMobileStyle, applyBackdrop, getBackdrop, type ColorMode } from "@/lib/theme";
-import { Welcome } from "@/components/site/Welcome";
 import { RouteProgress } from "@/components/site/RouteProgress";
 
 function NotFoundComponent() {
@@ -157,7 +156,6 @@ function RootComponent() {
           <Outlet />
         </SiteLayout>
         <RouteProgress />
-        <Welcome />
         <Toaster theme={mode} position="top-center" visibleToasts={3} richColors toastOptions={{ className: "ario-toast", duration: 4000, closeButton: false }} />
       </AuthProvider>
     </QueryClientProvider>
