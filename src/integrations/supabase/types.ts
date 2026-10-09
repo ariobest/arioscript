@@ -307,6 +307,134 @@ export type Database = {
         }
         Relationships: []
       }
+      user_preferences: {
+        Row: {
+          user_id: string;
+          theme: string;
+          email_notifications: boolean;
+          public_profile: boolean;
+          compact_layout: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          theme?: string;
+          email_notifications?: boolean;
+          public_profile?: boolean;
+          compact_layout?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          theme?: string;
+          email_notifications?: boolean;
+          public_profile?: boolean;
+          compact_layout?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      }
+      script_comments: {
+        Row: {
+          id: string;
+          script_id: string;
+          user_id: string;
+          content: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          script_id: string;
+          user_id: string;
+          content: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          script_id?: string;
+          user_id?: string;
+          content?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "script_comments_script_id_fkey";
+            columns: ["script_id"];
+            isOneToOne: false;
+            referencedRelation: "scripts";
+            referencedColumns: ["id"];
+          }
+        ];
+      }
+      script_collections: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          description: string | null;
+          is_public: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          description?: string | null;
+          is_public?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          description?: string | null;
+          is_public?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      }
+      script_collection_items: {
+        Row: {
+          collection_id: string;
+          script_id: string;
+          added_at: string;
+        };
+        Insert: {
+          collection_id: string;
+          script_id: string;
+          added_at?: string;
+        };
+        Update: {
+          collection_id?: string;
+          script_id?: string;
+          added_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "script_collection_items_collection_id_fkey";
+            columns: ["collection_id"];
+            isOneToOne: false;
+            referencedRelation: "script_collections";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "script_collection_items_script_id_fkey";
+            columns: ["script_id"];
+            isOneToOne: false;
+            referencedRelation: "scripts";
+            referencedColumns: ["id"];
+          }
+        ];
+      }
       raw_scripts: {
         Row: {
           code: string
