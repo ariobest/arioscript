@@ -104,7 +104,7 @@ function AdminRaw() {
           </div>
         ))}
         {list.isLoading && <p className="text-sm text-muted-foreground">Loading raw scripts…</p>}
-        {list.error && <div className="glass rounded-xl border border-destructive/30 p-4 text-sm"><p className="font-medium text-destructive">Could not load raw scripts</p><p className="mt-1 break-words text-muted-foreground">{list.error instanceof Error ? list.error.message : "Unknown database error"}</p><button className="btn btn-ghost mt-3" onClick={() => void list.refetch()}>Retry</button></div>}
+        {list.error && <div className="glass rounded-xl border border-destructive/30 p-4 text-sm"><p className="font-medium text-destructive">Could not load raw scripts</p><p className="mt-1 break-words text-muted-foreground">{list.error instanceof Error ? list.error.message : (typeof list.error === "object" && list.error !== null && "message" in list.error ? String((list.error as { message?: unknown }).message ?? JSON.stringify(list.error)) : String(list.error ?? "Unknown database error"))}</p><button className="btn btn-ghost mt-3" onClick={() => void list.refetch()}>Retry</button></div>}
         {list.data && !list.data.length && <div className="glass rounded-2xl p-8 text-center text-sm text-muted-foreground">No raw scripts yet — create your first one.</div>}
       </div>
 
