@@ -258,8 +258,6 @@ export interface FileRoutesByFullPath {
   '/admin/raw': typeof AdminRawRoute
   '/admin/lua': typeof AdminLuaRoute
   '/admin/loadstring': typeof AdminLoadstringRoute
-  '/admin/loadstring': typeof AdminLoadstringRoute
-  '/admin/loadstring': typeof AdminLoadstringRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -300,6 +298,7 @@ export interface FileRoutesByTo {
   '/admin/media': typeof AdminMediaRoute
   '/admin/raw': typeof AdminRawRoute
   '/admin/lua': typeof AdminLuaRoute
+  '/admin/loadstring': typeof AdminLoadstringRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -335,6 +334,7 @@ export interface FileRoutesById {
   '/admin/media': typeof AdminMediaRoute
   '/admin/raw': typeof AdminRawRoute
   '/admin/lua': typeof AdminLuaRoute
+  '/admin/loadstring': typeof AdminLoadstringRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -740,6 +740,7 @@ interface AdminRouteChildren {
   AdminMediaRoute: typeof AdminMediaRoute
   AdminRawRoute: typeof AdminRawRoute
   AdminLuaRoute: typeof AdminLuaRoute
+  AdminLoadstringRoute: typeof AdminLoadstringRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminScriptsRoute: typeof AdminScriptsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -760,6 +761,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminMediaRoute: AdminMediaRoute,
   AdminRawRoute: AdminRawRoute,
   AdminLuaRoute: AdminLuaRoute,
+  AdminLoadstringRoute: AdminLoadstringRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminScriptsRoute: AdminScriptsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
