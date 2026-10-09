@@ -32,7 +32,7 @@ export const Route = createFileRoute("/raw/$slug")({
           return new Response("-- valid ARIO API key required", { status: 401, headers });
         }
 
-        const supabaseUrl = (process.env["SUPABASE_URL"] ?? "").replace(/\\/+$/, "");
+        const supabaseUrl = (process.env["SUPABASE_URL"] ?? "").replace(/\/+$/, "");
         const supabaseKey = process.env["SUPABASE_PUBLISHABLE_KEY"] ?? "";
         if (!supabaseUrl || !supabaseKey) {
           console.error("Protected raw route is missing Supabase URL or publishable key.");
