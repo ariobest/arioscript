@@ -12,7 +12,16 @@ const headers = {
 export const Route = createFileRoute("/raw/$slug")({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      GET: async ({ params, request }) => {
+        // Casual browser deterrent only. Request headers can be spoofed, so this is not real access control.
+        const userAgent = request.headers.get("user-agent") ?? "";
+        const fetchDest = request.headers.get("sec-fetch-dest") ?? "";
+        const accept = request.headers.get("accept") ?? "";
+        const looksLikeBrowser =
+          /(mozilla|chrome|safari|firefox|edg)/i.test(userAgent) &&
+          (fetchDest === "document" || accept.includes("text/html"));
+        if (looksLikeBrowser) return new Response("", { status: 200, headers });
+
         const slug = String(params.slug ?? "").toLowerCase();
         if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(slug)) return new Response("-- not found", { status: 404, headers });
         const sb = createClient<Database>(process.env['SUPABASE_URL']!, process.env['SUPABASE_PUBLISHABLE_KEY']!, {
