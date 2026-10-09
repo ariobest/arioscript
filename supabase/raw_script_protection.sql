@@ -31,7 +31,8 @@ notify pgrst, 'reload schema';
 
 -- Admin-only RPCs let the admin UI manage protection without sending protection
 -- columns through PostgREST table inserts/updates.
-create or replace function public.admin_list_raw_script_protection()
+drop function if exists public.admin_list_raw_script_protection();
+create function public.admin_list_raw_script_protection(_request boolean)
 returns table (
   id uuid, name text, slug text, enabled boolean,
   is_protected boolean, protected_message text, updated_at timestamptz
@@ -68,8 +69,8 @@ begin
 end;
 $$;
 
-revoke all on function public.admin_list_raw_script_protection() from public;
+revoke all on function public.admin_list_raw_script_protection(boolean) from public;
 revoke all on function public.admin_set_raw_script_protection(text, boolean, text) from public;
-grant execute on function public.admin_list_raw_script_protection() to authenticated;
+grant execute on function public.admin_list_raw_script_protection(boolean) to authenticated;
 grant execute on function public.admin_set_raw_script_protection(text, boolean, text) to authenticated;
 notify pgrst, 'reload schema';
