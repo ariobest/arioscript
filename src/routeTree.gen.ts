@@ -33,6 +33,7 @@ import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminRawRouteImport } from './routes/admin.raw'
 import { Route as AdminLuaRouteImport } from './routes/admin.lua'
+import { Route as AdminProtectionRouteImport } from './routes/admin.protection'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -146,6 +147,11 @@ const AdminLuaRoute = AdminLuaRouteImport.update({
   path: '/lua',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminProtectionRoute = AdminProtectionRouteImport.update({
+  id: '/protection',
+  path: '/protection',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -251,6 +257,7 @@ export interface FileRoutesByFullPath {
   '/admin/media': typeof AdminMediaRoute
   '/admin/raw': typeof AdminRawRoute
   '/admin/lua': typeof AdminLuaRoute
+  '/admin/protection': typeof AdminProtectionRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -291,6 +298,7 @@ export interface FileRoutesByTo {
   '/admin/media': typeof AdminMediaRoute
   '/admin/raw': typeof AdminRawRoute
   '/admin/lua': typeof AdminLuaRoute
+  '/admin/protection': typeof AdminProtectionRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -606,6 +614,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLuaRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/protection': {
+      id: '/admin/protection'
+      path: '/protection'
+      fullPath: '/admin/protection'
+      preLoaderRoute: typeof AdminProtectionRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reports': {
       id: '/admin/reports'
       path: '/reports'
@@ -731,6 +746,7 @@ interface AdminRouteChildren {
   AdminMediaRoute: typeof AdminMediaRoute
   AdminRawRoute: typeof AdminRawRoute
   AdminLuaRoute: typeof AdminLuaRoute
+  AdminProtectionRoute: typeof AdminProtectionRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminScriptsRoute: typeof AdminScriptsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -751,6 +767,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminMediaRoute: AdminMediaRoute,
   AdminRawRoute: AdminRawRoute,
   AdminLuaRoute: AdminLuaRoute,
+  AdminProtectionRoute: AdminProtectionRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminScriptsRoute: AdminScriptsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
