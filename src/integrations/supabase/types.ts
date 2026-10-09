@@ -313,7 +313,9 @@ export type Database = {
           created_at: string
           enabled: boolean
           id: string
+          is_protected: boolean
           name: string
+          protected_message: string
           slug: string
           updated_at: string
         }
@@ -322,7 +324,9 @@ export type Database = {
           created_at?: string
           enabled?: boolean
           id?: string
+          is_protected?: boolean
           name: string
+          protected_message?: string
           slug: string
           updated_at?: string
         }
@@ -331,7 +335,9 @@ export type Database = {
           created_at?: string
           enabled?: boolean
           id?: string
+          is_protected?: boolean
           name?: string
+          protected_message?: string
           slug?: string
           updated_at?: string
         }
