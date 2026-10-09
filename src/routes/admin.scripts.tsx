@@ -153,7 +153,7 @@ function AdminScripts() {
       setDraft((current) => current ? {
         ...current,
         code,
-        name: current.name?.trim() ? current.name : file.name.replace(/\\.lua$/i, ""),
+        name: current.name?.trim() ? current.name : file.name.replace(/\.lua$/i, ""),
       } : current);
       toast.success("Lua file loaded into the editor");
     } catch {
