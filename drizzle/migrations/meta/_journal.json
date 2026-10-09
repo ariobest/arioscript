@@ -92,6 +92,13 @@
       "when": 1791582073511,
       "tag": "0012_user_experience_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791582446274,
+      "tag": "0013_remove_raw_script_protection",
+      "breakpoints": true
     }
   ]
 }
