@@ -334,6 +334,7 @@ export interface FileRoutesById {
   '/admin/media': typeof AdminMediaRoute
   '/admin/raw': typeof AdminRawRoute
   '/admin/lua': typeof AdminLuaRoute
+  '/admin/protection': typeof AdminProtectionRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -377,6 +378,7 @@ export interface FileRouteTypes {
     | '/admin/media'
     | '/admin/raw'
     | '/admin/lua'
+    | '/admin/protection'
     | '/admin/reports'
     | '/admin/scripts'
     | '/admin/settings'
@@ -417,6 +419,7 @@ export interface FileRouteTypes {
     | '/admin/media'
     | '/admin/raw'
     | '/admin/lua'
+    | '/admin/protection'
     | '/admin/reports'
     | '/admin/scripts'
     | '/admin/settings'
@@ -449,6 +452,7 @@ export interface FileRouteTypes {
     | '/admin/media'
     | '/admin/raw'
     | '/admin/lua'
+    | '/admin/protection'
     | '/admin/reports'
     | '/admin/scripts'
     | '/admin/settings'
