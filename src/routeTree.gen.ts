@@ -606,12 +606,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLuaRouteImport
       parentRoute: typeof AdminRoute
     }
-      path: '/protection'
-      parentRoute: typeof AdminRoute
-    }
-      path: '/protection'
-      parentRoute: typeof AdminRoute
-    }
     '/admin/reports': {
       id: '/admin/reports'
       path: '/reports'
