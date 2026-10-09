@@ -32,6 +32,7 @@ import { Route as AdminKeysRouteImport } from './routes/admin.keys'
 import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminRawRouteImport } from './routes/admin.raw'
+import { Route as AdminLuaRouteImport } from './routes/admin.lua'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -140,6 +141,11 @@ const AdminRawRoute = AdminRawRouteImport.update({
   path: '/raw',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLuaRoute = AdminLuaRouteImport.update({
+  id: '/lua',
+  path: '/lua',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -244,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/raw': typeof AdminRawRoute
+  '/admin/lua': typeof AdminLuaRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -587,6 +594,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRawRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/lua': {
+      id: '/admin/lua'
+      path: '/lua'
+      fullPath: '/admin/lua'
+      preLoaderRoute: typeof AdminLuaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reports': {
       id: '/admin/reports'
       path: '/reports'
@@ -711,6 +725,7 @@ interface AdminRouteChildren {
   AdminLogsRoute: typeof AdminLogsRoute
   AdminMediaRoute: typeof AdminMediaRoute
   AdminRawRoute: typeof AdminRawRoute
+  AdminLuaRoute: typeof AdminLuaRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminScriptsRoute: typeof AdminScriptsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -730,6 +745,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLogsRoute: AdminLogsRoute,
   AdminMediaRoute: AdminMediaRoute,
   AdminRawRoute: AdminRawRoute,
+  AdminLuaRoute: AdminLuaRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminScriptsRoute: AdminScriptsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
