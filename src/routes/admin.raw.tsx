@@ -30,6 +30,7 @@ function AdminRaw() {
   const fileInput = useRef<HTMLInputElement>(null);
   const list = useQuery({
     queryKey: ["raw_scripts"],
+    retry: 1,
     enabled: isAdmin,
     queryFn: async () => {
       const { data, error } = await supabase.from("raw_scripts").select("id,name,slug,code,enabled,is_protected,protected_message,updated_at").order("updated_at", { ascending: false });
@@ -44,14 +45,14 @@ function AdminRaw() {
   async function save() {
     if (!draft || !user) return;
     const name = draft.name?.trim() ?? "";
-    const slug = slugify(draft.slug?.trim() || name).slice(0, 80);
+    const slug = slugify(draft.slug?.trim() || name).toLowerCase().slice(0, 80);
     if (!name || !slug) return toast.error("Name is required");
     if (!draft.code?.trim()) return toast.error("Lua code is required");
     const payload = { name, slug, code: draft.code, enabled: draft.enabled !== false, is_protected: draft.is_protected === true, protected_message: (draft.protected_message || "ADMIN REQUIRED GO PLAY WITH THE SCRIPT DUM").slice(0, 180) };
     const { error } = draft.id
       ? await supabase.from("raw_scripts").update(payload).eq("id", draft.id)
       : await supabase.from("raw_scripts").insert(payload);
-    if (error) return toast.error(error.code === "23505" ? "That URL name is already used" : error.message);
+    if (error) return toast.error(error.code === "23505" ? "That URL name is already used" : `Could not save raw script: ${error.message}`);
     await adminLog({ adminId: user.id, action: draft.id ? "edited raw script" : "added raw script", targetType: "raw_script", details: name });
     toast.success(draft.id ? "Raw script updated" : "Raw script created");
     setDraft(null);
@@ -60,7 +61,7 @@ function AdminRaw() {
 
   async function toggle(r: Raw) {
     const { error } = await supabase.from("raw_scripts").update({ enabled: !r.enabled }).eq("id", r.id);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(`Could not update raw URL: ${error.message}`);
     toast.success(r.enabled ? "Raw URL disabled" : "Raw URL enabled");
     refresh();
   }
@@ -68,7 +69,7 @@ function AdminRaw() {
   async function remove(r: Raw) {
     if (!user || !confirm(`Delete "${r.name}"? Its raw URL will stop working.`)) return;
     const { error } = await supabase.from("raw_scripts").delete().eq("id", r.id);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(`Could not delete raw script: ${error.message}`);
     await adminLog({ adminId: user.id, action: "deleted raw script", targetType: "raw_script", details: r.name });
     toast.success("Raw script deleted");
     refresh();
@@ -102,7 +103,8 @@ function AdminRaw() {
             </div>
           </div>
         ))}
-        {list.isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
+        {list.isLoading && <p className="text-sm text-muted-foreground">Loading raw scripts…</p>}
+        {list.error && <div className="glass rounded-xl border border-destructive/30 p-4 text-sm"><p className="font-medium text-destructive">Could not load raw scripts</p><p className="mt-1 break-words text-muted-foreground">{list.error instanceof Error ? list.error.message : "Unknown database error"}</p><button className="btn btn-ghost mt-3" onClick={() => void list.refetch()}>Retry</button></div>}
         {list.data && !list.data.length && <div className="glass rounded-2xl p-8 text-center text-sm text-muted-foreground">No raw scripts yet — create your first one.</div>}
       </div>
 
