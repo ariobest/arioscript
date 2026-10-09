@@ -16,7 +16,6 @@ export const Route = createFileRoute("/admin/loadstring")({
 function AdminLoadstring() {
   const [url, setUrl] = useState("");
   const [generated, setGenerated] = useState("");
-  const [apiKey, setApiKey] = useState("");
 
   function generate() {
     let parsed: URL;
@@ -25,14 +24,13 @@ function AdminLoadstring() {
     if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
       toast.error("Only HTTP or HTTPS URLs are supported"); return;
     }
-    const key = apiKey.trim();
-    if (!key) { toast.error("Enter an active ARIO Developer API key"); return; }
     parsed.searchParams.delete("key");
     const luaUrl = JSON.stringify(parsed.toString());
-    const luaKey = JSON.stringify(key);
     const code = [
       "local endpoint = " + luaUrl,
-      "local apiKey = " + luaKey,
+      "local env = (getgenv and getgenv()) or _G",
+      "local apiKey = env.ARIO_API_KEY",
+      "if type(apiKey) ~= 'string' or apiKey == '' then error('ARIO loader: set getgenv().ARIO_API_KEY first') end",
       "local send = (request or http_request or (syn and syn.request))",
       "if not send then error('ARIO loader: executor does not support POST requests') end",
       "local ok, response = pcall(function()",
@@ -51,7 +49,7 @@ function AdminLoadstring() {
       "run()",
     ].join("\n");
     setGenerated(code);
-    toast.success("Loader generated; the key is not in the URL");
+    toast.success("Loader generated without embedding an API key");
   }
 
   async function copyGenerated() {
@@ -93,19 +91,7 @@ function AdminLoadstring() {
             />
           </div>
         </label>
-        <p className="mt-2 text-xs text-muted-foreground">Use the direct ARIO raw URL. Opening it in a browser shows a blank page; the generated loader uses POST to request the source.</p>
-        <label className="mt-4 block space-y-2 text-sm font-medium">
-          ARIO Developer API key
-          <input
-            className="input-base w-full font-mono text-xs sm:text-sm"
-            type="password"
-            autoComplete="off"
-            placeholder="Paste an active API key"
-            value={apiKey}
-            onChange={(event) => { setApiKey(event.target.value); setGenerated(""); }}
-          />
-          <span className="block text-xs font-normal text-muted-foreground">The key is not in the URL, but is embedded in client code and can still be extracted. Revoke it if shared.</span>
-        </label>
+        <p className="mt-2 text-xs text-muted-foreground">Use the direct ARIO raw URL. Opening it in a browser shows a blank page. The generated loader contains no API key; it reads a key supplied separately at runtime.</p>
         <button type="button" onClick={generate} className="btn btn-primary mt-4 w-full sm:w-auto">
           <WandSparkles size={15} /> Generate loadstring
         </button>
@@ -135,8 +121,8 @@ function AdminLoadstring() {
         <div className="flex items-start gap-3">
           <ShieldAlert size={19} className="mt-0.5 shrink-0 text-amber-400" />
           <div className="space-y-1 text-sm">
-            <p className="font-semibold">POST hides the key from the URL, not from the client</p>
-            <p className="text-muted-foreground">The server validates the key before returning source. The loader sends the key in the HTTPS request body, not the URL, so it will not appear in URL history or query strings. Because the key is available to the client, someone who obtains the loader can still extract it. Revoke shared keys and keep sensitive logic server-side.</p>
+            <p className="font-semibold">The generated loader does not contain your API key</p>
+            <p className="text-muted-foreground">The loader reads getgenv().ARIO_API_KEY at runtime and sends it in the HTTPS POST body. Set that variable separately with a key authorized for the person running the script. Never put your private developer key into a shared loader; anything sent to a client can be extracted.</p>
           </div>
         </div>
       </section>
