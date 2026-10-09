@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import {
-  Plus, Pencil, Trash2, Archive, Star, BadgeCheck, Eye, EyeOff, X, BarChart3, Upload, History, RotateCcw,
+  Plus, Pencil, Trash2, Archive, Star, BadgeCheck, Eye, EyeOff, X, BarChart3, History, RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,7 +14,7 @@ import type { Script } from "@/lib/types";
 import { uploadSiteImage } from "@/lib/media";
 import { loaderCommand, validRawLoaderUrl } from "@/lib/loader";
 import { Button } from "@/components/ui/button";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, ExternalLink } from "lucide-react";
 
 export const Route = createFileRoute("/admin/scripts")({
   head: () => ({ meta: [{ title: 'Manage Scripts — ARIO SCRIPTS' }, { name: "description", content: 'Add and manage scripts in the ARIO SCRIPTS library.' }, { property: "og:title", content: 'Manage Scripts — ARIO SCRIPTS' }, { property: "og:description", content: 'Add and manage scripts in the ARIO SCRIPTS library.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -37,7 +37,6 @@ function AdminScripts() {
   const [versionsFor, setVersionsFor] = useState<Script | null>(null);
   const [search, setSearch] = useState("");
   const [copiedLoader, setCopiedLoader] = useState(false);
-  const luaInput = useRef<HTMLInputElement>(null);
 
   const categories = useQuery({ queryKey: ["categories"], queryFn: getCategories });
   const scripts = useQuery({
@@ -135,31 +134,6 @@ function AdminScripts() {
     catch (error) { toast.error(error instanceof Error ? error.message : "Upload failed"); }
   }
 
-  async function uploadLua(file: File) {
-    if (!file.name.toLowerCase().endsWith(".lua")) {
-      toast.error("Choose a .lua file");
-      return;
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("Lua files must be 2 MB or smaller");
-      return;
-    }
-    try {
-      const code = await file.text();
-      if (!code.trim()) {
-        toast.error("That Lua file is empty");
-        return;
-      }
-      setDraft((current) => current ? {
-        ...current,
-        code,
-        name: current.name?.trim() ? current.name : file.name.replace(/\.lua$/i, ""),
-      } : current);
-      toast.success("Lua file loaded into the editor");
-    } catch {
-      toast.error("Could not read that Lua file");
-    }
-  }
 
   const rows = (scripts.data ?? []).filter((s) =>
     !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.game_name.toLowerCase().includes(search.toLowerCase()),
@@ -209,7 +183,7 @@ function AdminScripts() {
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-1">
                     <button title="Analytics" onClick={() => setStatsFor(s)} className="btn btn-ghost !p-1.5"><BarChart3 size={14} /></button><button title="Version history" onClick={() => setVersionsFor(s)} className="btn btn-ghost !p-1.5"><History size={14} /></button>
-                    {s.raw_loader_url && validRawLoaderUrl(s.raw_loader_url) && <button title="Copy loader" onClick={async () => { try { await navigator.clipboard.writeText(loaderCommand(s.raw_loader_url!)); toast.success("Loader copied"); } catch { toast.error("Could not copy loader"); } }} className="btn btn-ghost !p-1.5"><CopyIcon size={14} /></button>}
+                    {s.raw_loader_url && validRawLoaderUrl(s.raw_loader_url) && <button title="Copy loader" onClick={async () => { try { await navigator.clipboard.writeText(loaderCommand(s.raw_loader_url!)); toast.success("Loader copied"); } catch { toast.error("Could not copy loader"); } }} className="btn btn-ghost !p-1.5"><Copy size={14} /></button>}
                     {s.raw_loader_url && validRawLoaderUrl(s.raw_loader_url) && <a title="Open raw loader" href={s.raw_loader_url} target="_blank" rel="noreferrer" className="btn btn-ghost !p-1.5"><ExternalLink size={14} /></a>}
                     <button title="Feature" onClick={() => void patch(s, { featured: !s.featured }, s.featured ? "unfeatured script" : "featured script")} className="btn btn-ghost !p-1.5"><Star size={14} /></button>
                     <button title="Verify" onClick={() => void patch(s, { verified: !s.verified }, s.verified ? "unverified script" : "verified script")} className="btn btn-ghost !p-1.5"><BadgeCheck size={14} /></button>
@@ -300,18 +274,6 @@ function AdminScripts() {
                 <input type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && void uploadImage(e.target.files[0])} />
               </label>
               <textarea className="input-base sm:col-span-2" rows={3} placeholder="Description" value={draft.description ?? ""} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
-              <div className="sm:col-span-2 rounded-xl border border-border/70 bg-background/20 p-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button type="button" variant="ghost" onClick={() => luaInput.current?.click()}><Upload size={14} /> Upload .lua file</Button>
-                  <span className="text-xs text-muted-foreground">.lua only · max 2 MB</span>
-                  <input ref={luaInput} type="file" accept=".lua,text/plain" hidden onChange={async (e) => {
-                    const file = e.currentTarget.files?.[0];
-                    if (file) await uploadLua(file);
-                    e.currentTarget.value = "";
-                  }} />
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground">Choose a Lua file to fill the code editor, then publish or save your script.</p>
-              </div>
               <textarea className="input-base sm:col-span-2 font-mono text-xs" rows={10} placeholder="-- Lua code here (or upload a .lua file)" value={draft.code ?? ""} onChange={(e) => setDraft({ ...draft, code: e.target.value })} />
             </div>
 
