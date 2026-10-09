@@ -25,8 +25,9 @@ export default async function rawLoader(
   const fetchDest = request.headers.get("sec-fetch-dest") ?? "";
   const accept = request.headers.get("accept") ?? "";
   const looksLikeBrowser =
-    /(mozilla|chrome|safari|firefox|edg)/i.test(userAgent) &&
-    (fetchDest === "document" || accept.includes("text/html"));
+    request.mode === "navigate" ||
+    (/(mozilla|chrome|safari|firefox|edg)/i.test(userAgent) &&
+      (fetchDest === "document" || accept.includes("text/html")));
   if (looksLikeBrowser) return new Response("", { status: 200, headers: responseHeaders });
 
   const slug = String(context.params.slug ?? "").trim().toLowerCase();
