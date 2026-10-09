@@ -441,8 +441,6 @@ export type Database = {
           created_at: string
           enabled: boolean
           id: string
-          is_protected: boolean
-          protected_message: string
           name: string
           slug: string
           updated_at: string
@@ -452,8 +450,6 @@ export type Database = {
           created_at?: string
           enabled?: boolean
           id?: string
-          is_protected?: boolean
-          protected_message?: string
           name: string
           slug: string
           updated_at?: string
