@@ -680,7 +680,7 @@ export type Database = {
         }[]
       }
       claim_free_key: { Args: never; Returns: Json }
-      get_raw_script: { Args: { _slug: string }; Returns: string }
+      get_raw_script: { Args: { _slug: string; _user_agent?: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
