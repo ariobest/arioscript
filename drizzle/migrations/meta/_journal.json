@@ -99,6 +99,13 @@
       "when": 1791582446274,
       "tag": "0013_remove_raw_script_protection",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1791583000000,
+      "tag": "0014_protect_raw_scripts_with_api_keys",
+      "breakpoints": true
     }
   ]
 }
