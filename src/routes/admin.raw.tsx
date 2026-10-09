@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { Plus, Pencil, Trash2, X, Link2, Copy, Eye, EyeOff, Upload, ShieldCheck } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Link2, Copy, Eye, EyeOff, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/admin/raw")({
   component: AdminRaw,
 });
 
-type Raw = { id: string; name: string; slug: string; code: string; enabled: boolean; is_protected?: boolean; protected_message?: string; updated_at: string };
+type Raw = { id: string; name: string; slug: string; code: string; enabled: boolean; updated_at: string };
 type Draft = Partial<Raw>;
 
 const rawUrl = (slug: string) => `${typeof window !== "undefined" ? window.location.origin : ""}/raw/${slug}`;
@@ -33,7 +33,7 @@ function AdminRaw() {
     retry: 1,
     enabled: isAdmin,
     queryFn: async () => {
-      const { data, error } = await supabase.from("raw_scripts").select("id,name,slug,code,enabled,is_protected,protected_message,updated_at").order("updated_at", { ascending: false });
+      const { data, error } = await supabase.from("raw_scripts").select("id,name,slug,code,enabled,updated_at").order("updated_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as Raw[];
     },
@@ -48,7 +48,7 @@ function AdminRaw() {
     const slug = slugify(draft.slug?.trim() || name).toLowerCase().slice(0, 80);
     if (!name || !slug) return toast.error("Name is required");
     if (!draft.code?.trim()) return toast.error("Lua code is required");
-    const payload = { name, slug, code: draft.code, enabled: draft.enabled !== false, is_protected: draft.is_protected === true, protected_message: (draft.protected_message || "ADMIN REQUIRED GO PLAY WITH THE SCRIPT DUM").slice(0, 180) };
+    const payload = { name, slug, code: draft.code, enabled: draft.enabled !== false };
     const { error } = draft.id
       ? await supabase.from("raw_scripts").update(payload).eq("id", draft.id)
       : await supabase.from("raw_scripts").insert(payload);
@@ -79,7 +79,7 @@ function AdminRaw() {
     <div className="min-w-0 space-y-5">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="font-display text-2xl font-bold">Raw loader</h1>
-        <Button className="ml-auto" onClick={() => setDraft({ name: "", slug: "", code: "", enabled: true, is_protected: false, protected_message: "ADMIN REQUIRED GO PLAY WITH THE SCRIPT DUM" })}><Plus size={15} /> New raw script</Button>
+        <Button className="ml-auto" onClick={() => setDraft({ name: "", slug: "", code: "", enabled: true })}><Plus size={15} /> New raw script</Button>
       </div>
 
       <div className="grid gap-3">
@@ -119,7 +119,7 @@ function AdminRaw() {
               <input className="input-base" placeholder="Name" value={draft.name ?? ""} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
               <input className="input-base font-mono" placeholder="url-name (optional)" value={draft.slug ?? ""} onChange={(e) => setDraft({ ...draft, slug: e.target.value })} />
               <p className="truncate font-mono text-xs text-muted-foreground sm:col-span-2">{rawUrl(slugify(draft.slug?.trim() || draft.name || "") || "…")}</p>
-              <div className="sm:col-span-2"><input ref={fileInput} type="file" accept=".lua,text/plain" className="hidden" onChange={async (e) => { const file = e.target.files?.[0]; if (!file) return; if (!file.name.toLowerCase().endsWith(".lua")) { toast.error("Choose a .lua file"); e.currentTarget.value = ""; return; } if (file.size > 2097152) { toast.error("Lua files must be 2 MB or smaller"); e.currentTarget.value = ""; return; } const code = await file.text(); setDraft((prev) => prev ? { ...prev, name: prev.name?.trim() ? prev.name : file.name.replace(/\.lua$/i, ""), code } : prev); toast.success("Lua file loaded"); e.currentTarget.value = ""; }} /><button type="button" onClick={() => fileInput.current?.click()} className="btn btn-ghost mb-2 h-10 !px-3 text-xs"><Upload size={14} /> Upload .lua file</button><textarea className="input-base w-full font-mono text-xs" rows={14} spellCheck={false} placeholder="-- Lua code (or upload a .lua file)" value={draft.code ?? ""} onChange={(e) => setDraft({ ...draft, code: e.target.value })} /></div><label className="flex items-center gap-2 text-sm sm:col-span-2"><input type="checkbox" className="h-4 w-4 accent-[var(--primary)]" checked={draft.is_protected === true} onChange={(e) => setDraft({ ...draft, is_protected: e.target.checked, protected_message: draft.protected_message || "ADMIN REQUIRED GO PLAY WITH THE SCRIPT DUM" })} /><ShieldCheck size={15} /> Protect browser view</label>{draft.is_protected && <input className="input-base sm:col-span-2" placeholder="Message shown to browser visitors" value={draft.protected_message ?? "ADMIN REQUIRED GO PLAY WITH THE SCRIPT DUM"} onChange={(e) => setDraft({ ...draft, protected_message: e.target.value })} />}
+              <div className="sm:col-span-2"><input ref={fileInput} type="file" accept=".lua,text/plain" className="hidden" onChange={async (e) => { const file = e.target.files?.[0]; if (!file) return; if (!file.name.toLowerCase().endsWith(".lua")) { toast.error("Choose a .lua file"); e.currentTarget.value = ""; return; } if (file.size > 2097152) { toast.error("Lua files must be 2 MB or smaller"); e.currentTarget.value = ""; return; } const code = await file.text(); setDraft((prev) => prev ? { ...prev, name: prev.name?.trim() ? prev.name : file.name.replace(/\.lua$/i, ""), code } : prev); toast.success("Lua file loaded"); e.currentTarget.value = ""; }} /><button type="button" onClick={() => fileInput.current?.click()} className="btn btn-ghost mb-2 h-10 !px-3 text-xs"><Upload size={14} /> Upload .lua file</button><textarea className="input-base w-full font-mono text-xs" rows={14} spellCheck={false} placeholder="-- Lua code (or upload a .lua file)" value={draft.code ?? ""} onChange={(e) => setDraft({ ...draft, code: e.target.value })} /></div>
               <label className="flex items-center gap-2 text-sm"><input type="checkbox" className="h-4 w-4 accent-[var(--primary)]" checked={draft.enabled !== false} onChange={(e) => setDraft({ ...draft, enabled: e.target.checked })} /> Raw URL enabled</label>
             </div>
             <div className="mt-5 flex justify-end gap-2">
