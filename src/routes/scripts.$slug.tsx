@@ -33,6 +33,7 @@ function ScriptPage() {
   const [reason, setReason] = useState("Not working");
   const [details, setDetails] = useState("");
   const [quickCopied, setQuickCopied] = useState(false);
+  const [commentText, setCommentText] = useState("");
 
   const script = useQuery({
     queryKey: ["script", slug],
@@ -44,6 +45,28 @@ function ScriptPage() {
   });
 
   const versions = useQuery({ queryKey: ["script-versions", script.data?.id], enabled: !!script.data?.id, queryFn: async () => { const { data, error } = await (supabase as any).from("script_versions").select("id,version,changelog,created_at").eq("script_id", script.data!.id).order("created_at", { ascending: false }).limit(20); if (error) throw error; return data ?? []; } });
+
+  const comments = useQuery({
+    queryKey: ["script-comments", script.data?.id],
+    enabled: !!script.data?.id,
+    queryFn: async () => {
+      const sb = supabase as any;
+      const { data, error } = await sb.from("script_comments")
+        .select("id,content,user_id,created_at,updated_at")
+        .eq("script_id", script.data!.id)
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      const rows = data ?? [];
+      const ids = [...new Set(rows.map((row: any) => row.user_id))];
+      const profiles = ids.length
+        ? await sb.from("profiles").select("id,username,avatar_url").in("id", ids)
+        : { data: [], error: null };
+      if (profiles.error) throw profiles.error;
+      const byId = new Map((profiles.data ?? []).map((profile: any) => [profile.id, profile]));
+      return rows.map((row: any) => ({ ...row, profile: byId.get(row.user_id) ?? null }));
+    },
+  });
 
   const fav = useQuery({
     queryKey: ["fav", script.data?.id, user?.id],
@@ -129,6 +152,35 @@ function ScriptPage() {
     }
   }
 
+  async function submitComment() {
+    if (!user) {
+      toast.error("Sign in to comment");
+      return;
+    }
+    const content = commentText.trim();
+    if (!content || content.length > 2000) {
+      toast.error("Comments must be between 1 and 2000 characters");
+      return;
+    }
+    const { error } = await (supabase as any).from("script_comments").insert({
+      script_id: s!.id,
+      user_id: user.id,
+      content,
+    });
+    if (error) return toast.error("Could not post comment: " + error.message);
+    setCommentText("");
+    toast.success("Comment posted");
+    await qc.invalidateQueries({ queryKey: ["script-comments", s!.id] });
+  }
+
+  async function deleteComment(commentId: string) {
+    if (!user) return;
+    const { error } = await (supabase as any).from("script_comments").delete().eq("id", commentId).eq("user_id", user.id);
+    if (error) return toast.error("Could not delete comment");
+    toast.success("Comment deleted");
+    await qc.invalidateQueries({ queryKey: ["script-comments", s!.id] });
+  }
+
   async function submitReport() {
     if (!user) {
       toast.error("Sign in to report a script");
@@ -210,6 +262,51 @@ function ScriptPage() {
               toast.success("Downloading .lua file");
             }}
           />}
+
+          <section className="glass rounded-2xl p-5">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h2 className="font-display text-lg font-semibold">Community comments</h2>
+                <p className="mt-1 text-xs text-muted-foreground">Comments are saved in the ARIO database.</p>
+              </div>
+              <span className="chip">{comments.data?.length ?? 0}</span>
+            </div>
+            <form className="mt-4 space-y-2" onSubmit={(event) => { event.preventDefault(); void submitComment(); }}>
+              <textarea
+                value={commentText}
+                onChange={(event) => setCommentText(event.target.value)}
+                maxLength={2000}
+                rows={3}
+                className="input-base"
+                placeholder={user ? "Share a helpful comment…" : "Sign in to leave a comment"}
+                disabled={!user}
+              />
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs text-muted-foreground">{commentText.length}/2000</span>
+                <button type="submit" className="btn btn-primary" disabled={!user || !commentText.trim()}>Post comment</button>
+              </div>
+            </form>
+            <div className="mt-5 space-y-3">
+              {comments.isLoading && <p className="text-sm text-muted-foreground">Loading comments…</p>}
+              {comments.isError && <p className="text-sm text-destructive">Comments could not be loaded. Please refresh.</p>}
+              {(comments.data ?? []).map((comment: any) => (
+                <article key={comment.id} className="rounded-xl border border-border/70 p-3">
+                  <div className="flex items-center gap-2">
+                    {comment.profile?.avatar_url
+                      ? <img src={comment.profile.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
+                      : <span className="grid h-7 w-7 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">{(comment.profile?.username ?? "A").slice(0, 1).toUpperCase()}</span>}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold">{comment.profile?.username ?? "ARIO member"}</p>
+                      <p className="text-[11px] text-muted-foreground">{formatDate(comment.created_at)}</p>
+                    </div>
+                    {user?.id === comment.user_id && <button type="button" onClick={() => void deleteComment(comment.id)} className="text-xs text-destructive hover:underline">Delete</button>}
+                  </div>
+                  <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed">{comment.content}</p>
+                </article>
+              ))}
+              {!comments.isLoading && !comments.isError && !comments.data?.length && <p className="py-5 text-center text-sm text-muted-foreground">No comments yet. Start the conversation.</p>}
+            </div>
+          </section>
 
           {embed && (
             <div className="glass overflow-hidden rounded-2xl">
