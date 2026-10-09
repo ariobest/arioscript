@@ -16,6 +16,7 @@ export const Route = createFileRoute("/admin/loadstring")({
 function AdminLoadstring() {
   const [url, setUrl] = useState("");
   const [generated, setGenerated] = useState("");
+  const [apiKey, setApiKey] = useState("");
 
   function generate() {
     const value = url.trim();
@@ -31,6 +32,12 @@ function AdminLoadstring() {
       return;
     }
     // JSON.stringify safely escapes quotes and backslashes for a Lua string literal.
+    const key = apiKey.trim();
+    if (!key) {
+      toast.error("Enter an active ARIO Developer API key");
+      return;
+    }
+    parsed.searchParams.set("key", key);
     const luaUrl = JSON.stringify(parsed.toString());
     setGenerated(`loadstring(game:HttpGet(${luaUrl}))()`);
     toast.success("Loadstring generated");
@@ -75,7 +82,19 @@ function AdminLoadstring() {
             />
           </div>
         </label>
-        <p className="mt-2 text-xs text-muted-foreground">Use a direct URL that returns raw Lua source, not a webpage that displays a download button.</p>
+        <p className="mt-2 text-xs text-muted-foreground">Use your ARIO raw URL (for example, https://your-site.com/raw/my-script). The endpoint will only return source when the API key is active.</p>
+        <label className="mt-4 block space-y-2 text-sm font-medium">
+          ARIO Developer API key
+          <input
+            className="input-base w-full font-mono text-xs sm:text-sm"
+            type="password"
+            autoComplete="off"
+            placeholder="Paste an active API key"
+            value={apiKey}
+            onChange={(event) => { setApiKey(event.target.value); setGenerated(""); }}
+          />
+          <span className="block text-xs font-normal text-muted-foreground">Create or manage keys in your ARIO API dashboard. Revoke a key if it gets shared.</span>
+        </label>
         <button type="button" onClick={generate} className="btn btn-primary mt-4 w-full sm:w-auto">
           <WandSparkles size={15} /> Generate loadstring
         </button>
@@ -106,7 +125,7 @@ function AdminLoadstring() {
           <ShieldAlert size={19} className="mt-0.5 shrink-0 text-amber-400" />
           <div className="space-y-1 text-sm">
             <p className="font-semibold">Important: a loadstring does not hide source code</p>
-            <p className="text-muted-foreground">This tool only builds a loader for the URL you enter. If the URL is public, people may open or download it. Once code is delivered to a client to run, it can potentially be inspected or copied. This page cannot make an arbitrary third-party URL show a blank response.</p>
+            <p className="text-muted-foreground">The server now checks the API key before returning raw source, and legacy public raw-script RPC access is being closed. The key is included in the generated loader, so it can still be extracted and revoked if shared. Once code is delivered to a client to run, it can potentially be inspected or copied; keep sensitive logic on a server you control.</p>
           </div>
         </div>
       </section>
