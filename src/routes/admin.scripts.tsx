@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Plus, Pencil, Trash2, Archive, Star, BadgeCheck, Eye, EyeOff, X, BarChart3, Upload, History, RotateCcw,
 } from "lucide-react";
@@ -37,6 +37,7 @@ function AdminScripts() {
   const [versionsFor, setVersionsFor] = useState<Script | null>(null);
   const [search, setSearch] = useState("");
   const [copiedLoader, setCopiedLoader] = useState(false);
+  const luaInput = useRef<HTMLInputElement>(null);
 
   const categories = useQuery({ queryKey: ["categories"], queryFn: getCategories });
   const scripts = useQuery({
@@ -132,6 +133,32 @@ function AdminScripts() {
   async function uploadImage(file: File) {
     try { const url = await uploadSiteImage(file); setDraft((d) => ({ ...(d ?? {}), image_url: url })); toast.success("Thumbnail uploaded"); }
     catch (error) { toast.error(error instanceof Error ? error.message : "Upload failed"); }
+  }
+
+  async function uploadLua(file: File) {
+    if (!file.name.toLowerCase().endsWith(".lua")) {
+      toast.error("Choose a .lua file");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Lua files must be 2 MB or smaller");
+      return;
+    }
+    try {
+      const code = await file.text();
+      if (!code.trim()) {
+        toast.error("That Lua file is empty");
+        return;
+      }
+      setDraft((current) => current ? {
+        ...current,
+        code,
+        name: current.name?.trim() ? current.name : file.name.replace(/\\.lua$/i, ""),
+      } : current);
+      toast.success("Lua file loaded into the editor");
+    } catch {
+      toast.error("Could not read that Lua file");
+    }
   }
 
   const rows = (scripts.data ?? []).filter((s) =>
@@ -273,7 +300,19 @@ function AdminScripts() {
                 <input type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && void uploadImage(e.target.files[0])} />
               </label>
               <textarea className="input-base sm:col-span-2" rows={3} placeholder="Description" value={draft.description ?? ""} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
-              <textarea className="input-base sm:col-span-2 font-mono text-xs" rows={10} placeholder="-- Lua code here (optional when a raw loader link is set)" value={draft.code ?? ""} onChange={(e) => setDraft({ ...draft, code: e.target.value })} />
+              <div className="sm:col-span-2 rounded-xl border border-border/70 bg-background/20 p-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button type="button" variant="ghost" onClick={() => luaInput.current?.click()}><Upload size={14} /> Upload .lua file</Button>
+                  <span className="text-xs text-muted-foreground">.lua only · max 2 MB</span>
+                  <input ref={luaInput} type="file" accept=".lua,text/plain" hidden onChange={async (e) => {
+                    const file = e.currentTarget.files?.[0];
+                    if (file) await uploadLua(file);
+                    e.currentTarget.value = "";
+                  }} />
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">Choose a Lua file to fill the code editor, then publish or save your script.</p>
+              </div>
+              <textarea className="input-base sm:col-span-2 font-mono text-xs" rows={10} placeholder="-- Lua code here (or upload a .lua file)" value={draft.code ?? ""} onChange={(e) => setDraft({ ...draft, code: e.target.value })} />
             </div>
 
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
