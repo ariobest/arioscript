@@ -34,8 +34,11 @@ function AdminScriptProtection() {
   const query = useQuery({
     queryKey: ["raw_script_protection"],
     enabled: isStaff,
+    retry: false,
+    staleTime: 15_000,
+    refetchOnWindowFocus: false,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_raw_script_protection");
+      const { data, error } = await supabase.rpc("admin_list_raw_script_protection", { _request: true });
       if (error) throw error;
       return (data ?? []) as ProtectionRow[];
     },
