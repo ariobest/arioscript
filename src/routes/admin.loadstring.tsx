@@ -40,7 +40,7 @@ function AdminLoadstring() {
       "        Url = endpoint,",
       "        Method = 'POST',",
       "        Headers = { ['Content-Type'] = 'application/json', ['Accept'] = 'text/plain' },",
-      "        Body = '{\\"key\\":' .. game:GetService('HttpService'):JSONEncode(apiKey) .. '}'",
+      "        Body = game:GetService('HttpService'):JSONEncode({ key = apiKey })",
       "    })",
       "end)",
       "if not ok or not response or (response.StatusCode and response.StatusCode ~= 200) then error('ARIO loader: request failed or key is invalid') end",
@@ -49,7 +49,7 @@ function AdminLoadstring() {
       "local run, compileError = loadstring(source)",
       "if not run then error(compileError) end",
       "run()",
-    ].join("\\n");
+    ].join("\n");
     setGenerated(code);
     toast.success("Loader generated; the key is not in the URL");
   }
