@@ -19,28 +19,39 @@ function AdminLoadstring() {
   const [apiKey, setApiKey] = useState("");
 
   function generate() {
-    const value = url.trim();
     let parsed: URL;
-    try {
-      parsed = new URL(value);
-    } catch {
-      toast.error("Enter a complete script URL starting with https://");
-      return;
-    }
+    try { parsed = new URL(url.trim()); }
+    catch { toast.error("Enter a complete script URL starting with https://"); return; }
     if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
-      toast.error("Only HTTP or HTTPS URLs are supported");
-      return;
+      toast.error("Only HTTP or HTTPS URLs are supported"); return;
     }
-    // JSON.stringify safely escapes quotes and backslashes for a Lua string literal.
     const key = apiKey.trim();
-    if (!key) {
-      toast.error("Enter an active ARIO Developer API key");
-      return;
-    }
-    parsed.searchParams.set("key", key);
+    if (!key) { toast.error("Enter an active ARIO Developer API key"); return; }
+    parsed.searchParams.delete("key");
     const luaUrl = JSON.stringify(parsed.toString());
-    setGenerated(`loadstring(game:HttpGet(${luaUrl}))()`);
-    toast.success("Loadstring generated");
+    const luaKey = JSON.stringify(key);
+    const code = [
+      "local endpoint = " + luaUrl,
+      "local apiKey = " + luaKey,
+      "local send = (request or http_request or (syn and syn.request))",
+      "if not send then error('ARIO loader: executor does not support POST requests') end",
+      "local ok, response = pcall(function()",
+      "    return send({",
+      "        Url = endpoint,",
+      "        Method = 'POST',",
+      "        Headers = { ['Content-Type'] = 'application/json', ['Accept'] = 'text/plain' },",
+      "        Body = '{\\"key\\":' .. game:GetService('HttpService'):JSONEncode(apiKey) .. '}'",
+      "    })",
+      "end)",
+      "if not ok or not response or (response.StatusCode and response.StatusCode ~= 200) then error('ARIO loader: request failed or key is invalid') end",
+      "local source = response.Body or response.body",
+      "if type(source) ~= 'string' or source == '' then error('ARIO loader: empty response') end",
+      "local run, compileError = loadstring(source)",
+      "if not run then error(compileError) end",
+      "run()",
+    ].join("\\n");
+    setGenerated(code);
+    toast.success("Loader generated; the key is not in the URL");
   }
 
   async function copyGenerated() {
@@ -61,7 +72,7 @@ function AdminLoadstring() {
         </span>
         <div>
           <h1 className="font-display text-2xl font-bold">Loadstring Generator</h1>
-          <p className="text-sm text-muted-foreground">Turn a direct script URL into a ready-to-copy Lua loader.</p>
+          <p className="text-sm text-muted-foreground">Generate a protected POST-based Lua loader.</p>
         </div>
       </div>
 
@@ -82,7 +93,7 @@ function AdminLoadstring() {
             />
           </div>
         </label>
-        <p className="mt-2 text-xs text-muted-foreground">Use your ARIO raw URL (for example, https://your-site.com/raw/my-script). The endpoint will only return source when the API key is active.</p>
+        <p className="mt-2 text-xs text-muted-foreground">Use the direct ARIO raw URL. Opening it in a browser shows a blank page; the generated loader uses POST to request the source.</p>
         <label className="mt-4 block space-y-2 text-sm font-medium">
           ARIO Developer API key
           <input
@@ -93,7 +104,7 @@ function AdminLoadstring() {
             value={apiKey}
             onChange={(event) => { setApiKey(event.target.value); setGenerated(""); }}
           />
-          <span className="block text-xs font-normal text-muted-foreground">Create or manage keys in your ARIO API dashboard. Revoke a key if it gets shared.</span>
+          <span className="block text-xs font-normal text-muted-foreground">The key is not in the URL, but is embedded in client code and can still be extracted. Revoke it if shared.</span>
         </label>
         <button type="button" onClick={generate} className="btn btn-primary mt-4 w-full sm:w-auto">
           <WandSparkles size={15} /> Generate loadstring
@@ -111,7 +122,7 @@ function AdminLoadstring() {
           <textarea
             aria-label="Generated loadstring"
             className="input-base mt-3 w-full resize-y font-mono text-xs sm:text-sm"
-            rows={4}
+            rows={12}
             spellCheck={false}
             readOnly
             value={generated}
@@ -124,8 +135,8 @@ function AdminLoadstring() {
         <div className="flex items-start gap-3">
           <ShieldAlert size={19} className="mt-0.5 shrink-0 text-amber-400" />
           <div className="space-y-1 text-sm">
-            <p className="font-semibold">Important: a loadstring does not hide source code</p>
-            <p className="text-muted-foreground">The server now checks the API key before returning raw source, and legacy public raw-script RPC access is being closed. The key is included in the generated loader, so it can still be extracted and revoked if shared. Once code is delivered to a client to run, it can potentially be inspected or copied; keep sensitive logic on a server you control.</p>
+            <p className="font-semibold">POST hides the key from the URL, not from the client</p>
+            <p className="text-muted-foreground">The server validates the key before returning source. The loader sends the key in the HTTPS request body, not the URL, so it will not appear in URL history or query strings. Because the key is available to the client, someone who obtains the loader can still extract it. Revoke shared keys and keep sensitive logic server-side.</p>
           </div>
         </div>
       </section>
