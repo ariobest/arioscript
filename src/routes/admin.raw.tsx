@@ -26,7 +26,8 @@ async function copy(text: string, label: string) {
 function AdminRaw() {
   const { user, isAdmin } = useAuth();
   const qc = useQueryClient();
-  const [draft, setDraft] = useState<Draft | null>(null);\n  const fileInput = useRef<HTMLInputElement>(null);
+  const [draft, setDraft] = useState<Draft | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
   const list = useQuery({
     queryKey: ["raw_scripts"],
     enabled: isAdmin,
