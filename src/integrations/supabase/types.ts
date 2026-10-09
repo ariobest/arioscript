@@ -680,6 +680,8 @@ export type Database = {
         }[]
       }
       claim_free_key: { Args: never; Returns: Json }
+      admin_list_raw_script_protection: { Args: never; Returns: { id: string; name: string; slug: string; enabled: boolean; is_protected: boolean; protected_message: string; updated_at: string }[] }
+      admin_set_raw_script_protection: { Args: { _slug: string; _is_protected: boolean; _protected_message?: string }; Returns: boolean }
       get_raw_script: { Args: { _slug: string; _user_agent?: string }; Returns: string }
       has_role: {
         Args: {
