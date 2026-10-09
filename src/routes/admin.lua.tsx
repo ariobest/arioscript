@@ -96,8 +96,6 @@ function AdminLuaUploads() {
         slug: cleanSlug,
         code,
         enabled: true,
-        is_protected: false,
-        protected_message: "GO PLAY DUM",
       });
       if (error) {
         toast.error(error.code === "23505" ? "That URL name already exists. Change the URL name and try again." : error.message);
