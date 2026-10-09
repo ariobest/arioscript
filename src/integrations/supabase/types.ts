@@ -313,9 +313,7 @@ export type Database = {
           created_at: string
           enabled: boolean
           id: string
-          is_protected: boolean
           name: string
-          protected_message: string
           slug: string
           updated_at: string
         }
@@ -324,9 +322,7 @@ export type Database = {
           created_at?: string
           enabled?: boolean
           id?: string
-          is_protected?: boolean
           name: string
-          protected_message?: string
           slug: string
           updated_at?: string
         }
@@ -335,9 +331,7 @@ export type Database = {
           created_at?: string
           enabled?: boolean
           id?: string
-          is_protected?: boolean
           name?: string
-          protected_message?: string
           slug?: string
           updated_at?: string
         }
@@ -680,8 +674,6 @@ export type Database = {
         }[]
       }
       claim_free_key: { Args: never; Returns: Json }
-      admin_list_raw_script_protection: { Args: { _request: boolean }; Returns: { id: string; name: string; slug: string; enabled: boolean; is_protected: boolean; protected_message: string; updated_at: string }[] }
-      admin_set_raw_script_protection: { Args: { _slug: string; _is_protected: boolean; _protected_message?: string }; Returns: boolean }
       get_raw_script: { Args: { _slug: string; _user_agent?: string }; Returns: string }
       has_role: {
         Args: {
