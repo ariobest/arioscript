@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  Shield, LayoutDashboard, Terminal, Users, Award, Flag, Megaphone, Settings, ScrollText, BarChart3, Lock, Mail, KeyRound, Images, Bot, Palette, Code2, MessageSquare, ChevronRight, Activity, Zap, Menu, X, FileCode2,
+  Shield, LayoutDashboard, Terminal, Users, Award, Flag, Megaphone, Settings, ScrollText, BarChart3, Lock, Mail, KeyRound, Images, Bot, Palette, Code2, MessageSquare, ChevronRight, Activity, Zap, Menu, X, FileCode2, ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +17,7 @@ const LINKS = [
   { to: "/admin/scripts", label: "Scripts", icon: Terminal },
   { to: "/admin/raw", label: "Raw loader", icon: Terminal },
   { to: "/admin/lua", label: "Lua uploads", icon: FileCode2 },
+  { to: "/admin/protection", label: "Script protection", icon: ShieldCheck },
   { to: "/admin/keys", label: "Keys", icon: KeyRound },
   { to: "/admin/assistant", label: "Script assistant", icon: Bot },
   { to: "/admin/studio", label: "Studio", icon: Code2 },
@@ -95,7 +96,7 @@ function AdminLayout() {
 
   const groups = [
     { label: "Overview", links: LINKS.filter(x => ["/admin","/admin/analytics","/admin/logs"].includes(x.to)) },
-    { label: "Content", links: LINKS.filter(x => ["/admin/scripts","/admin/raw","/admin/lua","/admin/keys","/admin/media","/admin/themes"].includes(x.to)) },
+    { label: "Content", links: LINKS.filter(x => ["/admin/scripts","/admin/raw","/admin/lua","/admin/protection","/admin/keys","/admin/media","/admin/themes"].includes(x.to)) },
     { label: "Tools", links: LINKS.filter(x => ["/admin/assistant","/admin/studio","/admin/discord"].includes(x.to)) },
     { label: "Community", links: LINKS.filter(x => ["/admin/users","/admin/badges","/admin/reports","/admin/announcements"].includes(x.to)) },
     { label: "System", links: LINKS.filter(x => x.to === "/admin/settings") },
