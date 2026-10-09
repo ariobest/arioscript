@@ -12,13 +12,13 @@ const headers = {
 export const Route = createFileRoute("/raw/$slug")({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      GET: async ({ params, request }) => {
         const slug = String(params.slug ?? "").toLowerCase();
         if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(slug)) return new Response("-- not found", { status: 404, headers });
         const sb = createClient<Database>(process.env['SUPABASE_URL']!, process.env['SUPABASE_PUBLISHABLE_KEY']!, {
           auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
         });
-        const { data, error } = await sb.rpc("get_raw_script", { _slug: slug });
+        const { data, error } = await sb.rpc("get_raw_script", { _slug: slug, _user_agent: request.headers.get("user-agent") ?? "" });
         if (error) return new Response("-- error", { status: 500, headers });
         if (data == null) return new Response("-- not found", { status: 404, headers });
         return new Response(data as string, { status: 200, headers });
