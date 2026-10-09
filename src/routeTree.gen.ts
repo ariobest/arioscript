@@ -33,6 +33,7 @@ import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminRawRouteImport } from './routes/admin.raw'
 import { Route as AdminLuaRouteImport } from './routes/admin.lua'
+import { Route as AdminLoadstringRouteImport } from './routes/admin.loadstring'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -146,6 +147,11 @@ const AdminLuaRoute = AdminLuaRouteImport.update({
   path: '/lua',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLoadstringRoute = AdminLoadstringRouteImport.update({
+  id: '/loadstring',
+  path: '/loadstring',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -251,6 +257,9 @@ export interface FileRoutesByFullPath {
   '/admin/media': typeof AdminMediaRoute
   '/admin/raw': typeof AdminRawRoute
   '/admin/lua': typeof AdminLuaRoute
+  '/admin/loadstring': typeof AdminLoadstringRoute
+  '/admin/loadstring': typeof AdminLoadstringRoute
+  '/admin/loadstring': typeof AdminLoadstringRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/admin/settings': typeof AdminSettingsRoute
