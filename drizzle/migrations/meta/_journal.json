@@ -78,6 +78,20 @@
       "when": 1791266512386,
       "tag": "0010_fix_validate_key",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791582073510,
+      "tag": "0011_platform_expansion",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1791582073511,
+      "tag": "0012_user_experience_tables",
+      "breakpoints": true
     }
   ]
 }
