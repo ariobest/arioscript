@@ -20,6 +20,15 @@ export default async function rawLoader(
     });
   }
 
+  // Casual browser deterrent only. This is not authentication: clients can spoof headers.
+  const userAgent = request.headers.get("user-agent") ?? "";
+  const fetchDest = request.headers.get("sec-fetch-dest") ?? "";
+  const accept = request.headers.get("accept") ?? "";
+  const looksLikeBrowser =
+    /(mozilla|chrome|safari|firefox|edg)/i.test(userAgent) &&
+    (fetchDest === "document" || accept.includes("text/html"));
+  if (looksLikeBrowser) return new Response("", { status: 200, headers: responseHeaders });
+
   const slug = String(context.params.slug ?? "").trim().toLowerCase();
   if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(slug)) {
     return plain("-- script not found", 404);
