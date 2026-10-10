@@ -23,6 +23,9 @@ async function copy(text: string, label: string) {
   try { await navigator.clipboard.writeText(text); toast.success(`${label} copied`); } catch { toast.error("Could not copy"); }
 }
 
+const loadstringFor = (slug: string) =>
+  `loadstring(game:HttpGet(${JSON.stringify(rawUrl(slug))}, true))()`;
+
 function AdminRaw() {
   const { user, isAdmin } = useAuth();
   const qc = useQueryClient();
@@ -94,6 +97,7 @@ function AdminRaw() {
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5">
               <button onClick={() => void copy(rawUrl(r.slug), "Raw URL")} className="btn btn-primary h-10 !px-3 !py-0 text-xs"><Link2 size={14} /> Copy Raw URL</button>
+              <button onClick={() => void copy(loadstringFor(r.slug), "Loadstring")} className="btn btn-primary h-10 !px-3 !py-0 text-xs"><Copy size={14} /> Copy Loadstring</button>
               <button onClick={() => void copy(r.code, "Script")} className="btn btn-ghost h-10 !px-3 !py-0 text-xs"><Copy size={14} /> Copy Script</button>
               <div className="ml-auto flex gap-1">
                 <button title={r.enabled ? "Disable" : "Enable"} onClick={() => void toggle(r)} className="btn btn-ghost h-10 w-10 !p-0">{r.enabled ? <Eye size={14} /> : <EyeOff size={14} />}</button>
