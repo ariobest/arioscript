@@ -31,6 +31,7 @@ const LINKS = [
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/admin/logs", label: "Admin logs", icon: ScrollText },
   { to: "/admin/settings", label: "Settings", icon: Settings },
+  { to: "/api-docs", label: "API Documentation", icon: Code2 },
 ] as const;
 
 function AdminLogin() {
@@ -133,9 +134,9 @@ function AdminLayout() {
   );
 
   return (
-    <div className="ario-admin-shell min-h-[calc(100vh-4rem)] bg-[radial-gradient(circle_at_15%_10%,hsl(var(--primary)/.10),transparent_30%),radial-gradient(circle_at_90%_20%,hsl(220_80%_60%/.06),transparent_25%)]">
+    <div className="ario-admin-shell min-h-[calc(100vh-4rem)] bg-[radial-gradient(circle_at_15%_10%,hsl(var(--primary)/.14),transparent_32%),radial-gradient(circle_at_90%_20%,hsl(220_80%_60%/.10),transparent_28%)]">
       <div className="mx-auto flex max-w-[1500px] gap-4 px-3 py-4 sm:px-5 lg:gap-5 lg:py-6">
-        <aside className={"glass sticky top-20 hidden h-[calc(100vh-6rem)] shrink-0 flex-col rounded-3xl p-3 lg:flex " + (collapsed ? "w-[72px]" : "w-64")}>
+        <aside className={"glass admin-frosted-panel sticky top-20 hidden h-[calc(100vh-6rem)] shrink-0 flex-col rounded-3xl p-3 lg:flex " + (collapsed ? "w-[72px]" : "w-64")}>
           <div className="mb-4 flex items-center gap-3 px-2">
             <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/15 text-primary glow-ring"><Shield size={19}/></div>
             {!collapsed && <div className="min-w-0"><p className="font-display text-sm font-bold">ARIO ADMIN</p><p className="text-[9px] uppercase tracking-widest text-primary">Control Center</p></div>}
@@ -160,7 +161,7 @@ function AdminLayout() {
         </aside>
 
         <main className="ario-admin-main min-w-0 flex-1">
-          <header className="glass mb-4 flex items-center gap-3 rounded-3xl px-4 py-3 sm:px-5">
+          <header className="glass admin-frosted-panel mb-4 flex items-center gap-3 rounded-3xl px-4 py-3 sm:px-5">
             <button onClick={() => setMobileOpen(true)} className="rounded-xl border border-border/50 bg-background/30 p-2 lg:hidden"><Menu size={18}/></button>
             <div className="hidden h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary sm:grid"><Zap size={17}/></div>
             <div className="min-w-0 flex-1">
