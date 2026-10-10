@@ -14,18 +14,35 @@ function serviceClient() {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
-async function requireStaff(request: Request) {
+type StaffAccess =
+  | { sb: ReturnType<typeof serviceClient>; user: NonNullable<Awaited<ReturnType<ReturnType<typeof serviceClient>["auth"]["getUser"]>>["data"]["user"]> }
+  | { error: string; status: number };
+
+async function requireStaff(request: Request): Promise<StaffAccess> {
   const auth = request.headers.get("authorization") ?? "";
-  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-  if (!token) return null;
+  const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
+  if (!token) return { error: "Your login session was not sent. Refresh the page and sign in again.", status: 401 };
+
   const sb = serviceClient();
-  const { data: { user }, error } = await sb.auth.getUser(token);
-  if (error || !user) return null;
-  // Match the app's existing authorization source: public.user_roles.
-  // profiles has no role column in this project.
-  const { data: roles, error: roleError } = await sb.from("user_roles").select("role").eq("user_id", user.id);
-  if (roleError || !roles?.some((row) => ["admin", "moderator"].includes(String(row.role).toLowerCase()))) return null;
-  return { sb, user };
+  const { data, error } = await sb.auth.getUser(token);
+  if (error || !data.user) {
+    return { error: "Your Supabase session is invalid or expired. Sign out, sign back in, and retry.", status: 401 };
+  }
+
+  // This matches the app's AuthProvider: roles are stored in public.user_roles.
+  const { data: roles, error: roleError } = await sb
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", data.user.id);
+
+  if (roleError) {
+    return { error: "Could not read your staff role from user_roles. Verify the table exists and the service-role key belongs to this Supabase project.", status: 503 };
+  }
+  const isStaff = (roles ?? []).some((row) => ["admin", "moderator"].includes(String(row.role).toLowerCase()));
+  if (!isStaff) {
+    return { error: "Your account has no admin or moderator role in user_roles. Add the correct role to your account, then sign in again.", status: 403 };
+  }
+  return { sb, user: data.user };
 }
 
 async function digest(value: string) {
@@ -71,7 +88,7 @@ export const Route = createFileRoute("/api/protector")({
       GET: async ({ request }) => {
         try {
           const access = await requireStaff(request);
-          if (!access) return json({ error: "Unauthorized" }, 401);
+          if ("error" in access) return json({ error: access.error }, access.status);
           const { data, error } = await access.sb.from("protected_scripts")
             .select("id,name,enabled,expires_at,created_at,last_accessed_at")
             .order("created_at", { ascending: false });
