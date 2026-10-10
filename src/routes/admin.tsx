@@ -16,6 +16,7 @@ const LINKS = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/scripts", label: "Scripts", icon: Terminal },
   { to: "/admin/raw", label: "Raw loader", icon: Terminal },
+  { to: "/admin/protector", label: "Script Protector", icon: Shield },
   { to: "/admin/lua", label: "Lua uploads", icon: FileCode2 },
   { to: "/admin/keys", label: "Keys", icon: KeyRound },
   { to: "/admin/assistant", label: "Script assistant", icon: Bot },
@@ -97,7 +98,7 @@ function AdminLayout() {
 
   const groups = [
     { label: "Overview", links: LINKS.filter(x => ["/admin","/admin/analytics","/admin/logs"].includes(x.to)) },
-    { label: "Content", links: LINKS.filter(x => ["/admin/scripts","/admin/raw","/admin/lua","/admin/keys","/admin/media","/admin/themes"].includes(x.to)) },
+    { label: "Content", links: LINKS.filter(x => ["/admin/scripts","/admin/raw","/admin/protector","/admin/lua","/admin/keys","/admin/media","/admin/themes"].includes(x.to)) },
     { label: "Tools", links: LINKS.filter(x => ["/admin/assistant","/admin/studio","/admin/discord","/admin/loadstring"].includes(x.to)) },
     { label: "Community", links: LINKS.filter(x => ["/admin/users","/admin/badges","/admin/reports","/admin/announcements"].includes(x.to)) },
     { label: "System", links: LINKS.filter(x => x.to === "/admin/settings") },
