@@ -123,7 +123,41 @@ function AdminRaw() {
               <input className="input-base" placeholder="Name" value={draft.name ?? ""} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
               <input className="input-base font-mono" placeholder="url-name (optional)" value={draft.slug ?? ""} onChange={(e) => setDraft({ ...draft, slug: e.target.value })} />
               <p className="truncate font-mono text-xs text-muted-foreground sm:col-span-2">{rawUrl(slugify(draft.slug?.trim() || draft.name || "") || "…")}</p>
-              <div className="sm:col-span-2"><input ref={fileInput} type="file" accept=".lua,text/plain" className="hidden" onChange={async (e) => { const file = e.target.files?.[0]; if (!file) return; if (!file.name.toLowerCase().endsWith(".lua")) { toast.error("Choose a .lua file"); e.currentTarget.value = ""; return; } if (file.size > 2097152) { toast.error("Lua files must be 2 MB or smaller"); e.currentTarget.value = ""; return; } const code = await file.text(); setDraft((prev) => prev ? { ...prev, name: prev.name?.trim() ? prev.name : file.name.replace(/\.lua$/i, ""), code } : prev); toast.success("Lua file loaded"); e.currentTarget.value = ""; }} /><button type="button" onClick={() => fileInput.current?.click()} className="btn btn-ghost mb-2 h-10 !px-3 text-xs"><Upload size={14} /> Upload .lua file</button><textarea className="input-base w-full font-mono text-xs" rows={14} spellCheck={false} placeholder="-- Lua code (or upload a .lua file)" value={draft.code ?? ""} onChange={(e) => setDraft({ ...draft, code: e.target.value })} /></div>
+              <div className="sm:col-span-2"><input ref={fileInput} type="file" accept=".lua,text/plain" className="hidden" onChange={async (e) => {
+                const input = e.currentTarget;
+                const file = input.files?.[0];
+                if (!file) return;
+                if (!file.name.toLowerCase().endsWith(".lua")) {
+                  toast.error("Choose a .lua file");
+                  input.value = "";
+                  return;
+                }
+                if (file.size > 2097152) {
+                  toast.error("Lua files must be 2 MB or smaller");
+                  input.value = "";
+                  return;
+                }
+                try {
+                  const code = await file.text();
+                  if (!code.trim()) {
+                    toast.error("That Lua file is empty");
+                    input.value = "";
+                    return;
+                  }
+                  const baseName = file.name.replace(/\\.lua$/i, "");
+                  setDraft((prev) => prev ? {
+                    ...prev,
+                    name: prev.name?.trim() ? prev.name : baseName,
+                    slug: prev.slug?.trim() ? prev.slug : slugify(baseName).toLowerCase().slice(0, 80),
+                    code,
+                  } : prev);
+                  toast.success("Lua file loaded — review it, then click Create or Save changes");
+                } catch {
+                  toast.error("Could not read that Lua file");
+                } finally {
+                  input.value = "";
+                }
+              }} /><button type="button" onClick={() => fileInput.current?.click()} className="btn btn-ghost mb-2 h-10 !px-3 text-xs"><Upload size={14} /> Upload .lua file</button><textarea className="input-base w-full font-mono text-xs" rows={14} spellCheck={false} placeholder="-- Lua code (or upload a .lua file)" value={draft.code ?? ""} onChange={(e) => setDraft({ ...draft, code: e.target.value })} /></div>
               <label className="flex items-center gap-2 text-sm"><input type="checkbox" className="h-4 w-4 accent-[var(--primary)]" checked={draft.enabled !== false} onChange={(e) => setDraft({ ...draft, enabled: e.target.checked })} /> Raw URL enabled</label>
             </div>
             <div className="mt-5 flex justify-end gap-2">
