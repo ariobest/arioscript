@@ -786,3 +786,55 @@ body:has(.admin-stat-tile) [class*="border-border"] {
   .ario-admin-main :where(.gap-6, .gap-7, .gap-8) { gap: .75rem !important; }
   .ario-admin-main :where(.text-3xl, .text-4xl) { font-size: 1.45rem; line-height: 1.25; }
 }
+
+
+/* ARIO admin: layered frosted-glass control center */
+.ario-admin-shell {
+  position: relative;
+  isolation: isolate;
+}
+.ario-admin-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 12% 8%, hsl(var(--primary) / .12), transparent 38%),
+    radial-gradient(ellipse at 88% 28%, hsl(220 90% 65% / .08), transparent 34%);
+}
+.admin-frosted-panel {
+  background: hsl(var(--background) / .56) !important;
+  border: 1px solid hsl(var(--foreground) / .10);
+  box-shadow:
+    0 18px 55px -28px hsl(220 70% 3% / .58),
+    inset 0 1px 0 hsl(var(--foreground) / .09);
+  -webkit-backdrop-filter: blur(24px) saturate(155%);
+  backdrop-filter: blur(24px) saturate(155%);
+}
+.ario-admin-shell .glass {
+  border-color: hsl(var(--foreground) / .09);
+  box-shadow:
+    0 16px 48px -30px hsl(220 70% 3% / .48),
+    inset 0 1px 0 hsl(var(--foreground) / .07);
+  -webkit-backdrop-filter: blur(20px) saturate(145%);
+  backdrop-filter: blur(20px) saturate(145%);
+}
+.ario-admin-shell nav a {
+  border: 1px solid transparent;
+}
+.ario-admin-shell nav a:hover {
+  border-color: hsl(var(--primary) / .14);
+  background: hsl(var(--foreground) / .045);
+}
+.ario-admin-shell nav a[aria-current="page"] {
+  background: hsl(var(--primary) / .14);
+  border-color: hsl(var(--primary) / .22);
+  box-shadow: inset 0 1px 0 hsl(var(--foreground) / .07), 0 8px 22px -16px hsl(var(--primary) / .65);
+}
+@supports not ((backdrop-filter: blur(1px))) {
+  .admin-frosted-panel,
+  .ario-admin-shell .glass {
+    background: hsl(var(--background) / .94) !important;
+  }
+}
