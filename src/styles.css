@@ -838,3 +838,51 @@ body:has(.admin-stat-tile) [class*="border-border"] {
     background: hsl(var(--background) / .94) !important;
   }
 }
+
+
+/* ===== Performance pass: smoother scrolling and lighter first paint ===== */
+/* Let the browser defer layout/paint for homepage sections below the fold. */
+.home-content-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
+}
+
+/* Avoid promoting every card to its own GPU layer; only animate while hovered. */
+.card-hover {
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+/* Frosted glass remains premium but uses less expensive blur on small devices. */
+@media (max-width: 767px) {
+  .ario-admin-shell .glass,
+  .admin-frosted-panel,
+  body:has(.admin-stat-tile) .glass,
+  .ario-toast[data-sonner-toast] {
+    -webkit-backdrop-filter: blur(10px) saturate(125%);
+    backdrop-filter: blur(10px) saturate(125%);
+  }
+  .hero-title-text {
+    filter: none;
+  }
+  .hero-title-text::after {
+    display: none;
+  }
+  .hero-title-line {
+    box-shadow: none;
+  }
+}
+
+/* Prefer composited transforms and stop decorative motion when requested. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-title-text,
+  .route-progress-spark,
+  .ario-toast[data-sonner-toast],
+  .card-hover,
+  .btn,
+  .glass,
+  .input-base {
+    animation: none !important;
+    transition: none !important;
+  }
+}
