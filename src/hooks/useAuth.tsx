@@ -9,6 +9,9 @@ export type Profile = {
   avatar_url: string | null;
   bio: string | null;
   is_banned: boolean;
+  is_soft_banned: boolean;
+  ban_expires_at: string | null;
+  ban_reason: string | null;
   is_disabled: boolean;
   last_seen: string;
   created_at: string;
