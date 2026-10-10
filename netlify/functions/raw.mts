@@ -6,21 +6,8 @@ const responseHeaders = {
 };
 
 export default async function rawLoader(request: Request, context: { params: Record<string, string | undefined> }) {
-  // Browsers opening the URL directly get a playful message; game:HttpGet/loadstring
-  // clients receive the Lua source. Browser navigation advertises HTML in Accept.
-  const accept = request.headers.get("accept") ?? "";
-  const fetchDest = request.headers.get("sec-fetch-dest") ?? "";
-  const userAgent = request.headers.get("user-agent") ?? "";
-  const isBrowserPage = /text\/html/i.test(accept) &&
-    (fetchDest === "document" || /Mozilla\//i.test(userAgent));
-
-  if (isBrowserPage) {
-    return new Response("OH WANNA STEAL IT? GO BACK TO SLEEP 😴", {
-      status: 200,
-      headers: { ...responseHeaders, "Content-Type": "text/plain; charset=utf-8" },
-    });
-  }
-
+  // Always return the Lua source. Request-header checks can misclassify Roblox
+  // HttpGet requests and return the browser taunt instead of executable source.
   const slug = String(context.params.slug ?? "").trim().toLowerCase();
   if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(slug)) {
     return new Response("", { status: 404, headers: responseHeaders });
