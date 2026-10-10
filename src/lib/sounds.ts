@@ -21,7 +21,6 @@ const KEY = "ario-ui-sounds";
 const VOLUME_KEY = "ario-ui-volume";
 
 let audio: AudioContext | null = null;
-let lastHoverAt = 0;
 
 export function soundsEnabled() {
   return typeof window !== "undefined" && localStorage.getItem(KEY) === "on";
@@ -189,19 +188,6 @@ export function installUISounds() {
     }
   };
 
-  const onPointerOver = (event: PointerEvent) => {
-    if (event.pointerType !== "mouse") return;
-
-    const control = getInteractive(event.target);
-    if (!control) return;
-
-    const now = performance.now();
-    if (now - lastHoverAt < 70) return;
-
-    lastHoverAt = now;
-    playSound("hover");
-  };
-
   const onPointerDown = (event: PointerEvent) => {
     if (event.pointerType !== "touch" && event.pointerType !== "pen") return;
 
@@ -233,7 +219,6 @@ export function installUISounds() {
 
   document.addEventListener("click", onClick);
   document.addEventListener("change", onChange);
-  document.addEventListener("pointerover", onPointerOver, { passive: true });
   document.addEventListener("pointerdown", onPointerDown, { passive: true });
   document.addEventListener("contextmenu", onContextMenu);
   document.addEventListener("selectstart", onSelectStart);
@@ -241,7 +226,6 @@ export function installUISounds() {
   return () => {
     document.removeEventListener("click", onClick);
     document.removeEventListener("change", onChange);
-    document.removeEventListener("pointerover", onPointerOver);
     document.removeEventListener("pointerdown", onPointerDown);
     document.removeEventListener("contextmenu", onContextMenu);
     document.removeEventListener("selectstart", onSelectStart);
