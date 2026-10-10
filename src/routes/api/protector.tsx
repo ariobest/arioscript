@@ -8,10 +8,20 @@ const json = (body: unknown, status = 200) =>
   });
 
 function serviceClient() {
-  const url = process.env["SUPABASE_URL"];
+  // The URL is public configuration; the service-role key must remain server-only.
+  const url = process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"];
   const key = process.env["SUPABASE_SERVICE_ROLE_KEY"];
-  if (!url || !key) throw new Error("Protector server configuration is missing");
-  return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  const missing = [
+    ...(!url ? ["SUPABASE_URL (or VITE_SUPABASE_URL)"] : []),
+    ...(!key ? ["SUPABASE_SERVICE_ROLE_KEY"] : []),
+  ];
+  if (missing.length) throw new Error("Missing server environment variable(s): " + missing.join(", "));
+  return createClient(url!, key!, { auth: { persistSession: false, autoRefreshToken: false } });
+}
+
+function serverError(error: unknown) {
+  const message = error instanceof Error ? error.message : "Unknown server error";
+  return json({ error: "Protector server error", detail: message }, 503);
 }
 
 type StaffAccess = { sb: ReturnType<typeof serviceClient> } | { error: string; status: number };
@@ -92,8 +102,8 @@ export const Route = createFileRoute("/api/protector")({
             .order("created_at", { ascending: false });
           if (error) return json({ error: "Protector database unavailable", detail: error.message }, 503);
           return json({ scripts: data ?? [] });
-        } catch {
-          return json({ error: "Protector server configuration is missing" }, 503);
+        } catch (error) {
+          return serverError(error);
         }
       },
       POST: async ({ request }) => {
@@ -126,8 +136,8 @@ export const Route = createFileRoute("/api/protector")({
           }).select("id,name,enabled,expires_at,created_at").single();
           if (error) return json({ error: "Could not save protected script", detail: error.message }, 503);
           return json({ script: data, token, loaderUrl: new URL("/api/protected/" + data.id + "?token=" + token, request.url).toString() }, 201);
-        } catch {
-          return json({ error: "Protector server configuration is missing" }, 503);
+        } catch (error) {
+          return serverError(error);
         }
       },
       PATCH: async ({ request }) => {
@@ -139,8 +149,8 @@ export const Route = createFileRoute("/api/protector")({
           const { error } = await access.sb.from("protected_scripts").update({ enabled: body.enabled, updated_at: new Date().toISOString() }).eq("id", body.id);
           if (error) return json({ error: "Could not update script", detail: error.message }, 503);
           return json({ ok: true });
-        } catch {
-          return json({ error: "Protector server configuration is missing" }, 503);
+        } catch (error) {
+          return serverError(error);
         }
       },
       DELETE: async ({ request }) => {
@@ -152,8 +162,8 @@ export const Route = createFileRoute("/api/protector")({
           const { error } = await access.sb.from("protected_scripts").delete().eq("id", body.id);
           if (error) return json({ error: "Could not delete script", detail: error.message }, 503);
           return json({ ok: true });
-        } catch {
-          return json({ error: "Protector server configuration is missing" }, 503);
+        } catch (error) {
+          return serverError(error);
         }
       },
     },
