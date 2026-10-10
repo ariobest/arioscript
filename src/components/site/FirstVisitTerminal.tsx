@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Terminal, X, Palette, UserPlus, ArrowRight } from "lucide-react";
 import { THEMES, applyTheme, themeLabel, type Theme } from "@/lib/theme";
 
-const INTRO_LINES = [
+const THEME_SWATCHES: Record<string, string> = { midnight: "#64748b", royal: "#4169e1", azure: "#1687ff", cobalt: "#2455d6", emerald: "#10b981", rose: "#f43f5e", violet: "#8b5cf6", matrix: "#39ff14", cyan: "#06b6d4", crimson: "#dc2626", gold: "#f59e0b", galaxy: "#7c3aed", arctic: "#7dd3fc", ocean: "#0284c7", plasma: "#d946ef", pearl: "#e5e7eb" };\n\nconst INTRO_LINES = [
   "ARIO SCRIPTS :: INITIALIZING...",
   "Welcome to your script workspace.",
   "Create an account to save favorites and manage your keys.",
@@ -63,12 +63,12 @@ export function FirstVisitTerminal() {
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
               {(["midnight", "royal", "azure", "cobalt", "emerald", "rose", "violet", "matrix"] as Theme[]).map(t => (
                 <button key={t} onClick={() => { setTheme(t); applyTheme(t); }} className={`min-w-0 rounded-lg border px-2 py-2 text-[11px] capitalize transition-colors sm:text-xs ${theme === t ? "border-emerald-300 bg-emerald-300/15 text-emerald-100" : "border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/10"}`}>
-                  <span className="mx-auto mb-1 block h-2 w-8 max-w-full rounded-full bg-primary" />{themeLabel(t)}
+                  <span className="mx-auto mb-1 block h-3 w-8 max-w-full rounded-full border border-white/20 shadow-[0_0_12px_var(--swatch-color)]" style={{ "--swatch-color": THEME_SWATCHES[t] ?? "#64748b", backgroundColor: THEME_SWATCHES[t] ?? "#64748b" } as React.CSSProperties} />{themeLabel(t)}
                 </button>
               ))}
             </div>
             <button onClick={() => setThemeOpen(v => !v)} className="mt-2 text-[11px] text-emerald-200/80 underline underline-offset-4">{themeOpen ? "Show fewer themes" : "More themes…"}</button>
-            {themeOpen && <div className="mt-2 grid max-h-32 grid-cols-3 gap-1 overflow-y-auto pr-1 sm:grid-cols-4">{THEMES.filter(t => !["midnight", "royal", "azure", "cobalt", "emerald", "rose", "violet", "matrix"].includes(t)).map(t => <button key={t} onClick={() => { setTheme(t); applyTheme(t); }} className={`rounded-md border px-2 py-2 text-[11px] capitalize ${theme === t ? "border-emerald-300 bg-emerald-300/15 text-emerald-100" : "border-white/10 text-white/70 hover:bg-white/10"}`}>{themeLabel(t)}</button>)}</div>}
+            {themeOpen && <div className="mt-2 grid max-h-36 grid-cols-3 gap-1 overflow-y-auto pr-1 sm:grid-cols-4">{THEMES.filter(t => !["midnight", "royal", "azure", "cobalt", "emerald", "rose", "violet", "matrix"].includes(t)).map(t => <button key={t} onClick={() => { setTheme(t); applyTheme(t); }} className={`min-w-0 rounded-md border px-2 py-2 text-[11px] capitalize ${theme === t ? "border-emerald-300 bg-white/10 text-white" : "border-white/10 text-white/70 hover:bg-white/10"}`}><span className="mx-auto mb-1 block h-2.5 w-7 rounded-full border border-white/20" style={{ backgroundColor: THEME_SWATCHES[t] ?? "#64748b" }} />{themeLabel(t)}</button>)}</div>}
           </div>
           <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
             <button onClick={() => { dismiss(); navigate({ to: "/auth" }); }} className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-300 px-4 py-3 font-sans text-sm font-bold text-[#07100d] transition hover:bg-emerald-200"><UserPlus size={16} /> Sign up / Sign in <ArrowRight size={15} /></button>
