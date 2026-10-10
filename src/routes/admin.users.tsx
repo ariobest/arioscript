@@ -48,6 +48,7 @@ function AdminUsers() {
 
   const favCounts = useQuery({
     queryKey: ["fav_counts"],
+    enabled: isAdmin,
     queryFn: async () => {
       const { data } = await supabase.from("favorites").select("user_id");
       const m = new Map<string, number>();
@@ -128,6 +129,8 @@ function AdminUsers() {
   }
 
   async function changeRole(row: Row, role: string) {
+    if (!isAdmin) return toast.error("Administrator access required");
+    if (user?.id === row.id) return toast.error("You cannot change your own administrator role");
     await supabase.from("user_roles").delete().eq("user_id", row.id);
     const { error } = await supabase.from("user_roles").insert({ user_id: row.id, role: role as "user" | "moderator" | "admin" });
     if (error) return toast.error(error.message);
