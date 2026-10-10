@@ -912,3 +912,51 @@ body:has(.admin-stat-tile) [class*="border-border"] {
   50% { filter: drop-shadow(0 0 8px hsl(var(--primary) / .72)) drop-shadow(0 0 19px hsl(var(--primary) / .42)); }
 }
 @media (prefers-reduced-motion: reduce) { .ario-logo-glow { animation: none; } }
+
+
+/* ARIO liquid-glass polish — translucent macOS/iOS-inspired surfaces and a quieter scrollbar. */
+:root {
+  --ario-glass-fill: color-mix(in srgb, #101522 66%, transparent);
+  --ario-glass-edge: rgba(255,255,255,.16);
+}
+.glass,
+.appearance-panel,
+[role="dialog"],
+.ario-admin-shell aside.fixed {
+  background: linear-gradient(145deg, rgba(255,255,255,.085), rgba(255,255,255,.025) 48%, rgba(70,110,255,.045)) !important;
+  border: 1px solid var(--ario-glass-edge) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(165%);
+  backdrop-filter: blur(28px) saturate(165%);
+  box-shadow: 0 24px 70px rgba(0,0,0,.28), 0 1px 0 rgba(255,255,255,.12) inset, 0 -1px 0 rgba(255,255,255,.025) inset;
+}
+.glass :is(input, textarea, select),
+.input-base {
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass, .appearance-panel, [role="dialog"], .ario-admin-shell aside.fixed {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--card) !important;
+  }
+}
+/* Slim, rounded, translucent scrollbar instead of the oversized gray browser bar. */
+html, body, * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(142,163,205,.48) transparent;
+}
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(142,163,205,.42);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(164,185,255,.72);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-corner { background: transparent; }
