@@ -850,7 +850,6 @@ body:has(.admin-stat-tile) [class*="border-border"] {
 /* Avoid promoting every card to its own GPU layer; only animate while hovered. */
 .card-hover {
   will-change: auto;
-  transform: translateZ(0);
 }
 
 /* Frosted glass remains premium but uses less expensive blur on small devices. */
