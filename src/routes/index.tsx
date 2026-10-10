@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 
 function Section({ title, icon: Icon, to, children }: { title: string; icon: React.ElementType; to?: string; children: React.ReactNode }) {
   return (
-    <section className="mx-auto mt-14 max-w-7xl px-4">
+    <section className="home-content-section mx-auto mt-14 max-w-7xl px-4">
       <div className="mb-4 flex items-center gap-2">
         <span className="grid h-8 w-8 place-items-center rounded-xl bg-primary/15 text-primary">
           <Icon size={16} />
@@ -52,14 +52,14 @@ function Home() {
   const { data: settings } = useSettings();
   const sections = Array.isArray(settings?.homepage_sections) ? settings.homepage_sections : ["featured", "trending", "recent", "downloads", "views", "copies", "games", "categories"];
 
-  const featured = useQuery({ queryKey: ["s", "featured"], queryFn: () => listScripts({ featured: true, limit: 8 }) });
-  const trending = useQuery({ queryKey: ["s", "trending"], queryFn: () => getTrending(8) });
-  const recent = useQuery({ queryKey: ["s", "newest"], queryFn: () => listScripts({ sort: "newest", limit: 8 }) });
-  const downloaded = useQuery({ queryKey: ["s", "downloads"], queryFn: () => listScripts({ sort: "downloads", limit: 4 }) });
-  const viewed = useQuery({ queryKey: ["s", "views"], queryFn: () => listScripts({ sort: "views", limit: 4 }) });
-  const copied = useQuery({ queryKey: ["s", "copies"], queryFn: () => listScripts({ sort: "copies", limit: 4 }) });
-  const games = useQuery({ queryKey: ["games"], queryFn: getGames });
-  const categories = useQuery({ queryKey: ["categories"], queryFn: getCategories });
+  const featured = useQuery({ queryKey: ["s", "featured"], queryFn: () => listScripts({ featured: true, limit: 8 }), enabled: sections.includes("featured") });
+  const trending = useQuery({ queryKey: ["s", "trending"], queryFn: () => getTrending(8), enabled: sections.includes("trending") });
+  const recent = useQuery({ queryKey: ["s", "newest"], queryFn: () => listScripts({ sort: "newest", limit: 8 }), enabled: sections.includes("recent") });
+  const downloaded = useQuery({ queryKey: ["s", "downloads"], queryFn: () => listScripts({ sort: "downloads", limit: 4 }), enabled: sections.includes("downloads") });
+  const viewed = useQuery({ queryKey: ["s", "views"], queryFn: () => listScripts({ sort: "views", limit: 4 }), enabled: sections.includes("views") });
+  const copied = useQuery({ queryKey: ["s", "copies"], queryFn: () => listScripts({ sort: "copies", limit: 4 }), enabled: sections.includes("copies") });
+  const games = useQuery({ queryKey: ["games"], queryFn: getGames, enabled: sections.includes("games") });
+  const categories = useQuery({ queryKey: ["categories"], queryFn: getCategories, enabled: sections.includes("categories") });
   const announcements = useQuery({
     queryKey: ["announcements"],
     queryFn: async () => {
