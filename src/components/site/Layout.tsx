@@ -75,8 +75,27 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     navigate({ to: "/scripts", search: { q: q || undefined, sort: undefined, category: undefined, game: undefined } as never });
   }
 
+  const hardBanned = !!profile?.is_banned && (!profile.ban_expires_at || new Date(profile.ban_expires_at).getTime() > Date.now());
+  const softBanned = !!profile?.is_soft_banned && (!profile.ban_expires_at || new Date(profile.ban_expires_at).getTime() > Date.now());
+
+  if (user && hardBanned) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background px-4 py-12">
+        <section className="glass w-full max-w-md rounded-3xl border border-destructive/30 p-8 text-center">
+          <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-destructive/10 text-destructive"><Shield size={25}/></span>
+          <h1 className="mt-5 font-display text-2xl font-bold">Account suspended</h1>
+          <p className="mt-2 text-sm text-muted-foreground">This account is currently banned from ARIO SCRIPTS.</p>
+          {profile?.ban_reason && <p className="mt-4 rounded-xl border border-border bg-background/40 p-3 text-sm">Reason: {profile.ban_reason}</p>}
+          {profile?.ban_expires_at && <p className="mt-3 text-xs text-muted-foreground">Ban expires: {new Date(profile.ban_expires_at).toLocaleString()}</p>}
+          <button onClick={() => void signOut()} className="btn btn-primary mt-6 w-full">Sign out</button>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
+      {user && softBanned && <div className="border-b border-primary/25 bg-primary/10 px-4 py-2 text-center text-xs text-foreground"><strong>Soft ban active.</strong> Browsing remains available, but account interactions are restricted.{profile?.ban_reason ? ` Reason: ${profile.ban_reason}` : ""}{profile?.ban_expires_at ? ` Expires ${new Date(profile.ban_expires_at).toLocaleString()}.` : ""}</div>}
       <header className="sticky top-0 z-40 border-b border-border bg-[color-mix(in_oklab,var(--background)_78%,transparent)] backdrop-blur-xl">
         <div className="mx-auto grid h-16 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 md:flex md:gap-3">
           <Link to="/" className="flex min-w-0 items-center gap-2">
