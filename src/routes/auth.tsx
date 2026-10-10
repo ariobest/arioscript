@@ -64,10 +64,22 @@ function AuthPage() {
     try {
       if (mode === "signup") {
         if (!registrationOpen) throw new Error("Registration is currently closed.");
+        const normalizedEmail = email.trim().toLowerCase();
+        // Friendly pre-check; a database trigger below is the authoritative protection.
+        const { data: existingProfile, error: lookupError } = await supabase
+          .from("profiles")
+          .select("id")
+          .ilike("email", normalizedEmail)
+          .limit(1)
+          .maybeSingle();
+        if (lookupError) throw lookupError;
+        if (existingProfile) {
+          throw new Error("An account already uses this email. Sign in with your original method (Google or email) instead of creating another account.");
+        }
         const { error } = await supabase.auth.signUp({
-          email,
+          email: normalizedEmail,
           password,
-          options: { emailRedirectTo: window.location.origin, data: { username: username || email.split("@")[0] } },
+          options: { emailRedirectTo: window.location.origin, data: { username: username || normalizedEmail.split("@")[0] } },
         });
         if (error) throw error;
         toast.success("Account created — check your email to confirm.");
