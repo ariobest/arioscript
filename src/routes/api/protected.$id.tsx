@@ -9,7 +9,7 @@ export const Route = createFileRoute("/api/protected/$id")({
         if (!/^[a-f0-9]{64}$/.test(token)) {
           return new Response("", { status: 404, headers: { "cache-control": "no-store" } });
         }
-        const url = process.env["SUPABASE_URL"];
+        const url = process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"];
         const key = process.env["SUPABASE_SERVICE_ROLE_KEY"];
         if (!url || !key) return new Response("Protector unavailable", { status: 503 });
         const sb = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
