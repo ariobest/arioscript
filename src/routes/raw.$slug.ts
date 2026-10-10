@@ -7,6 +7,14 @@ const headers = {
   "Access-Control-Allow-Origin": "*",
 };
 
+function isBrowserPage(request: Request): boolean {
+  const accept = request.headers.get("accept") ?? "";
+  const fetchDest = request.headers.get("sec-fetch-dest") ?? "";
+  const userAgent = request.headers.get("user-agent") ?? "";
+  return /text\/html/i.test(accept) &&
+    (fetchDest === "document" || /Mozilla\//i.test(userAgent));
+}
+
 async function serveRaw(slugValue: string) {
   const slug = String(slugValue ?? "").trim().toLowerCase();
   if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(slug)) {
@@ -48,7 +56,15 @@ async function serveRaw(slugValue: string) {
 export const Route = createFileRoute("/raw/$slug")({
   server: {
     handlers: {
-      GET: async ({ params }) => serveRaw(params.slug),
+      GET: async ({ request, params }) => {
+        if (isBrowserPage(request)) {
+          return new Response("OH WANNA STEAL IT? GO BACK TO SLEEP 😴", {
+            status: 200,
+            headers: { ...headers, "Content-Type": "text/plain; charset=utf-8" },
+          });
+        }
+        return serveRaw(params.slug);
+      },
     },
   },
 });
