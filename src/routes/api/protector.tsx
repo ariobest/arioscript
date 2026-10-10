@@ -9,7 +9,7 @@ const json = (body: unknown, status = 200) =>
 
 function serviceClient() {
   // The URL is public configuration; the service-role key must remain server-only.
-  const url = process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"];
+  const url = process.env["VITE_SUPABASE_URL"] || process.env["SUPABASE_URL"];
   const key = process.env["SUPABASE_SERVICE_ROLE_KEY"];
   const missing = [
     ...(!url ? ["SUPABASE_URL (or VITE_SUPABASE_URL)"] : []),
