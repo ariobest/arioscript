@@ -279,6 +279,9 @@ export type Database = {
           email: string | null
           id: string
           is_banned: boolean
+          is_soft_banned: boolean
+          ban_expires_at: string | null
+          ban_reason: string | null
           is_disabled: boolean
           last_seen: string
           username: string
@@ -290,6 +293,9 @@ export type Database = {
           email?: string | null
           id: string
           is_banned?: boolean
+          is_soft_banned?: boolean
+          ban_expires_at?: string | null
+          ban_reason?: string | null
           is_disabled?: boolean
           last_seen?: string
           username: string
