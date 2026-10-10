@@ -58,8 +58,8 @@ local function drag(handle, frame)
 end
 local saved = load()
 if saved and verify(saved) then run() return end
-local mobile = UIS.TouchEnabled and not UIS.KeyboardEnabled
-local W = mobile and 0.9 or 0
+local mobile = UIS.TouchEnabled
+local W = mobile and 0.92 or 0
 local Screen = new("ScreenGui", { Name = "ArioKey", ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling, Parent = guiParent })
 `;
 
@@ -82,7 +82,7 @@ end
 `;
 
 const AURORA = `${SUBMIT}
-local Card = new("Frame", { Size = UDim2.new(W, mobile and 0 or 380, 0, 250), Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(14, 16, 26), BackgroundTransparency = 0.08, Parent = Screen }, { corner(18) })
+local Card = new("Frame", { Size = UDim2.new(W, mobile and 0 or 380, 0, mobile and 250 or 250), Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(14, 16, 26), BackgroundTransparency = 0.08, Parent = Screen }, { corner(18) })
 local stroke = new("UIStroke", { Thickness = 2, Parent = Card })
 local grad = new("UIGradient", { Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, CONFIG.ACCENT), ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255,255,255)), ColorSequenceKeypoint.new(1, CONFIG.ACCENT) }), Parent = stroke })
 task.spawn(function() while Card.Parent do grad.Rotation = (grad.Rotation + 2) % 360 task.wait() end end)
@@ -103,12 +103,12 @@ Card.Size = UDim2.new(0, 0, 0, 0) tween(Card, 0.45, { Size = UDim2.new(W, mobile
 
 const TERMINAL = `${SUBMIT}
 local G = Color3.fromRGB(${"${R}"})
-local Win = new("Frame", { Size = UDim2.new(W, mobile and 0 or 420, 0, 270), Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(6, 8, 6), Parent = Screen, ClipsDescendants = true }, { corner(8), new("UIStroke", { Color = CONFIG.ACCENT, Thickness = 1.5 }) })
+local Win = new("Frame", { Size = UDim2.new(W, mobile and 0 or 420, 0, mobile and 260 or 270), Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(6, 8, 6), Parent = Screen, ClipsDescendants = true }, { corner(8), new("UIStroke", { Color = CONFIG.ACCENT, Thickness = 1.5 }) })
 local Bar = new("Frame", { Size = UDim2.new(1, 0, 0, 30), BackgroundColor3 = Color3.fromRGB(14, 18, 14), Parent = Win })
 new("TextLabel", { Text = "  root@ario:~/" .. CONFIG.TITLE:lower():gsub("%s", "_"), Font = Enum.Font.Code, TextSize = 13, TextColor3 = CONFIG.ACCENT, BackgroundTransparency = 1, Size = UDim2.new(1, -40, 1, 0), TextXAlignment = Enum.TextXAlignment.Left, Parent = Bar })
 local Close = new("TextButton", { Text = "[x]", Font = Enum.Font.Code, TextSize = 14, TextColor3 = Color3.fromRGB(255, 90, 90), BackgroundTransparency = 1, Position = UDim2.new(1, -36, 0, 0), Size = UDim2.fromOffset(32, 30), Parent = Bar })
 local Log = new("TextLabel", { Text = "", Font = Enum.Font.Code, TextSize = 13, TextColor3 = CONFIG.ACCENT, BackgroundTransparency = 1, Position = UDim2.new(0, 14, 0, 40), Size = UDim2.new(1, -28, 0, 60), TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Top, TextWrapped = true, Parent = Win })
-task.spawn(function() local s = "> initializing secure link...\\n> key required. type: get_key or paste below" for i = 1, #s do Log.Text = s:sub(1, i) task.wait(0.015) end end)
+task.spawn(function() local s = "> initializing secure link..." .. string.char(10) .. "> key required. type: get_key or paste below" for i = 1, #s do Log.Text = s:sub(1, i) task.wait(0.015) end end)
 local Box = new("TextBox", { PlaceholderText = "$ paste key_", Text = "", ClearTextOnFocus = false, Font = Enum.Font.Code, TextSize = 14, TextColor3 = Color3.new(1,1,1), PlaceholderColor3 = Color3.fromRGB(80, 110, 80), BackgroundColor3 = Color3.fromRGB(12, 16, 12), Position = UDim2.new(0, 14, 0, 110), Size = UDim2.new(1, -28, 0, 40), TextXAlignment = Enum.TextXAlignment.Left, Parent = Win }, { corner(4), new("UIStroke", { Color = CONFIG.ACCENT, Transparency = 0.6 }), new("UIPadding", { PaddingLeft = UDim.new(0, 10) }) })
 local Status = new("TextLabel", { Text = "", Font = Enum.Font.Code, TextSize = 12, BackgroundTransparency = 1, Position = UDim2.new(0, 14, 0, 156), Size = UDim2.new(1, -28, 0, 18), TextXAlignment = Enum.TextXAlignment.Left, TextColor3 = Color3.new(1,1,1), Parent = Win })
 local function btn(text, x) return new("TextButton", { Text = text, Font = Enum.Font.Code, TextSize = 14, TextColor3 = CONFIG.ACCENT, BackgroundColor3 = Color3.fromRGB(12, 20, 12), Position = UDim2.new(x, x == 0 and 14 or 6, 0, 190), Size = UDim2.new(0.5, -20, 0, 44), Parent = Win }, { corner(4), new("UIStroke", { Color = CONFIG.ACCENT }) }) end
