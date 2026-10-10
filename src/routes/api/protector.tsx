@@ -21,8 +21,10 @@ async function requireStaff(request: Request) {
   const sb = serviceClient();
   const { data: { user }, error } = await sb.auth.getUser(token);
   if (error || !user) return null;
-  const { data: profile } = await sb.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (!profile || !["admin", "owner", "staff"].includes(String(profile.role).toLowerCase())) return null;
+  // Match the app's existing authorization source: public.user_roles.
+  // profiles has no role column in this project.
+  const { data: roles, error: roleError } = await sb.from("user_roles").select("role").eq("user_id", user.id);
+  if (roleError || !roles?.some((row) => ["admin", "moderator"].includes(String(row.role).toLowerCase()))) return null;
   return { sb, user };
 }
 
