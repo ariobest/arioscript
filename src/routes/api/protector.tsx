@@ -31,6 +31,38 @@ async function digest(value: string) {
   return Array.from(new Uint8Array(bytes), b => b.toString(16).padStart(2, "0")).join("");
 }
 
+async function loadRawSource(rawUrl: string) {
+  let parsed: URL;
+  try { parsed = new URL(rawUrl); } catch { throw new Error("Enter a valid raw script URL"); }
+  const allowedHosts = new Set([
+    "raw.githubusercontent.com",
+    "gist.githubusercontent.com",
+    "pastebin.com",
+    "paste.rs",
+    "rentry.co",
+    "arioscript.lovable.app",
+    "arioscriptvault.netlify.app",
+  ]);
+  if (parsed.protocol !== "https:" || !allowedHosts.has(parsed.hostname.toLowerCase()) || parsed.username || parsed.password) {
+    throw new Error("Use an HTTPS raw link from GitHub Raw, GitHub Gist, Pastebin, paste.rs, Rentry, or your ARIO site");
+  }
+  if (parsed.hostname === "pastebin.com" && !parsed.pathname.startsWith("/raw/")) {
+    throw new Error("Pastebin links must use the /raw/ URL");
+  }
+  const response = await fetch(parsed.toString(), {
+    headers: { accept: "text/plain, application/octet-stream;q=0.9, */*;q=0.1" },
+    signal: AbortSignal.timeout(10000),
+    redirect: "error",
+  });
+  if (!response.ok) throw new Error("Could not fetch raw link (HTTP " + response.status + ")");
+  const contentType = response.headers.get("content-type") ?? "";
+  if (/text\/html/i.test(contentType)) throw new Error("That link returned a webpage, not raw script text");
+  const source = await response.text();
+  if (!source.trim()) throw new Error("The raw link is empty");
+  if (source.length > 1_000_000) throw new Error("Script is too large (1 MB maximum)");
+  return source;
+}
+
 export const Route = createFileRoute("/api/protector")({
   server: {
     handlers: {
@@ -51,14 +83,27 @@ export const Route = createFileRoute("/api/protector")({
         try {
           const access = await requireStaff(request);
           if (!access) return json({ error: "Unauthorized" }, 401);
-          const body = await request.json().catch(() => null) as { name?: unknown; source?: unknown; expiresAt?: unknown } | null;
+          const body = await request.json().catch(() => null) as { name?: unknown; source?: unknown; rawUrl?: unknown; expiresAt?: unknown } | null;
           const name = typeof body?.name === "string" ? body.name.trim().slice(0, 100) : "";
-          const source = typeof body?.source === "string" ? body.source : "";
-          if (!name || !source.trim()) return json({ error: "Name and Lua source are required" }, 400);
+          const rawUrl = typeof body?.rawUrl === "string" ? body.rawUrl.trim() : "";
+          let source = typeof body?.source === "string" ? body.source : "";
+          if (!name || (!source.trim() && !rawUrl)) return json({ error: "Name and Lua source or raw URL are required" }, 400);
+          if (rawUrl) {
+            try { source = await loadRawSource(rawUrl); }
+            catch (error) { return json({ error: error instanceof Error ? error.message : "Could not load raw URL" }, 400); }
+          }
+          if (!source.trim()) return json({ error: "The source is empty" }, 400);
           if (source.length > 1_000_000) return json({ error: "Script is too large (1 MB maximum)" }, 413);
+          let expiresAt: string | null = null;
+          if (typeof body?.expiresAt === "string" && body.expiresAt) {
+            const parsedExpiry = new Date(body.expiresAt);
+            if (!Number.isFinite(parsedExpiry.getTime()) || parsedExpiry.getTime() <= Date.now()) {
+              return json({ error: "Expiry must be a valid future date" }, 400);
+            }
+            expiresAt = parsedExpiry.toISOString();
+          }
           const token = Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, "0")).join("");
           const tokenHash = await digest(token);
-          const expiresAt = typeof body?.expiresAt === "string" && body.expiresAt ? new Date(body.expiresAt).toISOString() : null;
           const { data, error } = await access.sb.from("protected_scripts").insert({
             name, source, token_hash: tokenHash, enabled: true, expires_at: expiresAt,
           }).select("id,name,enabled,expires_at,created_at").single();
