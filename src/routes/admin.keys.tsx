@@ -101,7 +101,9 @@ function AdminKeys() {
   function exportCsv() {
     const list = rows.filter(r => !sel.size || sel.has(r.id));
     const csv = ["key,type,status,owner,expires,uses,max_uses,notes,created", ...list.map(k =>
-      [k.key, k.key_type, keyStatus(k), k.profiles?.username ?? "", k.expires_at ?? "never", k.uses, k.max_uses ?? "", (k.notes ?? "").replace(/[,\n]/g, " "), k.created_at].join(","))].join("\n");
+      [k.key, k.key_type, keyStatus(k), k.profiles?.username ?? "", k.expires_at ?? "never", k.uses, k.max_uses ?? "", (k.notes ?? "").replace(/[,
+]/g, " "), k.created_at].join(","))].join("
+");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
     a.download = "ario-keys.csv"; a.click();
@@ -240,7 +242,14 @@ function LoaderBuilder() {
           <p className="text-sm font-semibold">{g.name}</p><p className="mt-0.5 text-xs text-muted-foreground">{g.desc}</p>
         </button>)}
       </div>
-      <div className="mt-3 grid gap-2 sm:grid-cols-2">\n        <label className="text-xs text-muted-foreground">Custom validator URL <input className="input-base mt-1" value={validatorUrl} onChange={e => setValidatorUrl(e.target.value)} placeholder={`${origin}/api/public/keys/validate?key=`} /></label>\n        <label className="text-xs text-muted-foreground">Custom Get Key website <input className="input-base mt-1" value={getKeyUrl} onChange={e => setGetKeyUrl(e.target.value)} placeholder={`${origin}/keys`} /></label>\n        {style === "terminal" && <label className="text-xs text-muted-foreground sm:col-span-2">Terminal startup message <input className="input-base mt-1" maxLength={180} value={terminalMessage} onChange={e => setTerminalMessage(e.target.value)} /></label>}\n        <div className="flex flex-wrap items-center gap-2 sm:col-span-2"><Button variant="outline" onClick={() => void testValidator()} disabled={checkingValidator}><ShieldCheck size={14}/>{checkingValidator ? "Testing…" : "Test validator website"}</Button><span className="text-xs text-muted-foreground">Uses a dummy test key; it does not validate or consume a real key.</span></div>\n        {validatorStatus && <p className="break-words rounded-lg border border-border/50 bg-background/30 p-3 text-xs sm:col-span-2">{validatorStatus}</p>}\n      </div>\n      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]">
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        <label className="text-xs text-muted-foreground">Custom validator URL <input className="input-base mt-1" value={validatorUrl} onChange={e => setValidatorUrl(e.target.value)} placeholder={`${origin}/api/public/keys/validate?key=`} /></label>
+        <label className="text-xs text-muted-foreground">Custom Get Key website <input className="input-base mt-1" value={getKeyUrl} onChange={e => setGetKeyUrl(e.target.value)} placeholder={`${origin}/keys`} /></label>
+        {style === "terminal" && <label className="text-xs text-muted-foreground sm:col-span-2">Terminal startup message <input className="input-base mt-1" maxLength={180} value={terminalMessage} onChange={e => setTerminalMessage(e.target.value)} /></label>}
+        <div className="flex flex-wrap items-center gap-2 sm:col-span-2"><Button variant="outline" onClick={() => void testValidator()} disabled={checkingValidator}><ShieldCheck size={14}/>{checkingValidator ? "Testing…" : "Test validator website"}</Button><span className="text-xs text-muted-foreground">Uses a dummy test key; it does not validate or consume a real key.</span></div>
+        {validatorStatus && <p className="min-w-0 break-all whitespace-pre-wrap rounded-lg border border-border/50 bg-background/30 p-3 text-xs sm:col-span-2">{validatorStatus}</p>}
+      </div>
+      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]">
         <select className="input-base" value={slug} onChange={e => setSlug(e.target.value)}>
           <option value="">Choose raw script…</option>
           {raws.data?.map(r => <option key={r.slug} value={r.slug}>{r.name}</option>)}
