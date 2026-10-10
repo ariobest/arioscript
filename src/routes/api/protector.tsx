@@ -14,9 +14,7 @@ function serviceClient() {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
-type StaffAccess =
-  | { sb: ReturnType<typeof serviceClient>; user: NonNullable<Awaited<ReturnType<ReturnType<typeof serviceClient>["auth"]["getUser"]>>["data"]["user"]> }
-  | { error: string; status: number };
+type StaffAccess = { sb: ReturnType<typeof serviceClient> } | { error: string; status: number };
 
 async function requireStaff(request: Request): Promise<StaffAccess> {
   const auth = request.headers.get("authorization") ?? "";
@@ -42,7 +40,7 @@ async function requireStaff(request: Request): Promise<StaffAccess> {
   if (!isStaff) {
     return { error: "Your account has no admin or moderator role in user_roles. Add the correct role to your account, then sign in again.", status: 403 };
   }
-  return { sb, user: data.user };
+  return { sb };
 }
 
 async function digest(value: string) {
@@ -101,7 +99,7 @@ export const Route = createFileRoute("/api/protector")({
       POST: async ({ request }) => {
         try {
           const access = await requireStaff(request);
-          if (!access) return json({ error: "Unauthorized" }, 401);
+          if ("error" in access) return json({ error: access.error }, access.status);
           const body = await request.json().catch(() => null) as { name?: unknown; source?: unknown; rawUrl?: unknown; expiresAt?: unknown } | null;
           const name = typeof body?.name === "string" ? body.name.trim().slice(0, 100) : "";
           const rawUrl = typeof body?.rawUrl === "string" ? body.rawUrl.trim() : "";
@@ -135,7 +133,7 @@ export const Route = createFileRoute("/api/protector")({
       PATCH: async ({ request }) => {
         try {
           const access = await requireStaff(request);
-          if (!access) return json({ error: "Unauthorized" }, 401);
+          if ("error" in access) return json({ error: access.error }, access.status);
           const body = await request.json().catch(() => null) as { id?: unknown; enabled?: unknown } | null;
           if (typeof body?.id !== "string" || typeof body.enabled !== "boolean") return json({ error: "Invalid update" }, 400);
           const { error } = await access.sb.from("protected_scripts").update({ enabled: body.enabled, updated_at: new Date().toISOString() }).eq("id", body.id);
@@ -148,7 +146,7 @@ export const Route = createFileRoute("/api/protector")({
       DELETE: async ({ request }) => {
         try {
           const access = await requireStaff(request);
-          if (!access) return json({ error: "Unauthorized" }, 401);
+          if ("error" in access) return json({ error: access.error }, access.status);
           const body = await request.json().catch(() => null) as { id?: unknown } | null;
           if (typeof body?.id !== "string") return json({ error: "Invalid script ID" }, 400);
           const { error } = await access.sb.from("protected_scripts").delete().eq("id", body.id);
