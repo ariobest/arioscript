@@ -144,7 +144,7 @@ function AdminRaw() {
                     input.value = "";
                     return;
                   }
-                  const baseName = file.name.replace(/\\.lua$/i, "");
+                  const baseName = file.name.replace(/\.lua$/i, "");
                   setDraft((prev) => prev ? {
                     ...prev,
                     name: prev.name?.trim() ? prev.name : baseName,
