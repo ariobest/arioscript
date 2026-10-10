@@ -34,6 +34,8 @@ function ScriptProtector() {
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const [source, setSource] = useState("");
+  const [sourceMode, setSourceMode] = useState<"paste" | "raw">("paste");
+  const [rawUrl, setRawUrl] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
   const [busy, setBusy] = useState(false);
   const [newLoader, setNewLoader] = useState("");
@@ -45,15 +47,15 @@ function ScriptProtector() {
   });
 
   async function create() {
-    if (!name.trim() || !source.trim()) return toast.error("Add a name and Lua source first.");
+    if (!name.trim() || (sourceMode === "paste" ? !source.trim() : !rawUrl.trim())) return toast.error("Add a name and Lua source or raw link first.");
     setBusy(true);
     try {
       const result = await requestApi("/api/protector", {
         method: "POST",
-        body: JSON.stringify({ name, source, expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null }),
+        body: JSON.stringify({ name, ...(sourceMode === "raw" ? { rawUrl } : { source }), expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null }),
       });
       setNewLoader(result.loaderUrl);
-      setName(""); setSource(""); setExpiresAt("");
+      setName(""); setSource(""); setRawUrl(""); setExpiresAt("");
       await qc.invalidateQueries({ queryKey: ["protected-scripts"] });
       toast.success("Protected loader created. Save the link now; the token is only shown once.");
     } catch (error) {
@@ -110,7 +112,18 @@ function ScriptProtector() {
       <section className="glass space-y-4 rounded-2xl p-4 sm:p-5">
         <div className="flex items-center gap-2"><Plus size={18} className="text-primary"/><h2 className="font-display text-lg font-semibold">Protect a Lua script</h2></div>
         <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Script name</span><input className="input-base" maxLength={100} value={name} onChange={e => setName(e.target.value)} placeholder="e.g. ARIO MM2 V2"/></label>
-        <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Lua source (max 1 MB)</span><textarea className="input-base w-full font-mono text-xs" rows={10} spellCheck={false} value={source} onChange={e => setSource(e.target.value)} placeholder="Paste your Lua script here…"/></label>
+        <div className="space-y-2">
+          <span className="text-sm text-muted-foreground">Source type</span>
+          <div className="grid grid-cols-2 gap-2">
+            <button type="button" className={sourceMode === "paste" ? "btn btn-primary" : "btn btn-ghost"} onClick={() => setSourceMode("paste")}>Paste Lua</button>
+            <button type="button" className={sourceMode === "raw" ? "btn btn-primary" : "btn btn-ghost"} onClick={() => setSourceMode("raw")}>Import raw link</button>
+          </div>
+        </div>
+        {sourceMode === "paste" ? (
+          <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Lua source (max 1 MB)</span><textarea className="input-base w-full font-mono text-xs" rows={10} spellCheck={false} value={source} onChange={e => setSource(e.target.value)} placeholder="Paste your Lua script here…"/></label>
+        ) : (
+          <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Public HTTPS raw script URL</span><input className="input-base w-full font-mono text-xs" type="url" inputMode="url" value={rawUrl} onChange={e => setRawUrl(e.target.value)} placeholder="https://raw.githubusercontent.com/user/repo/main/script.lua"/><span className="text-xs text-muted-foreground">ARIO fetches the raw text on the server and stores a protected snapshot. Supported: GitHub Raw, GitHub Gist, Pastebin /raw, paste.rs, Rentry, and your ARIO site. The source will not auto-sync when the original file changes.</span></label>
+        )}
         <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Optional expiry</span><input className="input-base" type="datetime-local" value={expiresAt} onChange={e => setExpiresAt(e.target.value)}/><span className="text-xs text-muted-foreground">Leave blank for no expiry.</span></label>
         <button disabled={busy} onClick={() => void create()} className="btn btn-primary w-full sm:w-auto">{busy ? "Protecting…" : "Protect script & generate loader"}</button>
       </section>
