@@ -885,3 +885,30 @@ body:has(.admin-stat-tile) [class*="border-border"] {
     transition: none !important;
   }
 }
+
+
+/* ARIO polish: no hover audio; premium royal-blue logo glow and native scrollbar. */
+:root {
+  scrollbar-color: hsl(var(--primary) / .72) hsl(var(--background));
+  scrollbar-width: thin;
+}
+* { scrollbar-width: thin; scrollbar-color: hsl(var(--primary) / .72) hsl(var(--background)); }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: hsl(var(--background) / .92); border-radius: 999px; }
+::-webkit-scrollbar-thumb {
+  border: 3px solid hsl(var(--background) / .92);
+  border-radius: 999px;
+  background: linear-gradient(180deg, hsl(var(--primary)), hsl(222 90% 56%));
+  box-shadow: 0 0 12px hsl(var(--primary) / .24);
+}
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, hsl(var(--primary) / .95), hsl(222 95% 68%)); }
+::-webkit-scrollbar-corner { background: hsl(var(--background)); }
+.ario-logo-glow {
+  filter: drop-shadow(0 0 5px hsl(var(--primary) / .52)) drop-shadow(0 0 13px hsl(var(--primary) / .32));
+  animation: arioLogoGlow 3.2s ease-in-out infinite;
+}
+@keyframes arioLogoGlow {
+  0%, 100% { filter: drop-shadow(0 0 4px hsl(var(--primary) / .42)) drop-shadow(0 0 10px hsl(var(--primary) / .22)); }
+  50% { filter: drop-shadow(0 0 8px hsl(var(--primary) / .72)) drop-shadow(0 0 19px hsl(var(--primary) / .42)); }
+}
+@media (prefers-reduced-motion: reduce) { .ario-logo-glow { animation: none; } }
