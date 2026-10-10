@@ -101,9 +101,7 @@ function AdminKeys() {
   function exportCsv() {
     const list = rows.filter(r => !sel.size || sel.has(r.id));
     const csv = ["key,type,status,owner,expires,uses,max_uses,notes,created", ...list.map(k =>
-      [k.key, k.key_type, keyStatus(k), k.profiles?.username ?? "", k.expires_at ?? "never", k.uses, k.max_uses ?? "", (k.notes ?? "").replace(/[,
-]/g, " "), k.created_at].join(","))].join("
-");
+      [k.key, k.key_type, keyStatus(k), k.profiles?.username ?? "", k.expires_at ?? "never", k.uses, k.max_uses ?? "", (k.notes ?? "").replace(/[,\n]/g, " "), k.created_at].join(","))].join("\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
     a.download = "ario-keys.csv"; a.click();
