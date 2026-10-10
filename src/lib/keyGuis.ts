@@ -108,7 +108,7 @@ local Bar = new("Frame", { Size = UDim2.new(1, 0, 0, 30), BackgroundColor3 = Col
 new("TextLabel", { Text = "  root@ario:~/" .. CONFIG.TITLE:lower():gsub("%s", "_"), Font = Enum.Font.Code, TextSize = 13, TextColor3 = CONFIG.ACCENT, BackgroundTransparency = 1, Size = UDim2.new(1, -40, 1, 0), TextXAlignment = Enum.TextXAlignment.Left, Parent = Bar })
 local Close = new("TextButton", { Text = "[x]", Font = Enum.Font.Code, TextSize = 14, TextColor3 = Color3.fromRGB(255, 90, 90), BackgroundTransparency = 1, Position = UDim2.new(1, -36, 0, 0), Size = UDim2.fromOffset(32, 30), Parent = Bar })
 local Log = new("TextLabel", { Text = "", Font = Enum.Font.Code, TextSize = 13, TextColor3 = CONFIG.ACCENT, BackgroundTransparency = 1, Position = UDim2.new(0, 14, 0, 40), Size = UDim2.new(1, -28, 0, 60), TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Top, TextWrapped = true, Parent = Win })
-task.spawn(function() local s = "> initializing secure link..." .. string.char(10) .. "> key required. type: get_key or paste below" for i = 1, #s do Log.Text = s:sub(1, i) task.wait(0.015) end end)
+task.spawn(function() local s = "ARIO_TERMINAL_MESSAGE" .. string.char(10) .. "> key required. type: get_key or paste below" for i = 1, #s do Log.Text = s:sub(1, i) task.wait(0.015) end end)
 local Box = new("TextBox", { PlaceholderText = "$ paste key_", Text = "", ClearTextOnFocus = false, Font = Enum.Font.Code, TextSize = 14, TextColor3 = Color3.new(1,1,1), PlaceholderColor3 = Color3.fromRGB(80, 110, 80), BackgroundColor3 = Color3.fromRGB(12, 16, 12), Position = UDim2.new(0, 14, 0, 110), Size = UDim2.new(1, -28, 0, 40), TextXAlignment = Enum.TextXAlignment.Left, Parent = Win }, { corner(4), new("UIStroke", { Color = CONFIG.ACCENT, Transparency = 0.6 }), new("UIPadding", { PaddingLeft = UDim.new(0, 10) }) })
 local Status = new("TextLabel", { Text = "", Font = Enum.Font.Code, TextSize = 12, BackgroundTransparency = 1, Position = UDim2.new(0, 14, 0, 156), Size = UDim2.new(1, -28, 0, 18), TextXAlignment = Enum.TextXAlignment.Left, TextColor3 = Color3.new(1,1,1), Parent = Win })
 local function btn(text, x) return new("TextButton", { Text = text, Font = Enum.Font.Code, TextSize = 14, TextColor3 = CONFIG.ACCENT, BackgroundColor3 = Color3.fromRGB(12, 20, 12), Position = UDim2.new(x, x == 0 and 14 or 6, 0, 190), Size = UDim2.new(0.5, -20, 0, 44), Parent = Win }, { corner(4), new("UIStroke", { Color = CONFIG.ACCENT }) }) end
@@ -149,7 +149,7 @@ export function buildKeyGui(o: Opts) {
   let generated = CORE(o) + body;
   if (o.terminalMessage && o.style === "terminal") {
     const safeMessage = o.terminalMessage.replaceAll(String.fromCharCode(13), " ").replaceAll(String.fromCharCode(10), " ").slice(0, 180).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-    generated = generated.replace("> initializing secure link...\\n> key required. type: get_key or paste below", "> " + safeMessage + "\\n> key required. type: get_key or paste below");
+    generated = generated.replace("ARIO_TERMINAL_MESSAGE", safeMessage);
   }
   return generated;
 }
