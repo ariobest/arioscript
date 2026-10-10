@@ -6,6 +6,7 @@ import {
   KeyRound, Bell, Code2, LayoutDashboard, Settings,
 } from "lucide-react";
 import { ThemePicker } from "./ThemePicker";
+import { FirstVisitTerminal } from "./FirstVisitTerminal";
 import catLogo from "@/assets/ario-logo.png.asset.json";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
@@ -95,6 +96,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <FirstVisitTerminal />
       {user && softBanned && <div className="border-b border-primary/25 bg-primary/10 px-4 py-2 text-center text-xs text-foreground"><strong>Soft ban active.</strong> Browsing remains available, but account interactions are restricted.{profile?.ban_reason ? ` Reason: ${profile.ban_reason}` : ""}{profile?.ban_expires_at ? ` Expires ${new Date(profile.ban_expires_at).toLocaleString()}.` : ""}</div>}
       <header className="sticky top-0 z-40 border-b border-border bg-[color-mix(in_oklab,var(--background)_78%,transparent)] backdrop-blur-xl">
         <div className="mx-auto grid h-16 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 md:flex md:gap-3">
