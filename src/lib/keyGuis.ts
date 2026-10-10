@@ -146,5 +146,10 @@ Close.MouseButton1Click:Connect(closeUI)
 
 export function buildKeyGui(o: Opts) {
   const body = o.style === "aurora" ? AURORA : o.style === "terminal" ? TERMINAL : DOCK;
-  return CORE(o) + body;
+  let generated = CORE(o) + body;
+  if (o.terminalMessage && o.style === "terminal") {
+    const safeMessage = o.terminalMessage.replace(/[\\r\\n]/g, " ").slice(0, 180).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+    generated = generated.replace("> initializing secure link...\\n> key required. type: get_key or paste below", "> " + safeMessage + "\\n> key required. type: get_key or paste below");
+  }
+  return generated;
 }
