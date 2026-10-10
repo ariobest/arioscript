@@ -25,7 +25,7 @@ async function requestApi(path: string, init: RequestInit = {}) {
     headers: { "content-type": "application/json", authorization: `Bearer ${token}`, ...(init.headers ?? {}) },
   });
   const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.error || `Request failed (${response.status})`);
+  if (!response.ok) throw new Error([payload.error, payload.detail].filter((part) => typeof part === "string" && part.trim()).join(": ") || `Request failed (${response.status})`);
   return payload;
 }
 
