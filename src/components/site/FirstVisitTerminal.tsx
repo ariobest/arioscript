@@ -3,7 +3,9 @@ import { useNavigate } from "@tanstack/react-router";
 import { Terminal, X, Palette, UserPlus, ArrowRight } from "lucide-react";
 import { THEMES, applyTheme, themeLabel, type Theme } from "@/lib/theme";
 
-const THEME_SWATCHES: Record<string, string> = { midnight: "#64748b", royal: "#4169e1", azure: "#1687ff", cobalt: "#2455d6", emerald: "#10b981", rose: "#f43f5e", violet: "#8b5cf6", matrix: "#39ff14", cyan: "#06b6d4", crimson: "#dc2626", gold: "#f59e0b", galaxy: "#7c3aed", arctic: "#7dd3fc", ocean: "#0284c7", plasma: "#d946ef", pearl: "#e5e7eb" };\n\nconst INTRO_LINES = [
+const THEME_SWATCHES: Record<string, string> = { midnight: "#64748b", royal: "#4169e1", azure: "#1687ff", cobalt: "#2455d6", emerald: "#10b981", rose: "#f43f5e", violet: "#8b5cf6", matrix: "#39ff14", cyan: "#06b6d4", crimson: "#dc2626", gold: "#f59e0b", galaxy: "#7c3aed", arctic: "#7dd3fc", ocean: "#0284c7", plasma: "#d946ef", pearl: "#e5e7eb" };
+
+const INTRO_LINES = [
   "ARIO SCRIPTS :: INITIALIZING...",
   "Welcome to your script workspace.",
   "Create an account to save favorites and manage your keys.",
