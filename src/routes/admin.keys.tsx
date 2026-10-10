@@ -205,9 +205,27 @@ function LoaderBuilder() {
   const [slug, setSlug] = useState("");
   const [title, setTitle] = useState("ARIO HUB");
   const [accent, setAccent] = useState("#3b82f6");
+  const [validatorUrl, setValidatorUrl] = useState("");
+  const [getKeyUrl, setGetKeyUrl] = useState("");
+  const [terminalMessage, setTerminalMessage] = useState("Initializing secure link...");
+  const [validatorStatus, setValidatorStatus] = useState("");
+  const [checkingValidator, setCheckingValidator] = useState(false);
   const raws = useQuery({ queryKey: ["raw_scripts_pick"], queryFn: async () => (await supabase.from("raw_scripts").select("name,slug").eq("enabled", true).order("name")).data ?? [] });
   const origin = typeof window !== "undefined" ? (window.location.hostname.includes("id-preview--") || window.location.hostname === "localhost" ? "https://arioscript.lovable.app" : window.location.origin) : "";
-  const code = buildKeyGui({ style, origin, scriptUrl: `${origin}/raw/${slug || "YOUR_SCRIPT_SLUG"}`, title: title || "ARIO HUB", accent });
+  const effectiveValidator = validatorUrl.trim() || `${origin}/api/public/keys/validate?key=`;
+  const effectiveGetKey = getKeyUrl.trim() || `${origin}/keys`;
+  const code = buildKeyGui({ style, origin, scriptUrl: `${origin}/raw/${slug || "YOUR_SCRIPT_SLUG"}`, title: title || "ARIO HUB", accent, validatorUrl: effectiveValidator, getKeyUrl: effectiveGetKey, terminalMessage });
+  async function testValidator() {
+    setCheckingValidator(true); setValidatorStatus("");
+    try {
+      const testUrl = effectiveValidator.includes("{key}") ? effectiveValidator.replaceAll("{key}", "ARIO-TEST-KEY") : effectiveValidator.includes("key=") ? effectiveValidator + "ARIO-TEST-KEY" : effectiveValidator;
+      const response = await fetch(testUrl, { method: "GET", headers: { Accept: "application/json, text/plain" } });
+      const body = (await response.text()).slice(0, 180);
+      setValidatorStatus(`HTTP ${response.status} ${response.statusText}${body ? ` — ${body}` : ""}`);
+    } catch (error) {
+      setValidatorStatus(`Could not read validator from this browser. It may be offline or block cross-origin (CORS) requests. ${error instanceof Error ? error.message : ""}`);
+    } finally { setCheckingValidator(false); }
+  }
   function download() {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([code], { type: "text/plain" }));
@@ -222,7 +240,7 @@ function LoaderBuilder() {
           <p className="text-sm font-semibold">{g.name}</p><p className="mt-0.5 text-xs text-muted-foreground">{g.desc}</p>
         </button>)}
       </div>
-      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]">
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">\n        <label className="text-xs text-muted-foreground">Custom validator URL <input className="input-base mt-1" value={validatorUrl} onChange={e => setValidatorUrl(e.target.value)} placeholder={`${origin}/api/public/keys/validate?key=`} /></label>\n        <label className="text-xs text-muted-foreground">Custom Get Key website <input className="input-base mt-1" value={getKeyUrl} onChange={e => setGetKeyUrl(e.target.value)} placeholder={`${origin}/keys`} /></label>\n        {style === "terminal" && <label className="text-xs text-muted-foreground sm:col-span-2">Terminal startup message <input className="input-base mt-1" maxLength={180} value={terminalMessage} onChange={e => setTerminalMessage(e.target.value)} /></label>}\n        <div className="flex flex-wrap items-center gap-2 sm:col-span-2"><Button variant="outline" onClick={() => void testValidator()} disabled={checkingValidator}><ShieldCheck size={14}/>{checkingValidator ? "Testing…" : "Test validator website"}</Button><span className="text-xs text-muted-foreground">Uses a dummy test key; it does not validate or consume a real key.</span></div>\n        {validatorStatus && <p className="break-words rounded-lg border border-border/50 bg-background/30 p-3 text-xs sm:col-span-2">{validatorStatus}</p>}\n      </div>\n      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]">
         <select className="input-base" value={slug} onChange={e => setSlug(e.target.value)}>
           <option value="">Choose raw script…</option>
           {raws.data?.map(r => <option key={r.slug} value={r.slug}>{r.name}</option>)}
