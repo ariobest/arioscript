@@ -1,0 +1,20 @@
+{
+  "id": "/",
+  "name": "ARIO SCRIPTS",
+  "short_name": "ARIO",
+  "description": "ARIO SCRIPTS — premium script database.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0B1020",
+  "theme_color": "#315DFF",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
