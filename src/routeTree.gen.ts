@@ -662,6 +662,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminStudioRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/apk-builder': {
+      id: '/admin/apk-builder'
+      path: '/apk-builder'
+      fullPath: '/admin/apk-builder'
+      preLoaderRoute: typeof AdminApkBuilderRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/discord': {
       id: '/admin/discord'
       path: '/discord'
