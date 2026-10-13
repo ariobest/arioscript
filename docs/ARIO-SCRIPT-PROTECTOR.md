@@ -1,35 +1,36 @@
-# ARIO Script Protector
+# ARIO API
 
-This repo uses TanStack Start, not a plain Netlify Functions project. The protector should be deployed as a server endpoint and must never put a Supabase service-role key in browser code.
+The new API is a Supabase Edge Function at:
 
-## What this protects
+`https://yxbzblbtzqioexszjjkc.supabase.co/functions/v1/ario-api`
 
-- Public script pages can display an empty/locked view rather than the Lua source.
-- Loader URLs can request a script by an opaque ID.
-- Server-side authorization can check a per-script token and optional ARIO key validation before returning source.
-- Admins can rotate/revoke tokens and disable a script.
-- Add rate limits and audit events at the server boundary.
+## What it does
+
+- Admin/moderator management uses the signed-in Supabase user's Bearer access token and checks `public.user_roles`.
+- `GET` without query parameters lists scripts for staff only.
+- `POST` creates a script and returns a one-time loader URL.
+- `PATCH` enables/disables a script.
+- `DELETE` revokes a script.
+- Public script delivery requires the exact `id` and 64-character random `token` in the query string.
+- Only a SHA-256 token hash is stored in `public.protected_scripts`.
+- Source is returned as `text/plain` with caching disabled.
+
+## Deploy it in Supabase
+
+1. Open the Supabase project `yxbzblbtzqioexszjjkc`.
+2. Go to **Edge Functions → ario-api → Editor**.
+3. Replace the editor code with the contents of `supabase/functions/ario-api/index.ts` from this repository.
+4. Deploy the function.
+5. In the function settings, turn **Verify JWT** off for this function only. The endpoint performs its own checks: per-script tokens for public loader requests and Supabase session/role checks for management requests.
+6. Make sure the function has the built-in `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` secrets available. Never put the service-role key in frontend code, public config, Lua, or GitHub.
+7. Open the website's Admin → API Manager and create a harmless test script. Save the generated loadstring.
+
+The GitHub/Lovable app deploy does not automatically deploy Supabase Edge Function code. The function itself must be deployed from Supabase.
+
+## Database
+
+This function uses the existing `public.protected_scripts` table defined by `supabase/migrations/20261010170000_protected_scripts.sql`. Do not drop or reset the database. The table must remain inaccessible to `anon` and `authenticated`; the function uses the server-side service-role key.
 
 ## Important limitation
 
-A loader must receive executable Lua source (or bytecode/payload) to execute it. Anyone who can run that loader can generally capture the returned source. Hiding source in a browser tab is only deterrence, not real DRM. Do not claim that obfuscation makes a script impossible to copy. For stronger protection, keep valuable logic server-side and expose only a narrow authenticated API.
-
-## Required server-only environment
-
-Configure these in the hosting provider's server environment (never as `VITE_*` variables):
-
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
-
-Do not change or remove existing `.env` or `.gitignore` files for this feature.
-
-## Suggested rollout
-
-1. Store protected source in a private table, not a public bucket or public table.
-2. Create a random, revocable token per protected script. Store only a cryptographic hash of the token.
-3. Make the server endpoint return an empty response for a normal browser visit without a valid token; return Lua as `text/plain` only after server-side checks.
-4. Validate any ARIO key server-side. Do not trust a client-provided `valid: true` flag.
-5. Add per-token rate limits, expiry/revocation, and access logs.
-6. Test the endpoint from a Roblox-compatible HTTP client and a normal browser before publishing loadstrings.
-
-A response that is blank in a browser but returns source to a loader is not secure by itself if both requests use the same public URL. Token validation and server-side authorization are essential.
+A loader has to deliver executable Lua source to the client that runs it. Someone who can run the loader may be able to capture the returned source. Tokens control access and allow revocation; they do not provide unbreakable source secrecy. Keep valuable logic server-side when possible.
