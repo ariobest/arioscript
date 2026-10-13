@@ -103,7 +103,23 @@ Deno.serve(async (req: Request) => {
       return json({ scripts: data ?? [] });
     }
     if (req.method === "POST") {
-      const body = await req.json().catch(() => null) as { name?: unknown; source?: unknown; rawUrl?: unknown; expiresAt?: unknown } | null;
+      const body = await req.json().catch(() => null) as { action?: unknown; id?: unknown; name?: unknown; source?: unknown; rawUrl?: unknown; expiresAt?: unknown } | null;
+      if (body?.action === "rotate") {
+        if (typeof body.id !== "string" || !/^[a-f0-9-]{36}$/i.test(body.id)) {
+          return json({ error: "Choose a valid API script." }, 400);
+        }
+        const { data: existing, error: lookupError } = await db.from("protected_scripts")
+          .select("id,name,enabled").eq("id", body.id).maybeSingle();
+        if (lookupError) return json({ error: "Could not find API script", detail: lookupError.message }, 503);
+        if (!existing) return json({ error: "That API script no longer exists. Refresh the list." }, 404);
+        if (!existing.enabled) return json({ error: "This API script is disabled. Enable it before generating a loader." }, 409);
+        const token = Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, "0")).join("");
+        const { error: rotateError } = await db.from("protected_scripts")
+          .update({ token_hash: await sha256(token), updated_at: new Date().toISOString() })
+          .eq("id", body.id);
+        if (rotateError) return json({ error: "Could not generate a fresh loader token", detail: rotateError.message }, 503);
+        return json({ script: existing, loaderUrl: `${FUNCTION_URL}?id=${encodeURIComponent(existing.id)}&token=${token}` });
+      }
       const name = typeof body?.name === "string" ? body.name.trim().slice(0, 100) : "";
       let source = typeof body?.source === "string" ? body.source : "";
       const rawUrl = typeof body?.rawUrl === "string" ? body.rawUrl.trim() : "";
