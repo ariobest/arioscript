@@ -182,7 +182,7 @@ function ApkBuilder() {
         display: fullscreen ? "fullscreen" : "standalone",
         enableNotifications: notifications,
         enableSiteSettingsShortcut: siteSettings,
-        fallbackType: "customtabs",
+        fallbackType: "webview",
         features: {
           locationDelegation: { enabled: location },
           playBilling: { enabled: false },
@@ -360,7 +360,7 @@ function ApkBuilder() {
           </section>
 
           <section className="rounded-3xl border border-amber-400/20 bg-amber-400/[.05] p-4 sm:p-5">
-            <div className="flex items-start gap-3"><AlertTriangle size={18} className="mt-0.5 shrink-0 text-amber-300" /><div className="min-w-0"><h3 className="text-sm font-bold">Before you build</h3><ul className="mt-2 list-disc space-y-1 pl-4 text-xs leading-relaxed text-muted-foreground"><li>Your website must be public and use HTTPS.</li><li>The manifest and icon URLs must exist and be accessible. Use a 512×512 PNG icon for the sharpest result.</li><li>This builder uses unsigned signing mode for testing. Do not upload an unsigned APK to Google Play.</li><li>The build service returns a ZIP package; extract the APK file from it.</li></ul></div></div>
+            <div className="flex items-start gap-3"><AlertTriangle size={18} className="mt-0.5 shrink-0 text-amber-300" /><div className="min-w-0"><h3 className="text-sm font-bold">Before you build</h3><ul className="mt-2 list-disc space-y-1 pl-4 text-xs leading-relaxed text-muted-foreground"><li>Your website must be public and use HTTPS.</li><li>The manifest and icon URLs must exist and be accessible. Use a 512×512 PNG icon for the sharpest result.</li><li>The builder requests a newly signed APK so Android can install it directly; keep your signing details safe if you plan to publish updates.</li><li>The downloaded APK targets Android 7.0 (API 24) and newer with this packaging service. Older Android versions cannot be guaranteed.</li><li>The build service returns a ZIP internally, but the builder extracts and downloads the APK file directly.</li></ul></div></div>
           </section>
 
           <div className="flex flex-col gap-3 sm:flex-row">
