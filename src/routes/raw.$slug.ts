@@ -31,9 +31,17 @@ export const Route = createFileRoute("/raw/$slug")({
           return new Response("", { status: 404, headers });
         }
 
-        // Browsers advertise HTML; show a landing page rather than rendering Lua source.
-        // Compatible executors generally request the response as */* and receive the Lua text.
-        if ((request.headers.get("accept") ?? "").toLowerCase().includes("text/html")) {
+        // Only treat an actual top-level browser navigation as a page visit.
+        // Some Lua HttpGet clients advertise text/html too, so Accept alone can break execution.
+        // Browsers send Fetch Metadata for navigations; executor requests normally do not.
+        const fetchMode = (request.headers.get("sec-fetch-mode") ?? "").toLowerCase();
+        const fetchDest = (request.headers.get("sec-fetch-dest") ?? "").toLowerCase();
+        const fetchUser = request.headers.get("sec-fetch-user") ?? "";
+        const accept = (request.headers.get("accept") ?? "").toLowerCase();
+        const isBrowserNavigation =
+          (fetchMode === "navigate" && fetchDest === "document") ||
+          (accept.includes("text/html") && fetchUser === "?1");
+        if (isBrowserNavigation) {
           return browserInfoPage();
         }
 
