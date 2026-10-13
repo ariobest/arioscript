@@ -57,6 +57,72 @@ function Toggle({
   );
 }
 
+async function extractApkFromPackage(packageBlob: Blob): Promise<Blob> {
+  const bytes = new Uint8Array(await packageBlob.arrayBuffer());
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const readU16 = (offset: number) => view.getUint16(offset, true);
+  const readU32 = (offset: number) => view.getUint32(offset, true);
+
+  // Locate the ZIP end-of-central-directory record (maximum ZIP comment: 65,535 bytes).
+  let eocd = -1;
+  for (let offset = bytes.length - 22; offset >= Math.max(0, bytes.length - 65_557); offset--) {
+    if (readU32(offset) === 0x06054b50) { eocd = offset; break; }
+  }
+  if (eocd < 0) throw new Error("The build service did not return a ZIP package.");
+
+  const entryCount = readU16(eocd + 10);
+  let entryOffset = readU32(eocd + 16);
+  let apkEntry: { name: string; method: number; compressedSize: number; size: number; localOffset: number } | null = null;
+
+  for (let index = 0; index < entryCount; index++) {
+    if (readU32(entryOffset) !== 0x02014b50) break;
+    const method = readU16(entryOffset + 10);
+    const compressedSize = readU32(entryOffset + 20);
+    const size = readU32(entryOffset + 24);
+    const nameLength = readU16(entryOffset + 28);
+    const extraLength = readU16(entryOffset + 30);
+    const commentLength = readU16(entryOffset + 32);
+    const localOffset = readU32(entryOffset + 42);
+    const name = new TextDecoder().decode(bytes.slice(entryOffset + 46, entryOffset + 46 + nameLength));
+    if (name.toLowerCase().endsWith(".apk")) {
+      const candidate = { name, method, compressedSize, size, localOffset };
+      if (!apkEntry || /signed|release/i.test(name)) apkEntry = candidate;
+      if (/signed.*\.apk$/i.test(name)) break;
+    }
+    entryOffset += 46 + nameLength + extraLength + commentLength;
+  }
+
+  if (!apkEntry) throw new Error("The service returned a package ZIP but no .apk file was found.");
+  const local = apkEntry.localOffset;
+  if (readU32(local) !== 0x04034b50) throw new Error("The APK entry in the package ZIP is invalid.");
+  const dataStart = local + 30 + readU16(local + 26) + readU16(local + 28);
+  const compressed = bytes.slice(dataStart, dataStart + apkEntry.compressedSize);
+  let apkBytes: Uint8Array;
+
+  if (apkEntry.method === 0) {
+    apkBytes = compressed;
+  } else if (apkEntry.method === 8) {
+    if (typeof DecompressionStream === "undefined") {
+      throw new Error("This browser cannot extract the APK automatically. Download the package ZIP and extract it with a ZIP app.");
+    }
+    try {
+      const stream = new Blob([compressed]).stream().pipeThrough(
+        new DecompressionStream("deflate-raw" as CompressionFormat)
+      );
+      apkBytes = new Uint8Array(await new Response(stream).arrayBuffer());
+    } catch {
+      throw new Error("Automatic APK extraction is not supported by this browser. Try Chrome or download the package ZIP.");
+    }
+  } else {
+    throw new Error("The package uses an unsupported ZIP compression method.");
+  }
+
+  if (apkEntry.size && apkBytes.length !== apkEntry.size) {
+    throw new Error("The extracted APK failed its size check. Please retry the build.");
+  }
+  return new Blob([apkBytes], { type: "application/vnd.android.package-archive" });
+}
+
 function ApkBuilder() {
   const [name, setName] = useState(DEFAULTS.name);
   const [launcherName, setLauncherName] = useState(DEFAULTS.launcherName);
@@ -143,7 +209,7 @@ function ApkBuilder() {
         },
         shortcuts: [],
         signing: null,
-        signingMode: "none",
+        signingMode: "new",
         splashScreenFadeOutDuration: 300,
         startUrl: startUrl.trim().startsWith("/") ? startUrl.trim() : "/" + startUrl.trim(),
         themeColor,
@@ -166,18 +232,19 @@ function ApkBuilder() {
         throw new Error(detail || "The build service did not return a package.");
       }
 
-      const blob = await response.blob();
-      if (!blob.size) throw new Error("The build service returned an empty package.");
-      const downloadUrl = URL.createObjectURL(blob);
+      const packageBlob = await response.blob();
+      if (!packageBlob.size) throw new Error("The build service returned an empty package.");
+      const apkBlob = await extractApkFromPackage(packageBlob);
+      const downloadUrl = URL.createObjectURL(apkBlob);
       const anchor = document.createElement("a");
       anchor.href = downloadUrl;
-      anchor.download = `${packageId.trim().replace(/[^a-zA-Z0-9._-]/g, "_")}-android-package.zip`;
+      anchor.download = `${packageId.trim().replace(/[^a-zA-Z0-9._-]/g, "_")}-android.apk`;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
       window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 60_000);
-      toast.success("Android package downloaded", {
-        description: "Open the ZIP and extract the APK inside. Signing mode is set to unsigned.",
+      toast.success("APK downloaded", {
+        description: "Your signed APK is ready to install. Android may ask you to allow installs from this browser.",
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown build error";
