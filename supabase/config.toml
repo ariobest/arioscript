@@ -1,1 +1,6 @@
 project_id = "yxbzblbtzqioexszjjkc"
+
+# This endpoint has its own public per-script token checks and validates
+# Supabase user JWTs manually for admin management operations.
+[functions.ario-api]
+verify_jwt = false
