@@ -996,9 +996,9 @@ input, select, textarea, button { font: inherit; }
   appearance: none;
   width: 42px;
   height: 25px;
-  border: 1px solid hsl(var(--border));
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: hsl(var(--muted));
+  background: var(--muted);
   position: relative;
   cursor: pointer;
   transition: background .18s ease, border-color .18s ease;
@@ -1015,7 +1015,7 @@ input, select, textarea, button { font: inherit; }
   box-shadow: 0 1px 4px rgba(0,0,0,.22);
   transition: transform .18s ease;
 }
-.ario-toggle:checked { background: hsl(var(--primary)); border-color: hsl(var(--primary)); }
-.ario-toggle:checked::after { transform: translateX(17px); background: hsl(var(--primary-foreground)); }
-.ario-toggle:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 3px; }
+.ario-toggle:checked { background: var(--primary); border-color: var(--primary); }
+.ario-toggle:checked::after { transform: translateX(17px); background: var(--primary-foreground); }
+.ario-toggle:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { .ario-toggle, .ario-toggle::after { transition: none; } }
