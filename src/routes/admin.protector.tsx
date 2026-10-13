@@ -19,15 +19,45 @@ type ProtectedScript = {
 const ARIO_API_URL = "https://yxbzblbtzqioexszjjkc.supabase.co/functions/v1/ario-api";
 
 async function requestApi(_path: string, init: RequestInit = {}) {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  if (!token) throw new Error("Your session expired. Sign in again.");
-  const response = await fetch(ARIO_API_URL, {
+  // First use the current session; if it is missing/stale, ask Supabase to refresh it.
+  let { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    const refreshed = await supabase.auth.refreshSession();
+    session = refreshed.data.session;
+  }
+  if (!session?.access_token) {
+    throw new Error("Your login session is missing or expired. Sign in again, then reopen API Manager.");
+  }
+
+  const send = (token: string) => fetch(ARIO_API_URL, {
     ...init,
-    headers: { "content-type": "application/json", authorization: `Bearer ${token}`, ...(init.headers ?? {}) },
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${token}`,
+      ...(init.headers ?? {}),
+    },
   });
+
+  let response = await send(session.access_token);
+  // A page can retain an old access token while refresh is pending. Refresh once on 401.
+  if (response.status === 401) {
+    const refreshed = await supabase.auth.refreshSession();
+    const freshToken = refreshed.data.session?.access_token;
+    if (freshToken && freshToken !== session.access_token) {
+      response = await send(freshToken);
+    }
+  }
+
   const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error([payload.error, payload.detail].filter((part) => typeof part === "string" && part.trim()).join(": ") || `Request failed (${response.status})`);
+  if (!response.ok) {
+    const message = [payload.error, payload.detail]
+      .filter((part) => typeof part === "string" && part.trim())
+      .join(": ");
+    if (response.status === 401) {
+      throw new Error(message || "Supabase rejected your login session. Sign in again.");
+    }
+    throw new Error(message || `Request failed (${response.status})`);
+  }
   return payload;
 }
 
