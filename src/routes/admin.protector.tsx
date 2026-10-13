@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ShieldCheck, Plus, Copy, Trash2, Eye, EyeOff, Clock3, AlertTriangle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -66,6 +66,8 @@ function ScriptProtector() {
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const [source, setSource] = useState("");
+  const sourceFileRef = useRef<HTMLInputElement>(null);
+  const [selectedLuaFile, setSelectedLuaFile] = useState("");
   const [sourceMode, setSourceMode] = useState<"paste" | "raw">("paste");
   const [rawUrl, setRawUrl] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
@@ -87,7 +89,7 @@ function ScriptProtector() {
         body: JSON.stringify({ name, ...(sourceMode === "raw" ? { rawUrl } : { source }), expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null }),
       });
       setNewLoader(result.loaderUrl);
-      setName(""); setSource(""); setRawUrl(""); setExpiresAt("");
+      setName(""); setSource(""); setRawUrl(""); setExpiresAt(""); setSelectedLuaFile("");
       await qc.invalidateQueries({ queryKey: ["protected-scripts"] });
       toast.success("API loader created. Save the link now; its token is only shown once.");
     } catch (error) {
@@ -152,7 +154,7 @@ function ScriptProtector() {
           </div>
         </div>
         {sourceMode === "paste" ? (
-          <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Lua source (max 1 MB)</span><textarea className="input-base w-full font-mono text-xs" rows={10} spellCheck={false} value={source} onChange={e => setSource(e.target.value)} placeholder="Paste your Lua script here…"/></label>
+          <div className="space-y-2"><label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Lua source (max 1 MB)</span><textarea className="input-base w-full font-mono text-xs" rows={10} spellCheck={false} value={source} onChange={e => setSource(e.target.value)} placeholder="Paste your Lua script here…"/></label><input ref={sourceFileRef} type="file" accept=".lua,text/plain" className="hidden" onChange={async e => { const input=e.currentTarget; const file=input.files?.[0]; if(!file)return; if(!file.name.toLowerCase().endsWith(".lua")){toast.error("Choose a .lua file");input.value="";return;} if(file.size>1024*1024){toast.error("Lua files must be 1 MB or smaller");input.value="";return;} try { const text=await file.text(); if(!text.trim()){toast.error("That Lua file is empty");return;} setSource(text); setSelectedLuaFile(file.name); if(!name.trim())setName(file.name.replace(/\.lua$/i,"")); toast.success("Lua source loaded into API Manager"); } catch { toast.error("Could not read that Lua file"); } finally {input.value="";} }} /><div className="flex flex-wrap items-center gap-2"><button type="button" className="btn btn-ghost h-10 !px-3 text-xs" onClick={()=>sourceFileRef.current?.click()}><Plus size={14}/> Upload .lua file</button>{selectedLuaFile && <span className="max-w-full truncate text-xs text-muted-foreground">Loaded: {selectedLuaFile}</span>}</div></div>
         ) : (
           <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Public HTTPS raw script URL</span><input className="input-base w-full font-mono text-xs" type="url" inputMode="url" value={rawUrl} onChange={e => setRawUrl(e.target.value)} placeholder="https://raw.githubusercontent.com/user/repo/main/script.lua"/><span className="text-xs text-muted-foreground">ARIO fetches the raw text on the server and stores a protected snapshot. Supported: GitHub Raw, GitHub Gist, Pastebin /raw, paste.rs, Rentry, and your ARIO site. The source will not auto-sync when the original file changes.</span></label>
         )}
