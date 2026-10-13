@@ -13,7 +13,7 @@ export const Route = createFileRoute("/admin/protector")({
 
 type ProtectedScript = {
   id: string; name: string; enabled: boolean; expires_at: string | null;
-  created_at: string; last_accessed_at: string | null;
+  created_at: string; last_accessed_at: string | null; loaderUrl?: string;
 };
 
 const ARIO_API_URL = "https://yxbzblbtzqioexszjjkc.supabase.co/functions/v1/ario-api";
@@ -96,6 +96,11 @@ function ScriptProtector() {
       setNewLoader(websiteLoader.toString());
       setLoadstringUrl(websiteLoader.toString());
       setLoadstringError("");
+      // The API stores only a token hash; retain the one-time URL in this browser session's query cache.
+      qc.setQueryData(["protected-scripts"], (current: ProtectedScript[] | undefined) => [
+        { id: result.script.id, name: result.script.name, enabled: result.script.enabled, expires_at: result.script.expires_at, created_at: result.script.created_at, last_accessed_at: null, loaderUrl: websiteLoader.toString() },
+        ...(current ?? []).filter(item => item.id !== result.script.id),
+      ]);
       setName(""); setSource(""); setRawUrl(""); setExpiresAt(""); setSelectedLuaFile("");
       await qc.invalidateQueries({ queryKey: ["protected-scripts"] });
       toast.success("API loader created. Save the link now; its token is only shown once.");
@@ -173,8 +178,16 @@ function ScriptProtector() {
         <div className="flex items-center gap-2"><Copy size={18} className="text-primary"/><h2 className="font-display text-lg font-semibold">Loadstring Maker</h2></div>
         <p className="text-sm text-muted-foreground">Paste a protected ARIO website loader URL or the Supabase ario-api loader URL. The maker converts Supabase loader links to your ARIO website endpoint and never embeds the Lua source in the URL.</p>
         <label className="block space-y-1.5 text-sm">
-          <span className="text-muted-foreground">Protected loader URL</span>
-          <textarea className="input-base w-full break-all font-mono text-xs" rows={3} value={loadstringUrl} onChange={e => { setLoadstringUrl(e.target.value); setLoadstringError(""); }} placeholder="https://arioscript.lovable.app/raw/api-loader?id=...&token=..."/>
+          <span className="text-muted-foreground">Choose one of your API scripts</span>
+          <select className="input-base w-full" value={loadstringUrl} onChange={e => { setLoadstringUrl(e.target.value); setLoadstringError(""); }}>
+            <option value="">Select an API script…</option>
+            {(list.data ?? []).map(item => <option key={item.id} value={item.loaderUrl ?? ""} disabled={!item.loaderUrl || !item.enabled}>{item.name}{!item.enabled ? " (disabled)" : !item.loaderUrl ? " (create a new loader URL)" : ""}</option>)}
+          </select>
+          <span className="text-xs text-muted-foreground">Existing scripts created before this update may not have their secret token stored for display. For security, tokens are stored as hashes, so select a script created with this maker or create a new loader.</span>
+        </label>
+        <label className="block space-y-1.5 text-sm">
+          <span className="text-muted-foreground">Or paste a protected loader URL</span>
+          <textarea className="input-base w-full break-all font-mono text-xs" rows={2} value={loadstringUrl} onChange={e => { setLoadstringUrl(e.target.value); setLoadstringError(""); }} placeholder="https://arioscript.lovable.app/raw/api-loader?id=...&token=..."/>
         </label>
         {(() => {
           let output = "";
@@ -190,7 +203,7 @@ function ScriptProtector() {
               if (!isSupabaseLoader && !isWebsiteLoader) {
                 throw new Error("Use an ARIO /raw/api-loader URL or the ARIO Supabase ario-api loader URL.");
               }
-              const websiteUrl = new URL("https://arioscript.lovable.app/raw/api-loader");
+              const websiteUrl = new URL("/raw/api-loader", window.location.origin);
               websiteUrl.search = inputUrl.search;
               if (!websiteUrl.searchParams.get("id") || !websiteUrl.searchParams.get("token")) {
                 throw new Error("Loader URL must include both id and token. Create a protected loader above first.");
