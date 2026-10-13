@@ -89,7 +89,10 @@ function ScriptProtector() {
         method: "POST",
         body: JSON.stringify({ name, ...(sourceMode === "raw" ? { rawUrl } : { source }), expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null }),
       });
-      setNewLoader(result.loaderUrl);
+      const upstreamLoader = new URL(result.loaderUrl);
+      const websiteLoader = new URL("/raw/api-loader", window.location.origin);
+      websiteLoader.search = upstreamLoader.search;
+      setNewLoader(websiteLoader.toString());
       setName(""); setSource(""); setRawUrl(""); setExpiresAt(""); setSelectedLuaFile("");
       await qc.invalidateQueries({ queryKey: ["protected-scripts"] });
       toast.success("API loader created. Save the link now; its token is only shown once.");
@@ -143,27 +146,6 @@ function ScriptProtector() {
           <button className="btn btn-ghost" onClick={() => setNewLoader("")}>Dismiss</button>
         </div>
       </div>}
-
-      <section className="glass space-y-4 rounded-2xl p-4 sm:p-5">
-        <div className="flex items-center gap-2"><Copy size={18} className="text-primary"/><h2 className="font-display text-lg font-semibold">Loadstring Maker</h2></div>
-        <p className="text-sm text-muted-foreground">Paste any direct Lua loader URL or use the latest API loader. Generate the standard HttpGet loadstring without require().</p>
-        <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Loader URL</span><input className="input-base w-full font-mono text-xs" type="url" inputMode="url" value={loadstringUrl} onChange={e => setLoadstringUrl(e.target.value)} placeholder="https://arioscript.lovable.app/raw/your-script"/></label>
-        <div className="flex flex-wrap gap-2">
-          <button type="button" className="btn btn-ghost h-10 !px-3 text-xs" disabled={!newLoader} onClick={() => setLoadstringUrl(newLoader)}><RefreshCw size={14}/> Use latest API loader</button>
-          <button type="button" className="btn btn-ghost h-10 !px-3 text-xs" onClick={() => setLoadstringUrl("https://arioscript.lovable.app/raw/your-script")}><Plus size={14}/> Use ARIO raw URL template</button>
-        </div>
-        {loadstringUrl.trim() && (() => {
-          let generated = "";
-          try {
-            const parsed = new URL(loadstringUrl.trim());
-            if (parsed.protocol === "https:" || parsed.protocol === "http:") generated = `loadstring(game:HttpGet(${JSON.stringify(parsed.toString())}, true))()`;
-          } catch { /* Keep the preview empty until a valid URL is entered. */ }
-          return generated ? <div className="space-y-2">
-            <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Generated loadstring</span><textarea readOnly rows={3} className="input-base w-full break-all font-mono text-xs" value={generated}/></label>
-            <button type="button" className="btn btn-primary w-full sm:w-auto" onClick={() => void copy(generated)}><Copy size={14}/> Copy loadstring</button>
-          </div> : <p className="text-xs text-amber-400">Enter a valid HTTP or HTTPS URL to generate the loadstring.</p>;
-        })()}
-      </section>
 
       <section className="glass space-y-4 rounded-2xl p-4 sm:p-5">
         <div className="flex items-center gap-2"><Plus size={18} className="text-primary"/><h2 className="font-display text-lg font-semibold">Create an API loader</h2></div>
