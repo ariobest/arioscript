@@ -46,12 +46,42 @@ function createSupabaseClient() {
     throw new Error(message);
   }
 
+  const baseStorage = brokeredPreviewStorage();
+  // Lovable can leave a session issued by the previous Supabase project in its
+  // preview auth broker. Never reuse that token against this project's API.
+  const authStorage = typeof window === 'undefined' || !baseStorage
+    ? baseStorage
+    : {
+        getItem: async (key: string) => {
+          const value = await baseStorage.getItem(key);
+          if (!value || key !== 'sb-yxbzblbtzqioexszjjkc-auth-token') return value;
+          try {
+            const stored = JSON.parse(value) as { access_token?: string };
+            const token = stored.access_token;
+            if (token) {
+              const payload = token.split('.')[1];
+              const decoded = JSON.parse(window.atob(payload.replace(/-/g, '+').replace(/_/g, '/'))) as { iss?: string };
+              if (decoded.iss !== SUPABASE_URL + '/auth/v1') {
+                await baseStorage.removeItem(key);
+                return null;
+              }
+            }
+          } catch {
+            await baseStorage.removeItem(key);
+            return null;
+          }
+          return value;
+        },
+        setItem: (key: string, value: string) => baseStorage.setItem(key, value),
+        removeItem: (key: string) => baseStorage.removeItem(key),
+      };
+
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     global: {
       fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY),
     },
     auth: {
-      storage: brokeredPreviewStorage(),
+      storage: authStorage,
       persistSession: true,
       autoRefreshToken: true,
     },
