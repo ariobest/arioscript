@@ -136,7 +136,11 @@ function ApkBuilder() {
         orientation: "default",
         packageId: packageId.trim(),
         serviceAccountJsonFile: null,
-        shareTarget: null,
+        shareTarget: {
+          action: "/share-target/",
+          method: "GET",
+          params: { title: "title", text: "text", url: "url" },
+        },
         shortcuts: [],
         signing: null,
         signingMode: "none",
@@ -289,7 +293,7 @@ function ApkBuilder() {
           </section>
 
           <section className="rounded-3xl border border-amber-400/20 bg-amber-400/[.05] p-4 sm:p-5">
-            <div className="flex items-start gap-3"><AlertTriangle size={18} className="mt-0.5 shrink-0 text-amber-300" /><div className="min-w-0"><h3 className="text-sm font-bold">Before you build</h3><ul className="mt-2 list-disc space-y-1 pl-4 text-xs leading-relaxed text-muted-foreground"><li>Your website must be public and use HTTPS.</li><li>The manifest and icon URLs must exist and be accessible.</li><li>This builder uses unsigned signing mode for testing. Do not upload an unsigned APK to Google Play.</li><li>The build service returns a ZIP package; extract the APK file from it.</li></ul></div></div>
+            <div className="flex items-start gap-3"><AlertTriangle size={18} className="mt-0.5 shrink-0 text-amber-300" /><div className="min-w-0"><h3 className="text-sm font-bold">Before you build</h3><ul className="mt-2 list-disc space-y-1 pl-4 text-xs leading-relaxed text-muted-foreground"><li>Your website must be public and use HTTPS.</li><li>The manifest and icon URLs must exist and be accessible. Use a 512×512 PNG icon for the sharpest result.</li><li>This builder uses unsigned signing mode for testing. Do not upload an unsigned APK to Google Play.</li><li>The build service returns a ZIP package; extract the APK file from it.</li></ul></div></div>
           </section>
 
           <div className="flex flex-col gap-3 sm:flex-row">
