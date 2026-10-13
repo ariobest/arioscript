@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { Mail, Lock, User as UserIcon, Chrome } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { useSettings } from "@/components/site/Layout";
 
@@ -39,10 +38,16 @@ function AuthPage() {
     }
     setBusy(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+      // Start Google OAuth in the same Supabase project used by the app.
+      // The old Lovable broker returned a session issued by the previous project,
+      // which caused bad_jwt/session errors after the project was switched.
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth`,
+        },
       });
-      if (result?.error) throw result.error;
+      if (error) throw error;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Google sign-in failed");
       setBusy(false);
