@@ -19,9 +19,44 @@ export function useAdminStats() {
   return useQuery({
     queryKey: ["admin_stats"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_stats");
-      if (error) throw error;
-      return data as unknown as Stats;
+      // Prefer the server-side aggregate RPC, but fall back to the existing tables
+      // so the dashboard still works when that optional SQL function is missing.
+      const rpc = await supabase.rpc("admin_stats");
+      if (!rpc.error && rpc.data && typeof rpc.data === "object") {
+        return rpc.data as unknown as Stats;
+      }
+
+      const [users, scripts, favorites, reports, events] = await Promise.all([
+        supabase.from("profiles").select("id,last_seen", { count: "exact" }),
+        supabase.from("scripts").select("views,downloads,copies", { count: "exact" }),
+        supabase.from("favorites").select("id", { count: "exact", head: true }),
+        supabase.from("reports").select("id", { count: "exact", head: true }).eq("status", "open"),
+        supabase.from("script_events").select("event_type", { count: "exact", head: true }),
+      ]);
+
+      const failed = [users, scripts, favorites, reports, events].find((result) => result.error);
+      if (failed?.error) {
+        throw new Error(`Statistics RPC failed (${rpc.error?.message ?? "no data"}) and table fallback failed: ${failed.error.message}`);
+      }
+
+      const profileRows = users.data ?? [];
+      const scriptRows = scripts.data ?? [];
+      const onlineCutoff = Date.now() - 5 * 60 * 1000;
+      const online = profileRows.filter((profile) => {
+        const seen = Date.parse(profile.last_seen ?? "");
+        return Number.isFinite(seen) && seen >= onlineCutoff;
+      }).length;
+
+      return {
+        users: users.count ?? profileRows.length,
+        online,
+        scripts: scripts.count ?? scriptRows.length,
+        views: scriptRows.reduce((sum, script) => sum + (Number(script.views) || 0), 0),
+        downloads: scriptRows.reduce((sum, script) => sum + (Number(script.downloads) || 0), 0),
+        copies: scriptRows.reduce((sum, script) => sum + (Number(script.copies) || 0), 0),
+        favorites: favorites.count ?? 0,
+        reports: reports.count ?? 0,
+      } as Stats;
     },
     refetchInterval: 30_000,
   });
@@ -31,9 +66,43 @@ export function useTimeseries(days: number) {
   return useQuery({
     queryKey: ["admin_ts", days],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_timeseries", { _days: days });
-      if (error) throw error;
-      return (data ?? []) as { day: string; views: number; copies: number; downloads: number; new_users: number; new_scripts: number }[];
+      const rpc = await supabase.rpc("admin_timeseries", { _days: days });
+      if (!rpc.error && Array.isArray(rpc.data)) {
+        return rpc.data as { day: string; views: number; copies: number; downloads: number; new_users: number; new_scripts: number }[];
+      }
+
+      const since = new Date(Date.now() - Math.min(days, 3650) * 86400_000).toISOString();
+      const [events, users, scripts] = await Promise.all([
+        supabase.from("script_events").select("event_type,created_at").gte("created_at", since),
+        supabase.from("profiles").select("created_at").gte("created_at", since),
+        supabase.from("scripts").select("created_at").gte("created_at", since),
+      ]);
+      const failed = [events, users, scripts].find((result) => result.error);
+      if (failed?.error) {
+        throw new Error(`Timeline RPC failed (${rpc.error?.message ?? "no data"}) and table fallback failed: ${failed.error.message}`);
+      }
+
+      const buckets = new Map<string, { day: string; views: number; copies: number; downloads: number; new_users: number; new_scripts: number }>();
+      const getBucket = (value: string) => {
+        const day = new Date(value).toISOString().slice(0, 10);
+        let bucket = buckets.get(day);
+        if (!bucket) {
+          bucket = { day, views: 0, copies: 0, downloads: 0, new_users: 0, new_scripts: 0 };
+          buckets.set(day, bucket);
+        }
+        return bucket;
+      };
+      for (const event of events.data ?? []) {
+        const bucket = getBucket(event.created_at);
+        const type = String(event.event_type).toLowerCase();
+        if (type.includes("view")) bucket.views += 1;
+        else if (type.includes("copy")) bucket.copies += 1;
+        else if (type.includes("download")) bucket.downloads += 1;
+      }
+      for (const user of users.data ?? []) getBucket(user.created_at).new_users += 1;
+      for (const script of scripts.data ?? []) getBucket(script.created_at).new_scripts += 1;
+
+      return Array.from(buckets.values()).sort((a, b) => a.day.localeCompare(b.day));
     },
   });
 }
