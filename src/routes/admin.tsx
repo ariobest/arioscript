@@ -16,7 +16,7 @@ const LINKS = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/scripts", label: "Scripts", icon: Terminal },
   { to: "/admin/raw", label: "Raw loader", icon: Terminal },
-  { to: "/admin/protector", label: "Script Protector", icon: Shield },
+  { to: "/admin/protector", label: "API Manager", icon: Code2 },
   { to: "/admin/lua", label: "Lua uploads", icon: FileCode2 },
   { to: "/admin/keys", label: "Keys", icon: KeyRound },
   { to: "/admin/assistant", label: "Script assistant", icon: Bot },
