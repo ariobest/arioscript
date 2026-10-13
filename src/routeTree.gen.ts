@@ -27,6 +27,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAnnouncementsRouteImport } from './routes/admin.announcements'
 import { Route as AdminAssistantRouteImport } from './routes/admin.assistant'
+import { Route as AdminApkBuilderRouteImport } from './routes/admin.apk-builder'
 import { Route as AdminBadgesRouteImport } from './routes/admin.badges'
 import { Route as AdminKeysRouteImport } from './routes/admin.keys'
 import { Route as AdminLogsRouteImport } from './routes/admin.logs'
@@ -110,6 +111,11 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
 const AdminAnnouncementsRoute = AdminAnnouncementsRouteImport.update({
   id: '/announcements',
   path: '/announcements',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminApkBuilderRoute = AdminApkBuilderRouteImport.update({
+  id: '/apk-builder',
+  path: '/apk-builder',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAssistantRoute = AdminAssistantRouteImport.update({
@@ -251,6 +257,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/assistant': typeof AdminAssistantRoute
+  '/admin/apk-builder': typeof AdminApkBuilderRoute
   '/admin/badges': typeof AdminBadgesRoute
   '/admin/keys': typeof AdminKeysRoute
   '/admin/logs': typeof AdminLogsRoute
@@ -292,6 +299,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/assistant': typeof AdminAssistantRoute
+  '/admin/apk-builder': typeof AdminApkBuilderRoute
   '/admin/badges': typeof AdminBadgesRoute
   '/admin/keys': typeof AdminKeysRoute
   '/admin/logs': typeof AdminLogsRoute
@@ -328,6 +336,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/assistant': typeof AdminAssistantRoute
+  '/admin/apk-builder': typeof AdminApkBuilderRoute
   '/admin/badges': typeof AdminBadgesRoute
   '/admin/keys': typeof AdminKeysRoute
   '/admin/logs': typeof AdminLogsRoute
@@ -372,6 +381,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/announcements'
     | '/admin/assistant'
+    | '/admin/apk-builder'
     | '/admin/badges'
     | '/admin/keys'
     | '/admin/logs'
@@ -412,6 +422,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/announcements'
     | '/admin/assistant'
+    | '/admin/apk-builder'
     | '/admin/badges'
     | '/admin/keys'
     | '/admin/logs'
@@ -444,6 +455,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/announcements'
     | '/admin/assistant'
+    | '/admin/apk-builder'
     | '/admin/badges'
     | '/admin/keys'
     | '/admin/logs'
@@ -734,6 +746,7 @@ interface AdminRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminAnnouncementsRoute: typeof AdminAnnouncementsRoute
   AdminAssistantRoute: typeof AdminAssistantRoute
+  AdminApkBuilderRoute: typeof AdminApkBuilderRoute
   AdminBadgesRoute: typeof AdminBadgesRoute
   AdminKeysRoute: typeof AdminKeysRoute
   AdminLogsRoute: typeof AdminLogsRoute
@@ -755,6 +768,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminAnnouncementsRoute: AdminAnnouncementsRoute,
   AdminAssistantRoute: AdminAssistantRoute,
+  AdminApkBuilderRoute: AdminApkBuilderRoute,
   AdminBadgesRoute: AdminBadgesRoute,
   AdminKeysRoute: AdminKeysRoute,
   AdminLogsRoute: AdminLogsRoute,
