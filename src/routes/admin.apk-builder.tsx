@@ -10,7 +10,7 @@ export const Route = createFileRoute("/admin/apk-builder")({
   head: () => ({
     meta: [
       { title: "APK Builder — ARIO SCRIPTS" },
-      { name: "description", content: "Build an Smartphone package from a published website." },
+      { name: "description", content: "Build an Android package from a published website." },
     ],
   }),
   component: ApkBuilder,
@@ -172,7 +172,7 @@ function ApkBuilder() {
       anchor.click();
       anchor.remove();
       window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 60_000);
-      toast.success("Smartphone package downloaded", {
+      toast.success("Android package downloaded", {
         description: "Open the ZIP and extract the APK inside. Signing mode is set to unsigned.",
       });
     } catch (error) {
@@ -224,10 +224,10 @@ function ApkBuilder() {
                 <Smartphone size={23} />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-[.2em] text-primary">Smartphone packaging studio</p>
+                <p className="text-[10px] font-bold uppercase tracking-[.2em] text-primary">Android packaging studio</p>
                 <h1 className="mt-1 font-display text-2xl font-bold sm:text-3xl">APK Builder</h1>
                 <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                  Turn a published HTTPS website into an Smartphone app package. Customize the app identity, colors, start path, and capabilities before building.
+                  Turn a published HTTPS website into an Android app package. Customize the app identity, colors, start path, and capabilities before building.
                 </p>
               </div>
             </div>
@@ -250,7 +250,7 @@ function ApkBuilder() {
               <label className={fieldClass}><span className={labelClass}>Start path</span><input className={inputClass} required value={startUrl} onChange={e => setStartUrl(e.target.value)} placeholder="/" /></label>
               <label className={fieldClass}><span className={labelClass}>App name</span><input className={inputClass} required maxLength={80} value={name} onChange={e => setName(e.target.value)} /></label>
               <label className={fieldClass}><span className={labelClass}>Launcher label</span><input className={inputClass} required maxLength={20} value={launcherName} onChange={e => setLauncherName(e.target.value)} /></label>
-              <label className={fieldClass}><span className={labelClass}>Smartphone package ID</span><input className={inputClass} required value={packageId} onChange={e => setPackageId(e.target.value)} placeholder="com.example.app" autoCapitalize="none" /></label>
+              <label className={fieldClass}><span className={labelClass}>Android package ID</span><input className={inputClass} required value={packageId} onChange={e => setPackageId(e.target.value)} placeholder="com.example.app" autoCapitalize="none" /></label>
               <label className={fieldClass}><span className={labelClass}>App version</span><input className={inputClass} required value={appVersion} onChange={e => setAppVersion(e.target.value)} placeholder="1.0.0.0" /></label>
               <label className={fieldClass}><span className={labelClass}>Version code</span><input className={inputClass} type="number" min={1} step={1} required value={appVersionCode} onChange={e => setAppVersionCode(e.target.value)} /></label>
               <label className={fieldClass}><span className={labelClass}>App icon URL (HTTPS)</span><input className={inputClass} type="url" required value={iconUrl} onChange={e => setIconUrl(e.target.value)} placeholder="https://example.com/icon-512.png" /></label>
@@ -261,7 +261,7 @@ function ApkBuilder() {
           <section className="glass rounded-3xl p-4 sm:p-6">
             <div className="mb-5 flex items-center gap-3">
               <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/12 text-primary"><Sparkles size={17} /></div>
-              <div><h2 className="font-display text-lg font-bold">Appearance</h2><p className="text-xs text-muted-foreground">Choose the Smartphone system bar and splash background colors.</p></div>
+              <div><h2 className="font-display text-lg font-bold">Appearance</h2><p className="text-xs text-muted-foreground">Choose the Android system bar and splash background colors.</p></div>
             </div>
             <div className="grid min-w-0 gap-4 sm:grid-cols-2">
               <label className={fieldClass}><span className={labelClass}>Theme / navigation color</span><div className="flex items-center gap-3 rounded-xl border border-border/70 bg-background/25 p-2"><input aria-label="Theme color" type="color" value={themeColor} onChange={e => setThemeColor(e.target.value)} className="h-9 w-11 shrink-0 cursor-pointer rounded-lg border-0 bg-transparent p-0" /><input className="min-w-0 flex-1 border-0 bg-transparent text-sm outline-none" value={themeColor} onChange={e => setThemeColor(e.target.value)} pattern="^#[0-9A-Fa-f]{6}$" /></div></label>
@@ -277,13 +277,13 @@ function ApkBuilder() {
 
         <div className="min-w-0 space-y-5">
           <section className="glass rounded-3xl p-4 sm:p-6">
-            <div className="mb-4 flex items-center gap-3"><div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/12 text-primary"><Package size={17} /></div><div><h2 className="font-display text-lg font-bold">Build options</h2><p className="text-xs text-muted-foreground">Toggle optional Smartphone behavior.</p></div></div>
+            <div className="mb-4 flex items-center gap-3"><div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/12 text-primary"><Package size={17} /></div><div><h2 className="font-display text-lg font-bold">Build options</h2><p className="text-xs text-muted-foreground">Toggle optional Android behavior.</p></div></div>
             <div className="space-y-3">
-              <Toggle label="Fullscreen app" description="Hide Smartphone system bars while the app is open." checked={fullscreen} onChange={setFullscreen} />
+              <Toggle label="Fullscreen app" description="Hide Android system bars while the app is open." checked={fullscreen} onChange={setFullscreen} />
               <Toggle label="Notifications" description="Request notification delegation where supported." checked={notifications} onChange={setNotifications} />
               <Toggle label="Location delegation" description="Allow supported PWA location features to be delegated." checked={location} onChange={setLocation} />
               <Toggle label="Site settings shortcut" description="Include a shortcut for site settings." checked={siteSettings} onChange={setSiteSettings} />
-              <Toggle label="Include Smartphone source" description="Add the generated project source to the package ZIP." checked={includeSource} onChange={setIncludeSource} />
+              <Toggle label="Include Android source" description="Add the generated project source to the package ZIP." checked={includeSource} onChange={setIncludeSource} />
               <Toggle label="ChromeOS only" description="Restrict the generated package to ChromeOS devices." checked={chromeOsOnly} onChange={setChromeOsOnly} />
             </div>
           </section>
