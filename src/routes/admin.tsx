@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  Shield, LayoutDashboard, Terminal, Users, Award, Flag, Megaphone, Settings, ScrollText, BarChart3, Lock, Mail, KeyRound, Images, Bot, Palette, Code2, MessageSquare, ChevronRight, Activity, Zap, Menu, X, FileCode2, WandSparkles,
+  Shield, LayoutDashboard, Terminal, Users, Award, Flag, Megaphone, Settings, ScrollText, BarChart3, Lock, Mail, KeyRound, Images, Bot, Palette, Code2, MessageSquare, ChevronRight, Activity, Zap, Menu, X, FileCode2, WandSparkles, Smartphone,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +22,7 @@ const LINKS = [
   { to: "/admin/assistant", label: "Script assistant", icon: Bot },
   { to: "/admin/studio", label: "Studio", icon: Code2 },
   { to: "/admin/loadstring", label: "Loadstring Generator", icon: WandSparkles },
+  { to: "/admin/apk-builder", label: "APK Builder", icon: Smartphone },
   { to: "/admin/discord", label: "Discord control", icon: MessageSquare },
   { to: "/admin/themes", label: "Themes", icon: Palette },
   { to: "/admin/users", label: "Users", icon: Users },
@@ -99,7 +100,7 @@ function AdminLayout() {
   const groups = [
     { label: "Overview", links: LINKS.filter(x => ["/admin","/admin/analytics","/admin/logs"].includes(x.to)) },
     { label: "Content", links: LINKS.filter(x => ["/admin/scripts","/admin/raw","/admin/protector","/admin/lua","/admin/keys","/admin/media","/admin/themes"].includes(x.to)) },
-    { label: "Tools", links: LINKS.filter(x => ["/admin/assistant","/admin/studio","/admin/discord","/admin/loadstring"].includes(x.to)) },
+    { label: "Tools", links: LINKS.filter(x => ["/admin/assistant","/admin/studio","/admin/discord","/admin/loadstring","/admin/apk-builder"].includes(x.to)) },
     { label: "Community", links: LINKS.filter(x => ["/admin/users","/admin/badges","/admin/reports","/admin/announcements"].includes(x.to)) },
     { label: "System", links: LINKS.filter(x => x.to === "/admin/settings") },
   ];
