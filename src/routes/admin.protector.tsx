@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/admin/protector")({
-  head: () => ({ meta: [{ title: "Script Protector — ARIO ADMIN" }] }),
+  head: () => ({ meta: [{ title: "ARIO API Manager — ARIO ADMIN" }] }),
   component: ScriptProtector,
 });
 
@@ -16,11 +16,13 @@ type ProtectedScript = {
   created_at: string; last_accessed_at: string | null;
 };
 
-async function requestApi(path: string, init: RequestInit = {}) {
+const ARIO_API_URL = "https://yxbzblbtzqioexszjjkc.supabase.co/functions/v1/ario-api";
+
+async function requestApi(_path: string, init: RequestInit = {}) {
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
   if (!token) throw new Error("Your session expired. Sign in again.");
-  const response = await fetch(path, {
+  const response = await fetch(ARIO_API_URL, {
     ...init,
     headers: { "content-type": "application/json", authorization: `Bearer ${token}`, ...(init.headers ?? {}) },
   });
@@ -57,7 +59,7 @@ function ScriptProtector() {
       setNewLoader(result.loaderUrl);
       setName(""); setSource(""); setRawUrl(""); setExpiresAt("");
       await qc.invalidateQueries({ queryKey: ["protected-scripts"] });
-      toast.success("Protected loader created. Save the link now; the token is only shown once.");
+      toast.success("API loader created. Save the link now; its token is only shown once.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not create protected loader");
     } finally { setBusy(false); }
@@ -76,7 +78,7 @@ function ScriptProtector() {
     try {
       await requestApi("/api/protector", { method: "DELETE", body: JSON.stringify({ id: item.id }) });
       await qc.invalidateQueries({ queryKey: ["protected-scripts"] });
-      toast.success("Protected script deleted");
+      toast.success("API script deleted");
     } catch (error) { toast.error(error instanceof Error ? error.message : "Delete failed"); }
   }
 
@@ -91,7 +93,7 @@ function ScriptProtector() {
     <div className="min-w-0 space-y-5">
       <div className="flex items-center gap-3">
         <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/15 text-primary"><ShieldCheck size={22}/></div>
-        <div><h1 className="font-display text-2xl font-bold">Script Protector</h1><p className="text-sm text-muted-foreground">Private source storage · token-gated delivery · revocable loaders</p></div>
+        <div><h1 className="font-display text-2xl font-bold">ARIO API Manager</h1><p className="text-sm text-muted-foreground">Private source storage · token-gated delivery · revocable loaders</p></div>
       </div>
 
       <div className="glass flex gap-3 rounded-2xl border border-amber-400/25 p-4 text-sm">
@@ -110,7 +112,7 @@ function ScriptProtector() {
       </div>}
 
       <section className="glass space-y-4 rounded-2xl p-4 sm:p-5">
-        <div className="flex items-center gap-2"><Plus size={18} className="text-primary"/><h2 className="font-display text-lg font-semibold">Protect a Lua script</h2></div>
+        <div className="flex items-center gap-2"><Plus size={18} className="text-primary"/><h2 className="font-display text-lg font-semibold">Create an API loader</h2></div>
         <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Script name</span><input className="input-base" maxLength={100} value={name} onChange={e => setName(e.target.value)} placeholder="e.g. ARIO MM2 V2"/></label>
         <div className="space-y-2">
           <span className="text-sm text-muted-foreground">Source type</span>
@@ -125,20 +127,20 @@ function ScriptProtector() {
           <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Public HTTPS raw script URL</span><input className="input-base w-full font-mono text-xs" type="url" inputMode="url" value={rawUrl} onChange={e => setRawUrl(e.target.value)} placeholder="https://raw.githubusercontent.com/user/repo/main/script.lua"/><span className="text-xs text-muted-foreground">ARIO fetches the raw text on the server and stores a protected snapshot. Supported: GitHub Raw, GitHub Gist, Pastebin /raw, paste.rs, Rentry, and your ARIO site. The source will not auto-sync when the original file changes.</span></label>
         )}
         <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Optional expiry</span><input className="input-base" type="datetime-local" value={expiresAt} onChange={e => setExpiresAt(e.target.value)}/><span className="text-xs text-muted-foreground">Leave blank for no expiry.</span></label>
-        <button disabled={busy} onClick={() => void create()} className="btn btn-primary w-full sm:w-auto">{busy ? "Protecting…" : "Protect script & generate loader"}</button>
+        <button disabled={busy} onClick={() => void create()} className="btn btn-primary w-full sm:w-auto">{busy ? "Creating…" : "Create API loader"}</button>
       </section>
 
       <section className="space-y-3">
-        <div className="flex items-center gap-2"><ShieldCheck size={17} className="text-primary"/><h2 className="font-display text-lg font-semibold">Protected scripts</h2><button aria-label="Refresh" className="btn btn-ghost ml-auto !p-2" onClick={() => void list.refetch()}><RefreshCw size={15}/></button></div>
-        {list.isLoading && <p className="text-sm text-muted-foreground">Loading protected scripts…</p>}
-        {list.error && <div className="glass rounded-xl border border-destructive/30 p-4 text-sm"><p className="font-semibold text-destructive">Protector API unavailable</p><p className="mt-1 break-words text-muted-foreground">{list.error instanceof Error ? list.error.message : "Unknown error"}. Ensure SUPABASE_SERVICE_ROLE_KEY is configured only as a server-side environment variable and apply the protector SQL migration.</p></div>}
+        <div className="flex items-center gap-2"><ShieldCheck size={17} className="text-primary"/><h2 className="font-display text-lg font-semibold">API scripts</h2><button aria-label="Refresh" className="btn btn-ghost ml-auto !p-2" onClick={() => void list.refetch()}><RefreshCw size={15}/></button></div>
+        {list.isLoading && <p className="text-sm text-muted-foreground">Loading API scripts…</p>}
+        {list.error && <div className="glass rounded-xl border border-destructive/30 p-4 text-sm"><p className="font-semibold text-destructive">ARIO API unavailable</p><p className="mt-1 break-words text-muted-foreground">{list.error instanceof Error ? list.error.message : "Unknown error"}. Check that the ario-api Edge Function is deployed and has access to the protected_scripts table. Never put the service-role key in browser code.</p></div>}
         {(list.data ?? []).map(item => <div key={item.id} className="glass flex flex-wrap items-center gap-3 rounded-2xl p-4">
           <div className={`grid h-10 w-10 place-items-center rounded-xl ${item.enabled ? "bg-emerald-500/10 text-emerald-400" : "bg-secondary text-muted-foreground"}`}>{item.enabled ? <Eye size={17}/> : <EyeOff size={17}/>}</div>
           <div className="min-w-0 flex-1"><p className="truncate font-semibold">{item.name}</p><p className="mt-1 text-xs text-muted-foreground">Created {new Date(item.created_at).toLocaleDateString()} · {item.expires_at ? `Expires ${new Date(item.expires_at).toLocaleString()}` : "No expiry"}</p><p className="text-xs text-muted-foreground">{item.last_accessed_at ? `Last request: ${new Date(item.last_accessed_at).toLocaleString()}` : "Never requested"}</p></div>
           <button className="btn btn-ghost h-10 !px-3 text-xs" onClick={() => void setEnabled(item)}>{item.enabled ? <><EyeOff size={14}/> Disable</> : <><Eye size={14}/> Enable</>}</button>
           <button aria-label={`Delete ${item.name}`} className="btn btn-ghost h-10 !px-3 text-xs text-destructive" onClick={() => void remove(item)}><Trash2 size={14}/> Delete</button>
         </div>)}
-        {list.data && !list.data.length && <div className="glass rounded-2xl p-7 text-center text-sm text-muted-foreground">No protected scripts yet. Add your first script above.</div>}
+        {list.data && !list.data.length && <div className="glass rounded-2xl p-7 text-center text-sm text-muted-foreground">No API scripts yet. Create your first loader above.</div>}
       </section>
     </div>
   );
