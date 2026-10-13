@@ -84,8 +84,13 @@ function AuthPage() {
         if (error) throw error;
         toast.success("Account created — check your email to confirm.");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        const { error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+        if (error) {
+          if (error.message.toLowerCase().includes("invalid login credentials")) {
+            throw new Error("Email/password sign-in failed. If you originally joined with Google or Discord, use that sign-in button. To create a password for this account, choose Forgot password and follow the email link.");
+          }
+          throw error;
+        }
         toast.success("Welcome back");
         navigate({ to: "/" });
       }
