@@ -74,6 +74,7 @@ function ScriptProtector() {
   const [busy, setBusy] = useState(false);
   const [newLoader, setNewLoader] = useState("");
   const [loadstringUrl, setLoadstringUrl] = useState("");
+  const [loadstringError, setLoadstringError] = useState("");
   const list = useQuery({
     queryKey: ["protected-scripts"],
     enabled: isStaff,
@@ -93,6 +94,8 @@ function ScriptProtector() {
       const websiteLoader = new URL("/raw/api-loader", window.location.origin);
       websiteLoader.search = upstreamLoader.search;
       setNewLoader(websiteLoader.toString());
+      setLoadstringUrl(websiteLoader.toString());
+      setLoadstringError("");
       setName(""); setSource(""); setRawUrl(""); setExpiresAt(""); setSelectedLuaFile("");
       await qc.invalidateQueries({ queryKey: ["protected-scripts"] });
       toast.success("API loader created. Save the link now; its token is only shown once.");
@@ -164,6 +167,52 @@ function ScriptProtector() {
         )}
         <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Optional expiry</span><input className="input-base" type="datetime-local" value={expiresAt} onChange={e => setExpiresAt(e.target.value)}/><span className="text-xs text-muted-foreground">Leave blank for no expiry.</span></label>
         <button disabled={busy} onClick={() => void create()} className="btn btn-primary w-full sm:w-auto">{busy ? "Creating…" : "Create API loader"}</button>
+      </section>
+
+      <section className="glass space-y-4 rounded-2xl p-4 sm:p-5">
+        <div className="flex items-center gap-2"><Copy size={18} className="text-primary"/><h2 className="font-display text-lg font-semibold">Loadstring Maker</h2></div>
+        <p className="text-sm text-muted-foreground">Paste a protected ARIO website loader URL or the Supabase ario-api loader URL. The maker converts Supabase loader links to your ARIO website endpoint and never embeds the Lua source in the URL.</p>
+        <label className="block space-y-1.5 text-sm">
+          <span className="text-muted-foreground">Protected loader URL</span>
+          <textarea className="input-base w-full break-all font-mono text-xs" rows={3} value={loadstringUrl} onChange={e => { setLoadstringUrl(e.target.value); setLoadstringError(""); }} placeholder="https://arioscript.lovable.app/raw/api-loader?id=...&token=..."/>
+        </label>
+        {(() => {
+          let output = "";
+          let error = loadstringError;
+          if (loadstringUrl.trim()) {
+            try {
+              const inputUrl = new URL(loadstringUrl.trim());
+              if (inputUrl.protocol !== "https:" || inputUrl.username || inputUrl.password) {
+                throw new Error("Use a valid HTTPS loader URL.");
+              }
+              const isSupabaseLoader = inputUrl.hostname === "yxbzblbtzqioexszjjkc.supabase.co" && inputUrl.pathname === "/functions/v1/ario-api";
+              const isWebsiteLoader = inputUrl.hostname === "arioscript.lovable.app" && inputUrl.pathname === "/raw/api-loader";
+              if (!isSupabaseLoader && !isWebsiteLoader) {
+                throw new Error("Use an ARIO /raw/api-loader URL or the ARIO Supabase ario-api loader URL.");
+              }
+              const websiteUrl = new URL("https://arioscript.lovable.app/raw/api-loader");
+              websiteUrl.search = inputUrl.search;
+              if (!websiteUrl.searchParams.get("id") || !websiteUrl.searchParams.get("token")) {
+                throw new Error("Loader URL must include both id and token. Create a protected loader above first.");
+              }
+              output = `loadstring(game:HttpGet(${JSON.stringify(websiteUrl.toString())}, true))()`;
+            } catch (e) {
+              error = e instanceof Error ? e.message : "Invalid loader URL.";
+            }
+          }
+          return <>
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            <label className="block space-y-1.5 text-sm">
+              <span className="text-muted-foreground">Generated loadstring</span>
+              <textarea readOnly rows={3} className="input-base w-full break-all font-mono text-xs" value={output} placeholder="Your loadstring will appear here after you enter a valid protected loader URL."/>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className="btn btn-primary" disabled={!output} onClick={() => void copy(output)}><Copy size={14}/> Copy Loadstring</button>
+              <button type="button" className="btn btn-ghost" onClick={() => { setLoadstringUrl(newLoader); setLoadstringError(""); }} disabled={!newLoader}>Use latest created loader</button>
+              <button type="button" className="btn btn-ghost" onClick={() => { setLoadstringUrl(""); setLoadstringError(""); }}>Clear</button>
+            </div>
+          </>;
+        })()}
       </section>
 
       <section className="space-y-3">
