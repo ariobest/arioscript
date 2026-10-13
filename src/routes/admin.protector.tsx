@@ -74,6 +74,8 @@ function ScriptProtector() {
   const [busy, setBusy] = useState(false);
   const [newLoader, setNewLoader] = useState("");
   const [loadstringUrl, setLoadstringUrl] = useState("");
+  const [selectedScriptId, setSelectedScriptId] = useState("");
+  const [generatingFor, setGeneratingFor] = useState("");
   const [loadstringError, setLoadstringError] = useState("");
   const list = useQuery({
     queryKey: ["protected-scripts"],
@@ -179,11 +181,49 @@ function ScriptProtector() {
         <p className="text-sm text-muted-foreground">Paste a protected ARIO website loader URL or the Supabase ario-api loader URL. The maker converts Supabase loader links to your ARIO website endpoint and never embeds the Lua source in the URL.</p>
         <label className="block space-y-1.5 text-sm">
           <span className="text-muted-foreground">Choose one of your API scripts</span>
-          <select className="input-base w-full" value={loadstringUrl} onChange={e => { setLoadstringUrl(e.target.value); setLoadstringError(""); }}>
+          <select
+            className="input-base w-full"
+            value={selectedScriptId}
+            disabled={!!generatingFor || list.isLoading}
+            onChange={async e => {
+              const id = e.target.value;
+              setSelectedScriptId(id);
+              setLoadstringError("");
+              if (!id) return;
+              const item = (list.data ?? []).find(script => script.id === id);
+              if (!item) return;
+              if (!item.enabled) {
+                setLoadstringError("This API script is disabled. Enable it in the API scripts list first.");
+                return;
+              }
+              setGeneratingFor(id);
+              try {
+                const result = await requestApi("/api/protector", {
+                  method: "POST",
+                  body: JSON.stringify({ action: "rotate", id }),
+                });
+                const upstreamLoader = new URL(result.loaderUrl);
+                const websiteLoader = new URL("/raw/api-loader", window.location.origin);
+                websiteLoader.search = upstreamLoader.search;
+                setLoadstringUrl(websiteLoader.toString());
+                setNewLoader(websiteLoader.toString());
+                toast.success(`New loadstring URL generated for ${item.name}. Save it now.`);
+              } catch (error) {
+                setLoadstringError(error instanceof Error ? error.message : "Could not generate a loader URL.");
+              } finally {
+                setGeneratingFor("");
+              }
+            }}
+          >
             <option value="">Select an API script…</option>
-            {(list.data ?? []).map(item => <option key={item.id} value={item.loaderUrl ?? ""} disabled={!item.loaderUrl || !item.enabled}>{item.name}{!item.enabled ? " (disabled)" : !item.loaderUrl ? " (create a new loader URL)" : ""}</option>)}
+            {(list.data ?? []).map(item => (
+              <option key={item.id} value={item.id} disabled={!item.enabled}>
+                {item.name}{!item.enabled ? " (disabled)" : ""}
+              </option>
+            ))}
           </select>
-          <span className="text-xs text-muted-foreground">Existing scripts created before this update may not have their secret token stored for display. For security, tokens are stored as hashes, so select a script created with this maker or create a new loader.</span>
+          {generatingFor && <span className="text-xs text-muted-foreground">Generating a secure loader URL…</span>}
+          <span className="text-xs text-muted-foreground">Choose any enabled API script. A fresh secret URL will be generated securely; this replaces the previous token for that script, so update any old loadstrings.</span>
         </label>
         <label className="block space-y-1.5 text-sm">
           <span className="text-muted-foreground">Or paste a protected loader URL</span>
@@ -222,7 +262,7 @@ function ScriptProtector() {
             <div className="flex flex-wrap gap-2">
               <button type="button" className="btn btn-primary" disabled={!output} onClick={() => void copy(output)}><Copy size={14}/> Copy Loadstring</button>
               <button type="button" className="btn btn-ghost" onClick={() => { setLoadstringUrl(newLoader); setLoadstringError(""); }} disabled={!newLoader}>Use latest created loader</button>
-              <button type="button" className="btn btn-ghost" onClick={() => { setLoadstringUrl(""); setLoadstringError(""); }}>Clear</button>
+              <button type="button" className="btn btn-ghost" onClick={() => { setLoadstringUrl(""); setSelectedScriptId(""); setLoadstringError(""); }}>Clear</button>
             </div>
           </>;
         })()}
