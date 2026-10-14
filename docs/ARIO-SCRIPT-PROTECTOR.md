@@ -9,7 +9,9 @@ The new API is a Supabase Edge Function at:
 - Admin/moderator management uses the signed-in Supabase user's Bearer access token and checks `public.user_roles`.
 - `GET` without query parameters lists scripts for staff only.
 - `POST` creates a script and returns a one-time loader URL.
-- `PATCH` enables/disables a script.
+- `PATCH` enables/disables a script, publishes a new source/name version, and updates its per-client request limit.
+- `GET ?action=versions&id=<script-id>` returns version metadata to staff; `POST { action: "restore", id, versionId }` rolls back by publishing a new version.
+- `GET ?action=events` returns recent audit events to staff.
 - `DELETE` revokes a script.
 - Public script delivery validates a script ID and 64-character random key. New website loadstrings use the clean path format `https://arioscript.lovable.app/s/<script-id>.<secret-key>` with no `token=` query parameter.
 - The website route proxies the request to the existing Edge Function, which validates the ID/key pair. The secret is still a bearer credential; anyone who receives the complete loader URL can use it until it is rotated or revoked.
@@ -32,6 +34,12 @@ The GitHub/Lovable app deploy does not automatically deploy Supabase Edge Functi
 ## Database
 
 This function uses the existing `public.protected_scripts` table defined by `supabase/migrations/20261010170000_protected_scripts.sql`. Do not drop or reset the database. The table must remain inaccessible to `anon` and `authenticated`; the function uses the server-side service-role key.
+
+## Protection notes
+
+- New loader URLs are shaped like `/s/<script-id>.<secret-key>` so users do not see a `token=` query parameter. The website route forwards the key to the Edge Function server-side; the key remains a bearer credential and should be treated as secret.
+- The per-script rate limit defaults to 60 requests per client per minute and can be adjusted from the Admin → API Manager editor (1–600). Rate limiting depends on the hosting platform forwarding a client IP header; if none is provided, the function still validates keys and records events but skips per-client buckets.
+- The Admin → API Manager includes source editing, version history, rollback, enable/disable, and recent audit events after the migration and Edge Function are deployed.
 
 ## Important limitation
 
