@@ -1,7 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Script, SiteStats } from "@/lib/types";
 
-export const SCRIPT_SELECT = "*, categories(name, slug)";
+// Keep large script source out of catalogue queries; fetch code only on the script detail/raw endpoint.
+export const SCRIPT_SELECT = "id,name,slug,game_name,description,category_id,image_url,youtube_url,raw_loader_url,tags,version,status,published,archived,featured,verified,download_enabled,views,downloads,copies,shares,favorites,created_at,updated_at,categories(name, slug)";
 
 export async function listScripts(opts: {
   sort?: string;
