@@ -148,3 +148,46 @@ export const pinDiscordMessage = createServerFn({ method: "POST" })
     }
     return { ok: true, pinned: data.pinned };
   });
+
+
+const webhookPayload = z.object({
+  webhookUrl: z.string().url().max(1000),
+  payload: z.record(z.string(), z.unknown()),
+});
+
+export const sendDiscordWebhook = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator(data => webhookPayload.parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+
+    // Only permit official Discord webhook endpoints to prevent SSRF.
+    const url = new URL(data.webhookUrl);
+    if (
+      url.protocol !== "https:" ||
+      !["discord.com", "discordapp.com"].includes(url.hostname) ||
+      !/^\/api\/webhooks\/\d{17,20}\/[A-Za-z0-9._-]+\/?$/.test(url.pathname)
+    ) {
+      throw new Error("Enter a valid official Discord webhook URL.");
+    }
+
+    const payload = data.payload;
+    if (typeof payload.content === "string" && payload.content.length > 2000) {
+      throw new Error("Discord content is limited to 2000 characters.");
+    }
+    if (Array.isArray(payload.embeds) && payload.embeds.length > 10) {
+      throw new Error("Discord allows up to 10 embeds per message.");
+    }
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      const body = await response.text();
+      let message = `Discord webhook error (${response.status}).`;
+      try { const parsed = JSON.parse(body) as { message?: string }; if (parsed.message) message = parsed.message; } catch {}
+      throw new Error(message);
+    }
+    return { ok: true };
+  });
