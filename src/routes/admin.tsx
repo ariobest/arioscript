@@ -154,12 +154,12 @@ function AdminLayout() {
         </aside>
 
         {mobileOpen && <button aria-label="Close menu" onClick={() => setMobileOpen(false)} className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden" />}
-        <aside className={"glass fixed inset-y-3 left-3 z-50 w-[280px] rounded-3xl p-4 shadow-2xl transition-transform lg:hidden " + (mobileOpen ? "translate-x-0" : "-translate-x-[120%]")}>
+        <aside className={"glass fixed inset-y-3 left-3 z-50 flex max-h-[calc(100dvh-1.5rem)] w-[280px] flex-col overflow-hidden rounded-3xl p-4 shadow-2xl transition-transform lg:hidden " + (mobileOpen ? "translate-x-0" : "-translate-x-[120%]")}>
           <div className="mb-5 flex items-center justify-between">
             <div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/15 text-primary"><Shield size={18}/></div><div><p className="font-bold">ARIO ADMIN</p><p className="text-[9px] uppercase tracking-widest text-primary">Control Center</p></div></div>
             <button onClick={() => setMobileOpen(false)} className="rounded-xl p-2 text-muted-foreground hover:bg-secondary"><X size={18}/></button>
           </div>
-          <div className="overflow-y-auto"><Nav mobile /></div>
+          <div className="min-h-0 flex-1 overscroll-contain overflow-x-hidden overflow-y-auto pb-6 pr-1 [scrollbar-gutter:stable] [-webkit-overflow-scrolling:touch]"><Nav mobile /></div>
         </aside>
 
         <main className="ario-admin-main min-w-0 flex-1">
