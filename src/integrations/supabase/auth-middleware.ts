@@ -3,6 +3,7 @@ import { createMiddleware } from '@tanstack/react-start'
 import { getRequest } from '@tanstack/react-start/server'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from './types'
+import { supabase } from './client'
 
 
 
@@ -31,8 +32,19 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
   };
 }
 
-export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server(
-  async ({ next }) => {
+export const requireSupabaseAuth = createMiddleware({ type: 'function' })
+  .client(async ({ next }) => {
+    // TanStack server-function RPCs do not automatically include the Supabase
+    // access token stored in the browser session. Forward the actual session JWT,
+    // never the publishable API key, so server-side getClaims() can verify it.
+    const { data: { session } } = await supabase.auth.getSession();
+    return next({
+      headers: session?.access_token
+        ? { Authorization: `Bearer ${session.access_token}` }
+        : {},
+    });
+  })
+  .server(async ({ next }) => {
     
     // Keep server-side auth pointed at the same Supabase project as the browser client.
     // Environment variables may override these values for an intentionally different deployment.
