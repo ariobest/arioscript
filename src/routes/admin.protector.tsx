@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { ShieldCheck, Plus, Copy, Trash2, Eye, EyeOff, Clock3, AlertTriangle, RefreshCw } from "lucide-react";
+import { ShieldCheck, Plus, Copy, Trash2, Eye, EyeOff, Clock3, AlertTriangle, RefreshCw, History, Activity, Pencil, Save, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,7 +14,10 @@ export const Route = createFileRoute("/admin/protector")({
 type ProtectedScript = {
   id: string; name: string; enabled: boolean; expires_at: string | null;
   created_at: string; last_accessed_at: string | null; loaderUrl?: string;
+  version?: number; rate_limit_per_minute?: number; disabled_reason?: string | null;
 };
+type ScriptVersion = { id: string; script_id: string; version: number; name: string; change_note: string; created_at: string };
+type AuditEvent = { id: number; script_id: string | null; event_type: string; status_code: number; metadata: Record<string, unknown>; created_at: string };
 
 const ARIO_API_URL = "https://yxbzblbtzqioexszjjkc.supabase.co/functions/v1/ario-api";
 
@@ -29,7 +32,8 @@ async function requestApi(_path: string, init: RequestInit = {}) {
     throw new Error("Your login session is missing or expired. Sign in again, then reopen API Manager.");
   }
 
-  const send = (token: string) => fetch(ARIO_API_URL, {
+  const requestUrl = _path.startsWith("?") ? `${ARIO_API_URL}${_path}` : ARIO_API_URL;
+  const send = (token: string) => fetch(requestUrl, {
     ...init,
     headers: {
       "content-type": "application/json",
@@ -77,6 +81,18 @@ function ScriptProtector() {
   const [selectedScriptId, setSelectedScriptId] = useState("");
   const [generatingFor, setGeneratingFor] = useState("");
   const [loadstringError, setLoadstringError] = useState("");
+  const [historyFor, setHistoryFor] = useState<ProtectedScript | null>(null);
+  const [versions, setVersions] = useState<ScriptVersion[]>([]);
+  const [historyBusy, setHistoryBusy] = useState(false);
+  const [editing, setEditing] = useState<ProtectedScript | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editSource, setEditSource] = useState("");
+  const [editNote, setEditNote] = useState("");
+  const [editRateLimit, setEditRateLimit] = useState(60);
+  const [editBusy, setEditBusy] = useState(false);
+  const [auditOpen, setAuditOpen] = useState(false);
+  const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
+  const [auditBusy, setAuditBusy] = useState(false);
   const list = useQuery({
     queryKey: ["protected-scripts"],
     enabled: isStaff,
@@ -133,13 +149,87 @@ function ScriptProtector() {
     catch { toast.error("Clipboard unavailable on this device"); }
   }
 
+  async function openHistory(item: ProtectedScript) {
+    setHistoryFor(item);
+    setHistoryBusy(true);
+    try {
+      const result = await requestApi(`?action=versions&id=${encodeURIComponent(item.id)}`);
+      setVersions((result.versions ?? []) as ScriptVersion[]);
+    } catch (error) {
+      setVersions([]);
+      toast.error(error instanceof Error ? error.message : "Could not load version history");
+    } finally { setHistoryBusy(false); }
+  }
+
+  async function openEditor(item: ProtectedScript) {
+    setEditBusy(true);
+    try {
+      const result = await requestApi(`?action=source&id=${encodeURIComponent(item.id)}`);
+      setEditing(item);
+      setEditName(String(result.script.name ?? item.name));
+      setEditSource(String(result.script.source ?? ""));
+      setEditNote("");
+      setEditRateLimit(Number(result.script.rate_limit_per_minute) || 60);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not load script source");
+    } finally { setEditBusy(false); }
+  }
+
+  async function saveEditor() {
+    if (!editing) return;
+    if (!editName.trim() || !editSource.trim()) return toast.error("Name and source are required.");
+    setEditBusy(true);
+    try {
+      await requestApi("/api/protector", {
+        method: "PATCH",
+        body: JSON.stringify({
+          id: editing.id, name: editName.trim(), source: editSource,
+          changeNote: editNote.trim() || "Updated from API Manager",
+          rateLimitPerMinute: editRateLimit,
+        }),
+      });
+      await qc.invalidateQueries({ queryKey: ["protected-scripts"] });
+      setEditing(null);
+      toast.success("New script version published");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not save script");
+    } finally { setEditBusy(false); }
+  }
+
+  async function restoreVersion(item: ProtectedScript, version: ScriptVersion) {
+    if (!confirm(`Restore ${item.name} to version ${version.version}? This creates a new version; it does not delete history.`)) return;
+    try {
+      await requestApi("/api/protector", {
+        method: "POST",
+        body: JSON.stringify({ action: "restore", id: item.id, versionId: version.id }),
+      });
+      await qc.invalidateQueries({ queryKey: ["protected-scripts"] });
+      await openHistory(item);
+      toast.success(`Restored version ${version.version} as a new version`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Rollback failed");
+    }
+  }
+
+  async function loadAudit() {
+    setAuditOpen(true);
+    setAuditBusy(true);
+    try {
+      const result = await requestApi("?action=events");
+      setAuditEvents((result.events ?? []) as AuditEvent[]);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not load audit events");
+    } finally { setAuditBusy(false); }
+  }
+
   if (!isStaff) return <p className="text-sm text-muted-foreground">Staff access required.</p>;
 
   return (
     <div className="min-w-0 space-y-5">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/15 text-primary"><ShieldCheck size={22}/></div>
-        <div><h1 className="font-display text-2xl font-bold">ARIO API Manager</h1><p className="text-sm text-muted-foreground">Private source storage · clean-key URLs · revocable loaders</p></div>
+        <div className="min-w-0 flex-1"><h1 className="font-display text-2xl font-bold">ARIO API Manager</h1><p className="text-sm text-muted-foreground">Private source storage · clean-key URLs · versioned delivery</p></div>
+        <button className="btn btn-ghost" onClick={() => void loadAudit()}><Activity size={14}/> Audit log</button>
       </div>
 
       <div className="glass flex gap-3 rounded-2xl border border-amber-400/25 p-4 text-sm">
@@ -281,12 +371,47 @@ function ScriptProtector() {
         {list.error && <div className="glass rounded-xl border border-destructive/30 p-4 text-sm"><p className="font-semibold text-destructive">ARIO API unavailable</p><p className="mt-1 break-words text-muted-foreground">{list.error instanceof Error ? list.error.message : "Unknown error"}. Check that the ario-api Edge Function is deployed and has access to the protected_scripts table. Never put the service-role key in browser code.</p></div>}
         {(list.data ?? []).map(item => <div key={item.id} className="glass flex flex-wrap items-center gap-3 rounded-2xl p-4">
           <div className={`grid h-10 w-10 place-items-center rounded-xl ${item.enabled ? "bg-emerald-500/10 text-emerald-400" : "bg-secondary text-muted-foreground"}`}>{item.enabled ? <Eye size={17}/> : <EyeOff size={17}/>}</div>
-          <div className="min-w-0 flex-1"><p className="truncate font-semibold">{item.name}</p><p className="mt-1 text-xs text-muted-foreground">Created {new Date(item.created_at).toLocaleDateString()} · {item.expires_at ? `Expires ${new Date(item.expires_at).toLocaleString()}` : "No expiry"}</p><p className="text-xs text-muted-foreground">{item.last_accessed_at ? `Last request: ${new Date(item.last_accessed_at).toLocaleString()}` : "Never requested"}</p></div>
+          <div className="min-w-0 flex-1"><p className="truncate font-semibold">{item.name}</p><p className="mt-1 text-xs text-muted-foreground">v{item.version ?? 1} · {item.rate_limit_per_minute ?? 60} requests/min · Created {new Date(item.created_at).toLocaleDateString()} · {item.expires_at ? `Expires ${new Date(item.expires_at).toLocaleString()}` : "No expiry"}</p><p className="text-xs text-muted-foreground">{item.last_accessed_at ? `Last request: ${new Date(item.last_accessed_at).toLocaleString()}` : "Never requested"}</p></div>
+          <button className="btn btn-ghost h-10 !px-3 text-xs" disabled={editBusy} onClick={() => void openEditor(item)}><Pencil size={14}/> Edit</button>
+          <button className="btn btn-ghost h-10 !px-3 text-xs" onClick={() => void openHistory(item)}><History size={14}/> Versions</button>
           <button className="btn btn-ghost h-10 !px-3 text-xs" onClick={() => void setEnabled(item)}>{item.enabled ? <><EyeOff size={14}/> Disable</> : <><Eye size={14}/> Enable</>}</button>
           <button aria-label={`Delete ${item.name}`} className="btn btn-ghost h-10 !px-3 text-xs text-destructive" onClick={() => void remove(item)}><Trash2 size={14}/> Delete</button>
         </div>)}
         {list.data && !list.data.length && <div className="glass rounded-2xl p-7 text-center text-sm text-muted-foreground">No API scripts yet. Create your first loader above.</div>}
       </section>
+
+      {historyFor && <section className="glass space-y-3 rounded-2xl p-4 sm:p-5">
+        <div className="flex flex-wrap items-center gap-2"><History size={17} className="text-primary"/><h2 className="font-display text-lg font-semibold">Version history · {historyFor.name}</h2><button className="btn btn-ghost ml-auto" onClick={() => setHistoryFor(null)}>Close</button></div>
+        {historyBusy && <p className="text-sm text-muted-foreground">Loading versions…</p>}
+        {!historyBusy && versions.map(version => <div key={version.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-border/60 p-3">
+          <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary"><span className="text-xs font-bold">v{version.version}</span></div>
+          <div className="min-w-0 flex-1"><p className="font-medium">{version.change_note || "Script version"}</p><p className="text-xs text-muted-foreground">{new Date(version.created_at).toLocaleString()}</p></div>
+          <button className="btn btn-ghost h-9 !px-3 text-xs" onClick={() => void restoreVersion(historyFor, version)}><RotateCcw size={13}/> Restore</button>
+        </div>)}
+        {!historyBusy && versions.length === 0 && <p className="text-sm text-muted-foreground">No version snapshots found. Apply the ARIO protection migration and publish a version to start history.</p>}
+      </section>}
+
+      {auditOpen && <section className="glass space-y-3 rounded-2xl p-4 sm:p-5">
+        <div className="flex flex-wrap items-center gap-2"><Activity size={17} className="text-primary"/><h2 className="font-display text-lg font-semibold">Security audit log</h2><button className="btn btn-ghost ml-auto" onClick={() => setAuditOpen(false)}>Close</button></div>
+        {auditBusy && <p className="text-sm text-muted-foreground">Loading audit events…</p>}
+        {!auditBusy && auditEvents.map(event => <div key={event.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-border/60 p-3">
+          <div className={`grid h-8 w-8 place-items-center rounded-lg ${event.status_code >= 400 ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}><Activity size={14}/></div>
+          <div className="min-w-0 flex-1"><p className="break-words font-medium">{event.event_type.replaceAll("_", " ")}</p><p className="break-all text-xs text-muted-foreground">{event.script_id ?? "System"} · HTTP {event.status_code}</p></div>
+          <span className="text-xs text-muted-foreground">{new Date(event.created_at).toLocaleString()}</span>
+        </div>)}
+        {!auditBusy && auditEvents.length === 0 && <p className="text-sm text-muted-foreground">No events recorded yet.</p>}
+      </section>}
+
+      {editing && <div className="fixed inset-0 z-[80] overflow-y-auto bg-black/70 p-3 backdrop-blur-sm sm:p-4" onClick={() => setEditing(null)}>
+        <section className="glass mx-auto my-6 w-full max-w-3xl space-y-4 rounded-2xl p-4 sm:p-6" onClick={e => e.stopPropagation()}>
+          <div className="flex items-center gap-2"><Pencil size={17} className="text-primary"/><h2 className="font-display text-lg font-semibold">Edit protected script</h2><button className="btn btn-ghost ml-auto" onClick={() => setEditing(null)}>Close</button></div>
+          <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Script name</span><input className="input-base w-full" maxLength={100} value={editName} onChange={e => setEditName(e.target.value)}/></label>
+          <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Change note (saved in history)</span><input className="input-base w-full" maxLength={300} value={editNote} onChange={e => setEditNote(e.target.value)} placeholder="What changed in this version?"/></label>
+          <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Rate limit per client per minute (1–600)</span><input className="input-base w-full" type="number" min={1} max={600} value={editRateLimit} onChange={e => setEditRateLimit(Number(e.target.value))}/></label>
+          <label className="block space-y-1.5 text-sm"><span className="text-muted-foreground">Lua source</span><textarea className="input-base w-full font-mono text-xs" rows={16} spellCheck={false} value={editSource} onChange={e => setEditSource(e.target.value)}/></label>
+          <div className="flex flex-wrap justify-end gap-2"><button className="btn btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn btn-primary" disabled={editBusy} onClick={() => void saveEditor()}><Save size={14}/>{editBusy ? "Saving…" : "Publish new version"}</button></div>
+        </section>
+      </div>}
     </div>
   );
 }
