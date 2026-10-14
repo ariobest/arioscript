@@ -187,6 +187,32 @@ Deno.serve(async (req: Request) => {
         if (rotateError) return json({ error: "Could not generate a fresh loader token", detail: rotateError.message }, 503);
         return json({ script: existing, loaderUrl: `${FUNCTION_URL}?id=${encodeURIComponent(existing.id)}&token=${token}` });
       }
+      if (body?.action === "restore") {
+        if (typeof body.id !== "string" || !/^[a-f0-9-]{36}$/i.test(body.id) ||
+            typeof body.versionId !== "string" || !/^[a-f0-9-]{36}$/i.test(body.versionId)) {
+          return json({ error: "A valid script and version are required." }, 400);
+        }
+        const { data: current, error: currentError } = await db.from("protected_scripts")
+          .select("id,version").eq("id", body.id).maybeSingle();
+        if (currentError) return json({ error: "Could not load current script", detail: currentError.message }, 503);
+        if (!current) return json({ error: "Script not found." }, 404);
+        const { data: snapshot, error: snapshotError } = await db.from("protected_script_versions")
+          .select("name,source,version").eq("id", body.versionId).eq("script_id", body.id).maybeSingle();
+        if (snapshotError) return json({ error: "Could not read version snapshot", detail: snapshotError.message }, 503);
+        if (!snapshot) return json({ error: "That version does not exist for this script." }, 404);
+        const nextVersion = (Number(current.version) || 1) + 1;
+        const { error: updateError } = await db.from("protected_scripts").update({
+          name: snapshot.name, source: snapshot.source, version: nextVersion, updated_at: new Date().toISOString(),
+        }).eq("id", body.id);
+        if (updateError) return json({ error: "Could not restore version", detail: updateError.message }, 503);
+        const { error: versionError } = await db.from("protected_script_versions").insert({
+          script_id: body.id, version: nextVersion, name: snapshot.name, source: snapshot.source,
+          change_note: `Rollback to version ${snapshot.version}`,
+        });
+        if (versionError) return json({ error: "Restored source, but could not record the rollback snapshot.", detail: versionError.message }, 503);
+        await recordEvent(db, { script_id: body.id, event_type: "script_rollback", status_code: 200, metadata: { fromVersion: snapshot.version, toVersion: nextVersion } });
+        return json({ ok: true, version: nextVersion });
+      }
       const name = typeof body?.name === "string" ? body.name.trim().slice(0, 100) : "";
       let source = typeof body?.source === "string" ? body.source : "";
       const rawUrl = typeof body?.rawUrl === "string" ? body.rawUrl.trim() : "";
