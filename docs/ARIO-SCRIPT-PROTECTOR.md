@@ -11,7 +11,8 @@ The new API is a Supabase Edge Function at:
 - `POST` creates a script and returns a one-time loader URL.
 - `PATCH` enables/disables a script.
 - `DELETE` revokes a script.
-- Public script delivery requires the exact `id` and 64-character random `token` in the query string.
+- Public script delivery validates a script ID and 64-character random key. New website loadstrings use the clean path format `https://arioscript.lovable.app/s/<script-id>.<secret-key>` with no `token=` query parameter.
+- The website route proxies the request to the existing Edge Function, which validates the ID/key pair. The secret is still a bearer credential; anyone who receives the complete loader URL can use it until it is rotated or revoked.
 - Only a SHA-256 token hash is stored in `public.protected_scripts`.
 - Source is returned as `text/plain` with caching disabled.
 
@@ -23,7 +24,8 @@ The new API is a Supabase Edge Function at:
 4. Deploy the function.
 5. In the function settings, turn **Verify JWT** off for this function only. The endpoint performs its own checks: per-script tokens for public loader requests and Supabase session/role checks for management requests.
 6. Make sure the function has the built-in `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` secrets available. Never put the service-role key in frontend code, public config, Lua, or GitHub.
-7. Open the website's Admin → API Manager and create a harmless test script. Save the generated loadstring.
+7. Open the website's Admin → API Manager and create a harmless test script. Save the generated loadstring. New generated URLs use `/s/<id>.<key>` instead of `?id=...&token=...`.
+8. Deploy the website build so the new `/s/$key` route is live. The existing Supabase Edge Function can stay deployed as-is; the website route translates the path key into the Edge Function's current request format server-side.
 
 The GitHub/Lovable app deploy does not automatically deploy Supabase Edge Function code. The function itself must be deployed from Supabase.
 
