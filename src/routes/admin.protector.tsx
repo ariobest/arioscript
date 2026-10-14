@@ -93,8 +93,8 @@ function ScriptProtector() {
         body: JSON.stringify({ name, ...(sourceMode === "raw" ? { rawUrl } : { source }), expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null }),
       });
       const upstreamLoader = new URL(result.loaderUrl);
-      const websiteLoader = new URL("/raw/api-loader", window.location.origin);
-      websiteLoader.search = upstreamLoader.search;
+      const loaderKey = `${upstreamLoader.searchParams.get("id") || ""}.${upstreamLoader.searchParams.get("token") || ""}`;
+      const websiteLoader = new URL(`/s/${loaderKey}`, window.location.origin);
       setNewLoader(websiteLoader.toString());
       setLoadstringUrl(websiteLoader.toString());
       setLoadstringError("");
@@ -139,7 +139,7 @@ function ScriptProtector() {
     <div className="min-w-0 space-y-5">
       <div className="flex items-center gap-3">
         <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/15 text-primary"><ShieldCheck size={22}/></div>
-        <div><h1 className="font-display text-2xl font-bold">ARIO API Manager</h1><p className="text-sm text-muted-foreground">Private source storage · token-gated delivery · revocable loaders</p></div>
+        <div><h1 className="font-display text-2xl font-bold">ARIO API Manager</h1><p className="text-sm text-muted-foreground">Private source storage · clean-key URLs · revocable loaders</p></div>
       </div>
 
       <div className="glass flex gap-3 rounded-2xl border border-amber-400/25 p-4 text-sm">
@@ -178,7 +178,7 @@ function ScriptProtector() {
 
       <section className="glass space-y-4 rounded-2xl p-4 sm:p-5">
         <div className="flex items-center gap-2"><Copy size={18} className="text-primary"/><h2 className="font-display text-lg font-semibold">Loadstring Maker</h2></div>
-        <p className="text-sm text-muted-foreground">Paste a protected ARIO website loader URL or the Supabase ario-api loader URL. The maker converts Supabase loader links to your ARIO website endpoint and never embeds the Lua source in the URL.</p>
+        <p className="text-sm text-muted-foreground">Paste a clean ARIO loader URL or a legacy Supabase loader URL. New loaders use a single opaque path key — no token= query string and no Lua source in the URL.</p>
         <label className="block space-y-1.5 text-sm">
           <span className="text-muted-foreground">Choose one of your API scripts</span>
           <select
@@ -203,8 +203,8 @@ function ScriptProtector() {
                   body: JSON.stringify({ action: "rotate", id }),
                 });
                 const upstreamLoader = new URL(result.loaderUrl);
-                const websiteLoader = new URL("/raw/api-loader", window.location.origin);
-                websiteLoader.search = upstreamLoader.search;
+                const loaderKey = `${upstreamLoader.searchParams.get("id") || ""}.${upstreamLoader.searchParams.get("token") || ""}`;
+                const websiteLoader = new URL(`/s/${loaderKey}`, window.location.origin);
                 setLoadstringUrl(websiteLoader.toString());
                 setNewLoader(websiteLoader.toString());
                 toast.success(`New loadstring URL generated for ${item.name}. Save it now.`);
@@ -227,7 +227,7 @@ function ScriptProtector() {
         </label>
         <label className="block space-y-1.5 text-sm">
           <span className="text-muted-foreground">Or paste a protected loader URL</span>
-          <textarea className="input-base w-full break-all font-mono text-xs" rows={2} value={loadstringUrl} onChange={e => { setLoadstringUrl(e.target.value); setLoadstringError(""); }} placeholder="https://arioscript.lovable.app/raw/api-loader?id=...&token=..."/>
+          <textarea className="input-base w-full break-all font-mono text-xs" rows={2} value={loadstringUrl} onChange={e => { setLoadstringUrl(e.target.value); setLoadstringError(""); }} placeholder="https://arioscript.lovable.app/s/script-id.secret-key"/>
         </label>
         {(() => {
           let output = "";
@@ -239,14 +239,21 @@ function ScriptProtector() {
                 throw new Error("Use a valid HTTPS loader URL.");
               }
               const isSupabaseLoader = inputUrl.hostname === "yxbzblbtzqioexszjjkc.supabase.co" && inputUrl.pathname === "/functions/v1/ario-api";
-              const isWebsiteLoader = inputUrl.hostname === "arioscript.lovable.app" && inputUrl.pathname === "/raw/api-loader";
-              if (!isSupabaseLoader && !isWebsiteLoader) {
-                throw new Error("Use an ARIO /raw/api-loader URL or the ARIO Supabase ario-api loader URL.");
+              const isCleanWebsiteLoader = inputUrl.origin === window.location.origin && /^\/s\/[a-f0-9-]{36}\.[a-f0-9]{64}$/i.test(inputUrl.pathname);
+              const isLegacyWebsiteLoader = inputUrl.origin === window.location.origin && inputUrl.pathname === "/raw/api-loader";
+              if (!isSupabaseLoader && !isCleanWebsiteLoader && !isLegacyWebsiteLoader) {
+                throw new Error("Use an ARIO /s/<script-key> URL or a legacy ARIO/Supabase loader URL.");
               }
-              const websiteUrl = new URL("/raw/api-loader", window.location.origin);
-              websiteUrl.search = inputUrl.search;
-              if (!websiteUrl.searchParams.get("id") || !websiteUrl.searchParams.get("token")) {
-                throw new Error("Loader URL must include both id and token. Create a protected loader above first.");
+              let websiteUrl: URL;
+              if (isCleanWebsiteLoader) {
+                websiteUrl = new URL(inputUrl.pathname, window.location.origin);
+              } else {
+                const id = inputUrl.searchParams.get("id") || "";
+                const token = inputUrl.searchParams.get("token") || "";
+                if (!/^[a-f0-9-]{36}$/i.test(id) || !/^[a-f0-9]{64}$/.test(token)) {
+                  throw new Error("Loader URL must include a valid script ID and key. Create a protected loader above first.");
+                }
+                websiteUrl = new URL(`/s/${id}.${token}`, window.location.origin);
               }
               output = `loadstring(game:HttpGet(${JSON.stringify(websiteUrl.toString())}, true))()`;
             } catch (e) {
