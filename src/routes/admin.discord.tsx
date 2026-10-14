@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { Activity, Bot, Check, Code2, Copy, Eye, Hash, MessageSquare, RefreshCw, Send, Server, Shield, Trash2, Users, Volume2, Wifi, Pin, History, Search, Megaphone, Settings2 } from "lucide-react";
 import { toast } from "sonner";
-import { deleteDiscordMessage, editDiscordEmbed, editDiscordJson, getDiscordStatus, sendDiscordEmbed, sendDiscordJson, getDiscordMessages, pinDiscordMessage } from "@/lib/discord.functions";
+import { deleteDiscordMessage, editDiscordEmbed, editDiscordJson, getDiscordStatus, sendDiscordEmbed, sendDiscordJson, getDiscordMessages, pinDiscordMessage, sendDiscordWebhook } from "@/lib/discord.functions";
 
 export const Route = createFileRoute("/admin/discord")({
   head: () => ({ meta: [{ title: "Discord Control — ARIO SCRIPTS" }, { name: "description", content: "Private ARIO Discord server control center." }] }),
@@ -17,6 +17,7 @@ const DEFAULT_JSON = {
 
 function DiscordControl() {
   const [guildId, setGuildId] = useState("");
+  const [webhookUrl, setWebhookUrl] = useState("");
   const [channelId, setChannelId] = useState("");
   const [messageId, setMessageId] = useState("");
   const [status, setStatus] = useState<any>(null);
@@ -41,6 +42,7 @@ function DiscordControl() {
   const editJson = useServerFn(editDiscordJson);
   const loadMessages = useServerFn(getDiscordMessages);
   const pinMessage = useServerFn(pinDiscordMessage);
+  const sendWebhook = useServerFn(sendDiscordWebhook);
 
   const jsonState = useMemo(() => {
     try { return { value: JSON.parse(json), error: "" }; }
@@ -124,6 +126,24 @@ function DiscordControl() {
     finally { setBusy(false); }
   }
 
+  async function sendViaWebhook() {
+    if (!webhookUrl.trim()) return toast.error("Paste a Discord webhook URL first.");
+    let payload: Record<string, unknown>;
+    if (mode === "json") {
+      if (!jsonState.value || typeof jsonState.value !== "object" || Array.isArray(jsonState.value)) return toast.error("Fix the JSON payload first.");
+      payload = jsonState.value as Record<string, unknown>;
+    } else {
+      payload = { content: content || undefined, embeds: [{ title: title || undefined, description: description || undefined, color: parseInt(color.replace("#", ""), 16), footer: { text: "ARIO SCRIPTS" } }] };
+    }
+    setBusy(true);
+    try {
+      await sendWebhook({ data: { webhookUrl: webhookUrl.trim(), payload } });
+      toast.success("Webhook message sent");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Webhook send failed.");
+    } finally { setBusy(false); }
+  }
+
   async function togglePin(message: any) {
     try {
       await pinMessage({
@@ -178,6 +198,23 @@ function DiscordControl() {
           <div className="admin-stat-tile glass rounded-2xl p-4"><Wifi size={16} className="text-primary"/><p className="mt-3 text-lg font-bold">{status.guild.approximate_presence_count ?? "—"}</p><p className="text-xs text-muted-foreground">Online</p></div>
           <div className="admin-stat-tile glass rounded-2xl p-4"><Shield size={16} className="text-primary"/><p className="mt-3 text-lg font-bold">{status.guild.premium_tier ?? 0}</p><p className="text-xs text-muted-foreground">Boost level</p></div>
         </div>}
+      </section>
+
+      <section className="glass rounded-3xl p-4 sm:p-5">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/15 text-primary"><Megaphone size={18}/></span>
+          <div><h2 className="font-display font-semibold">Discord Webhook Sender</h2><p className="text-xs text-muted-foreground">Send embeds directly with a webhook — no bot or server ID required.</p></div>
+          <span className="chip ml-auto text-[10px]">Admin only</span>
+        </div>
+        <label className="mt-4 block text-xs font-semibold text-muted-foreground">Webhook URL
+          <input type="password" autoComplete="off" value={webhookUrl} onChange={e=>setWebhookUrl(e.target.value)} placeholder="https://discord.com/api/webhooks/…" className="input-base mt-1"/>
+        </label>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <button onClick={()=>void sendViaWebhook()} disabled={busy} className="btn btn-primary"><Send size={14}/>{busy ? "Sending…" : "Send using webhook"}</button>
+          <button onClick={()=>{setMode("json");toast.success("Edit the JSON in the editor below, then send via webhook.")}} className="btn btn-ghost"><Code2 size={14}/>Open JSON editor</button>
+          <button onClick={()=>void copyText(JSON.stringify(mode==="json" ? jsonState.value : {content,embeds:[{title,description,color:parseInt(color.replace("#",""),16),footer:{text:"ARIO SCRIPTS"}}]},null,2))} className="btn btn-ghost"><Copy size={14}/>Copy payload</button>
+        </div>
+        <p className="mt-3 text-[11px] text-muted-foreground">Webhook URLs are treated like passwords. They are not saved by this page; keep them private. Webhook sending uses the JSON payload when JSON mode is selected, otherwise it uses the visual builder.</p>
       </section>
 
       {status && <section className="glass rounded-3xl p-4 sm:p-5">
