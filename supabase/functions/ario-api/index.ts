@@ -147,6 +147,16 @@ Deno.serve(async (req: Request) => {
     const db = access.db;
 
     if (req.method === "GET") {
+      if (url.searchParams.get("action") === "source") {
+        const targetId = url.searchParams.get("id") ?? "";
+        if (!/^[a-f0-9-]{36}$/i.test(targetId)) return json({ error: "A valid script ID is required." }, 400);
+        const { data, error } = await db.from("protected_scripts")
+          .select("id,name,source,version,rate_limit_per_minute,enabled")
+          .eq("id", targetId).maybeSingle();
+        if (error) return json({ error: "Could not read script source", detail: error.message }, 503);
+        if (!data) return json({ error: "Script not found." }, 404);
+        return json({ script: data });
+      }
       if (url.searchParams.get("action") === "versions") {
         const targetId = url.searchParams.get("id") ?? "";
         if (!/^[a-f0-9-]{36}$/i.test(targetId)) return json({ error: "A valid script ID is required." }, 400);
