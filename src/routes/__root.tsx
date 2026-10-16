@@ -20,11 +20,12 @@ import { RouteProgress } from "@/components/site/RouteProgress";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="glass max-w-md rounded-2xl p-10 text-center">
-        <h1 className="font-display text-6xl font-bold text-primary">404</h1>
-        <h2 className="mt-3 text-lg font-semibold">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">This script or page doesn't exist.</p>
+    <div className="flex min-h-[65vh] items-center justify-center px-4 py-12">
+      <div className="ario-state-card glass flex max-w-md flex-col items-center rounded-2xl p-8 text-center sm:p-10">
+        <span className="ario-state-icon"><span className="font-mono text-lg">404</span></span>
+        <p className="ario-page-kicker mt-5">PAGE NOT FOUND</p>
+        <h1 className="font-display text-2xl font-bold">This page wandered off.</h1>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">This script or page doesn't exist, or the link may have changed.</p>
         <Link to="/" className="btn btn-primary mt-6">Back home</Link>
       </div>
     </div>
@@ -39,10 +40,12 @@ function ErrorComponent({ error, reset }: { error: unknown; reset: () => void })
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="glass max-w-md rounded-2xl p-10 text-center">
+    <div className="flex min-h-[65vh] items-center justify-center px-4 py-12">
+      <div className="ario-state-card glass flex max-w-md flex-col items-center rounded-2xl p-8 text-center sm:p-10" role="alert">
+        <span className="ario-state-icon ario-state-icon-error"><span className="font-mono text-xl">!</span></span>
+        <p className="ario-page-kicker mt-5">TEMPORARY ERROR</p>
         <h1 className="font-display text-xl font-semibold">This page didn't load</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Something went wrong. Try again or head home.</p>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">Something went wrong. Try again or head home.</p>
         <div className="mt-6 flex justify-center gap-2">
           <button
             onClick={() => {
