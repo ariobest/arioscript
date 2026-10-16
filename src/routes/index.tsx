@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCategories, getGames, getTrending, listScripts } from "@/lib/queries";
-import { ScriptGrid } from "@/components/site/ScriptCard";
+import { ScriptGrid, ScriptGridSkeleton, DataErrorState } from "@/components/site/ScriptCard";
 import { DynamicIcon } from "@/components/site/DynamicIcon";
 import type { Script } from "@/lib/types";
 import { useSettings } from "@/components/site/Layout";
@@ -86,7 +86,7 @@ function Home() {
   return (
     <div className="ario-homepage pb-10">
       {/* HERO */}
-       <section className="mx-auto max-w-7xl px-4 pt-9 sm:pt-20" style={settings?.hero_image_url ? { backgroundImage: `linear-gradient(to bottom, transparent, var(--background)), url("${settings.hero_image_url.replace(/["\\]/g, "")}")`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}>
+       <section className="ario-hero mx-auto max-w-7xl px-4 pt-9 sm:pt-20" style={settings?.hero_image_url ? { backgroundImage: `linear-gradient(to bottom, transparent, var(--background)), url("${settings.hero_image_url.replace(/["\\]/g, "")}")`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}>
         <div className="fade-up mx-auto max-w-3xl text-center">
           <span className="chip mx-auto text-primary">
             <Sparkles size={12} /> Premium script library
@@ -142,27 +142,27 @@ function Home() {
       </section>
 
        {sections.includes("featured") && <Section title="Featured Scripts" icon={Sparkles} to="/scripts">
-        <ScriptGrid scripts={(featured.data ?? []) as Script[]} />
+        {featured.isLoading ? <ScriptGridSkeleton count={4} /> : featured.isError ? <DataErrorState title="This collection couldn’t load" /> : <ScriptGrid scripts={(featured.data ?? []) as Script[]} />}
        </Section>}
 
        {sections.includes("trending") && <Section title="Trending This Week" icon={Flame} to="/scripts">
-        <ScriptGrid scripts={(trending.data ?? []) as Script[]} />
+        {trending.isLoading ? <ScriptGridSkeleton count={4} /> : trending.isError ? <DataErrorState title="This collection couldn’t load" /> : <ScriptGrid scripts={(trending.data ?? []) as Script[]} />}
        </Section>}
 
        {sections.includes("recent") && <Section title="Recently Added" icon={Clock} to="/scripts">
-        <ScriptGrid scripts={(recent.data ?? []) as Script[]} />
+        {recent.isLoading ? <ScriptGridSkeleton count={4} /> : recent.isError ? <DataErrorState title="This collection couldn’t load" /> : <ScriptGrid scripts={(recent.data ?? []) as Script[]} />}
        </Section>}
 
        {sections.includes("downloads") && <Section title="Most Downloaded" icon={Download} to="/scripts">
-        <ScriptGrid scripts={(downloaded.data ?? []) as Script[]} />
+        {downloaded.isLoading ? <ScriptGridSkeleton count={4} /> : downloaded.isError ? <DataErrorState title="This collection couldn’t load" /> : <ScriptGrid scripts={(downloaded.data ?? []) as Script[]} />}
        </Section>}
 
        {sections.includes("views") && <Section title="Most Viewed" icon={Eye} to="/scripts">
-        <ScriptGrid scripts={(viewed.data ?? []) as Script[]} />
+        {viewed.isLoading ? <ScriptGridSkeleton count={4} /> : viewed.isError ? <DataErrorState title="This collection couldn’t load" /> : <ScriptGrid scripts={(viewed.data ?? []) as Script[]} />}
        </Section>}
 
        {sections.includes("copies") && <Section title="Most Copied" icon={Copy} to="/scripts">
-        <ScriptGrid scripts={(copied.data ?? []) as Script[]} />
+        {copied.isLoading ? <ScriptGridSkeleton count={4} /> : copied.isError ? <DataErrorState title="This collection couldn’t load" /> : <ScriptGrid scripts={(copied.data ?? []) as Script[]} />}
        </Section>}
 
        {sections.includes("games") && <Section title="Popular Games" icon={Gamepad2} to="/games">
