@@ -135,11 +135,7 @@ function Browse() {
       </div>
 
       <div className="mt-6">
-        {scripts.isLoading ? (
-          <ScriptGridSkeleton count={8} />
-        ) : (
-          {scripts.isError ? <DataErrorState title="The script library is unavailable" /> : <ScriptGrid scripts={(scripts.data ?? []) as Script[]} />}
-        )}
+        {scripts.isLoading ? <ScriptGridSkeleton count={8} /> : scripts.isError ? <DataErrorState title="The script library is unavailable" /> : <ScriptGrid scripts={(scripts.data ?? []) as Script[]} />}
       </div>
     </div>
   );
