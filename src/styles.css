@@ -1242,3 +1242,34 @@ td, th { border-color: var(--ario-line) !important; }
   transition: none !important;
   scroll-behavior: auto !important;
 }
+
+
+/* Final surface refinements for the main shell, script pages and admin tools. */
+.ario-primary-nav { padding: .28rem; border: 1px solid var(--ario-line); border-radius: .95rem; background: color-mix(in oklab, var(--card) 55%, transparent); }
+.ario-primary-nav .ario-nav-link { padding-inline: .75rem; }
+.ario-primary-nav .ario-nav-active { border-color: var(--ario-line) !important; background: color-mix(in oklab, var(--primary) 13%, var(--card)) !important; color: var(--foreground) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.035); }
+.ario-site-footer { position: relative; border-color: var(--ario-line) !important; }
+.ario-site-footer::before { content: ""; display: block; width: min(8rem, 25vw); height: 1px; margin: -1px auto 2.5rem; background: linear-gradient(90deg, transparent, var(--primary), var(--accent), transparent); opacity: .75; }
+.ario-quick-nav { border-color: color-mix(in oklab, var(--ario-line-strong) 90%, transparent) !important; background: color-mix(in oklab, var(--card) 83%, transparent) !important; box-shadow: 0 18px 55px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.04) !important; backdrop-filter: blur(24px) saturate(160%); }
+.ario-quick-nav a { min-height: 2.7rem; justify-content: center; transition: background .18s ease, color .18s ease, transform .18s ease; }
+.ario-quick-nav a:hover { transform: translateY(-1px); }
+.ario-homepage .ario-hero-search { padding: .35rem; border: 1px solid var(--ario-line-strong); border-radius: 1.05rem; background: color-mix(in oklab, var(--card) 76%, transparent); box-shadow: 0 15px 45px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.035); }
+.ario-homepage .ario-hero-search .input-base { border-color: transparent; background: transparent; box-shadow: none; }
+.ario-homepage .ario-hero-search .btn-primary { margin: .15rem; }
+.ario-code-window { border-radius: 1.1rem !important; border-color: var(--ario-line-strong) !important; box-shadow: 0 22px 60px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.025); }
+.ario-code-toolbar { min-height: 3.5rem; background: color-mix(in oklab, var(--card) 88%, var(--background)) !important; }
+.ario-code-window pre { margin: 0; background: color-mix(in oklab, var(--background) 88%, #05070b); }
+.ario-code-window button { min-height: 2.25rem; }
+.ario-admin-shell .btn { min-height: 2.25rem; }
+.ario-admin-shell .glass { border-radius: 1.1rem; }
+.ario-admin-shell input, .ario-admin-shell textarea, .ario-admin-shell select { border-radius: .75rem; }
+@media (max-width: 1023px) {
+  .ario-primary-nav { display: none; }
+}
+@media (max-width: 639px) {
+  .ario-homepage .ario-hero-search { gap: .35rem; }
+  .ario-homepage .ario-hero-search .input-base { padding-inline: .65rem; font-size: .82rem; }
+  .ario-homepage .ario-hero-search .btn-primary { padding-inline: .8rem; }
+  .ario-quick-nav { max-width: 100%; }
+  .ario-quick-nav a { font-size: 9px; }
+}
