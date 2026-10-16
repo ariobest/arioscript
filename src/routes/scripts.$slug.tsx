@@ -207,7 +207,7 @@ function ScriptPage() {
   const statusColor = s.status === "working" ? "text-[var(--success)]" : s.status === "patched" ? "text-destructive" : "text-[var(--warning)]";
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 pb-28 sm:py-8 sm:pb-8">
+    <div className="ario-page ario-script-detail mx-auto max-w-6xl px-4 py-6 pb-28 sm:py-8 sm:pb-8">
       <Link to="/scripts" className="mb-5 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary">
         <ArrowLeft size={13} /> Back to scripts
       </Link>
