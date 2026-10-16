@@ -1019,3 +1019,226 @@ input, select, textarea, button { font: inherit; }
 .ario-toggle:checked::after { transform: translateX(17px); background: var(--primary-foreground); }
 .ario-toggle:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { .ario-toggle, .ario-toggle::after { transition: none; } }
+
+
+/* ==========================================================================
+   ARIO SCRIPTS — premium interface layer
+   Original design system: deep graphite surfaces, cool blue light, quiet motion.
+   This layer intentionally keeps the existing theme variables and utility
+   classes intact so current settings, routes and admin tools continue working.
+   ========================================================================== */
+:root {
+  --ario-page: #080a10;
+  --ario-panel: #0e111a;
+  --ario-panel-raised: #121724;
+  --ario-line: rgba(177, 193, 225, .12);
+  --ario-line-strong: rgba(177, 193, 225, .2);
+  --ario-text-dim: #9ba7bd;
+  --ario-shadow: 0 22px 70px rgba(0, 0, 0, .22);
+  --radius: 1.05rem;
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+html { background: var(--background); scroll-padding-top: 6rem; }
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 55rem 35rem at 4% -10%, color-mix(in oklab, var(--primary) 12%, transparent), transparent 70%),
+    radial-gradient(ellipse 45rem 32rem at 100% 20%, color-mix(in oklab, var(--accent) 7%, transparent), transparent 72%),
+    linear-gradient(180deg, var(--background), color-mix(in oklab, var(--background) 94%, #101a2c));
+  color: var(--foreground);
+  font-feature-settings: "ss01" on, "cv11" on;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+::selection { background: color-mix(in oklab, var(--primary) 36%, transparent); color: var(--foreground); }
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--primary) 85%, white);
+  outline-offset: 3px;
+}
+a { text-decoration-thickness: .08em; text-underline-offset: .2em; }
+header {
+  border-color: var(--ario-line) !important;
+  background: color-mix(in oklab, var(--background) 78%, transparent) !important;
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+header > div { min-height: 4.15rem; }
+header nav a {
+  position: relative;
+  border: 1px solid transparent;
+  border-radius: .75rem !important;
+  transition: color .18s ease, background .18s ease, border-color .18s ease, transform .18s ease;
+}
+header nav a:hover { border-color: var(--ario-line); transform: translateY(-1px); }
+.glass {
+  border: 1px solid var(--ario-line);
+  background: linear-gradient(145deg, color-mix(in oklab, var(--card) 94%, white 2%), color-mix(in oklab, var(--card) 96%, var(--primary) 4%));
+  box-shadow: 0 12px 38px rgba(0,0,0,.09), inset 0 1px 0 rgba(255,255,255,.025);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.card-hover, .script-grid > a, .home-content-section .glass {
+  transition: transform .24s cubic-bezier(.2,.75,.25,1), border-color .24s ease, box-shadow .24s ease, background .24s ease;
+}
+.card-hover:hover, .script-grid > a:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in oklab, var(--primary) 42%, var(--ario-line));
+  box-shadow: 0 22px 55px rgba(0,0,0,.2), 0 0 0 1px color-mix(in oklab, var(--primary) 9%, transparent);
+}
+.script-grid { gap: 1.1rem !important; }
+.script-grid > a { border-radius: 1.15rem !important; }
+.script-grid > a > div:first-child { background: color-mix(in oklab, var(--secondary) 85%, var(--primary) 15%); }
+.script-grid > a img { transition: transform .55s cubic-bezier(.2,.75,.25,1), filter .35s ease; }
+.script-grid > a:hover img { filter: saturate(1.08); }
+.script-grid > a h3 { letter-spacing: -.025em; }
+.chip {
+  border: 1px solid color-mix(in oklab, var(--ario-line-strong) 75%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--card) 82%, transparent);
+  padding: .28rem .58rem;
+  font-weight: 550;
+  letter-spacing: .005em;
+}
+.btn {
+  border-radius: .8rem;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease, color .18s ease;
+}
+.btn:active { transform: translateY(1px) scale(.985); }
+.btn-primary {
+  border: 1px solid color-mix(in oklab, var(--primary) 70%, white 5%);
+  background: linear-gradient(135deg, color-mix(in oklab, var(--primary) 94%, white 6%), var(--primary));
+  box-shadow: 0 6px 18px color-mix(in oklab, var(--primary) 21%, transparent), inset 0 1px 0 rgba(255,255,255,.13);
+}
+.btn-primary:hover {
+  box-shadow: 0 9px 28px color-mix(in oklab, var(--primary) 30%, transparent), inset 0 1px 0 rgba(255,255,255,.18);
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+.btn-ghost {
+  border: 1px solid var(--ario-line);
+  background: color-mix(in oklab, var(--card) 60%, transparent);
+}
+.btn-ghost:hover { border-color: var(--ario-line-strong); background: color-mix(in oklab, var(--secondary) 88%, transparent); }
+.input-base, input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select {
+  border-color: var(--ario-line-strong);
+  border-radius: .8rem;
+  background: color-mix(in oklab, var(--background) 76%, var(--card));
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.input-base:focus, input:focus, textarea:focus, select:focus {
+  border-color: color-mix(in oklab, var(--primary) 72%, white 4%);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 13%, transparent);
+  outline: none;
+}
+input::placeholder, textarea::placeholder { color: var(--muted-foreground); opacity: .82; }
+.hero-title { line-height: 1.02; letter-spacing: -.055em; }
+.hero-kicker {
+  display: block;
+  margin-bottom: .8rem;
+  color: var(--muted-foreground);
+  font: 600 .68rem/1.4 var(--font-mono);
+  letter-spacing: .2em;
+}
+.hero-title-main {
+  display: block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  background: linear-gradient(110deg, var(--foreground) 5%, color-mix(in oklab, var(--primary) 78%, white) 52%, color-mix(in oklab, var(--accent) 75%, white) 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 8px 30px color-mix(in oklab, var(--primary) 10%, transparent));
+}
+.hero-title-sub { display: block; margin-top: 1rem; font-size: clamp(1rem, 2.2vw, 1.45rem); font-weight: 550; line-height: 1.4; letter-spacing: -.035em; }
+.hero-title-sub span { color: var(--primary); }
+.hero-title-line {
+  width: 4.2rem;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  box-shadow: 0 0 22px color-mix(in oklab, var(--primary) 35%, transparent);
+}
+.home-content-section { margin-top: clamp(2.5rem, 5vw, 4.25rem) !important; }
+.home-content-section > div:first-child h2 { letter-spacing: -.035em; }
+.home-content-section > div:first-child > span {
+  border: 1px solid color-mix(in oklab, var(--primary) 20%, transparent);
+  background: color-mix(in oklab, var(--primary) 10%, var(--card));
+}
+main { min-width: 0; }
+main h1, main h2, main h3 { text-wrap: pretty; }
+main h1 { letter-spacing: -.045em; }
+pre {
+  border-radius: 0 0 1rem 1rem;
+  scrollbar-color: color-mix(in oklab, var(--primary) 45%, var(--secondary)) transparent;
+  tab-size: 2;
+}
+pre code { white-space: pre; }
+table { border-collapse: separate; border-spacing: 0; }
+th { color: var(--muted-foreground); font-size: .72rem; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; }
+td, th { border-color: var(--ario-line) !important; }
+[role="dialog"], [data-radix-popper-content-wrapper] > *, [role="menu"], [role="listbox"] {
+  border-color: var(--ario-line-strong);
+  box-shadow: var(--ario-shadow);
+}
+.ario-admin-shell { background-color: transparent; }
+.ario-admin-shell .glass { box-shadow: 0 16px 44px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.025); }
+.ario-admin-shell aside a { border: 1px solid transparent; }
+.ario-admin-shell aside a:hover { border-color: var(--ario-line); }
+.ario-admin-shell aside a[aria-current="page"] { border-color: color-mix(in oklab, var(--primary) 25%, transparent) !important; }
+.ario-admin-shell main, .ario-admin-shell [role="main"] { min-width: 0; }
+.ario-admin-shell input, .ario-admin-shell textarea, .ario-admin-shell select { max-width: 100%; }
+.ario-toast { border-radius: .9rem !important; }
+.fade-up { animation: ario-enter .5s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes ario-enter { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes ario-soft-pulse { 0%,100% { opacity: .45; } 50% { opacity: .8; } }
+.skeleton, [data-loading="true"] .skeleton {
+  color: transparent !important;
+  border-color: transparent !important;
+  background: linear-gradient(100deg, var(--secondary) 20%, color-mix(in oklab, var(--secondary) 55%, var(--foreground) 10%) 38%, var(--secondary) 56%);
+  background-size: 220% 100%;
+  animation: ario-shimmer 1.45s ease-in-out infinite;
+}
+@keyframes ario-shimmer { to { background-position-x: -220%; } }
+[data-mode="light"] {
+  --ario-page: #f5f7fc;
+  --ario-panel: #fff;
+  --ario-panel-raised: #f4f6fb;
+  --ario-line: rgba(40, 54, 82, .1);
+  --ario-line-strong: rgba(40, 54, 82, .17);
+  --ario-text-dim: #5f6b80;
+  color-scheme: light;
+}
+[data-mode="light"] body {
+  background:
+    radial-gradient(ellipse 55rem 35rem at 4% -10%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 70%),
+    radial-gradient(ellipse 45rem 32rem at 100% 20%, color-mix(in oklab, var(--accent) 7%, transparent), transparent 72%),
+    linear-gradient(180deg, var(--background), color-mix(in oklab, var(--background) 96%, #e8edf8));
+}
+[data-mode="light"] .glass { background: linear-gradient(145deg, rgba(255,255,255,.94), color-mix(in oklab, var(--card) 96%, var(--primary) 4%)); box-shadow: 0 14px 38px rgba(30,45,75,.055), inset 0 1px 0 rgba(255,255,255,.8); }
+[data-mode="light"] .btn-ghost { background: rgba(255,255,255,.66); }
+[data-mode="light"] .input-base, [data-mode="light"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), [data-mode="light"] textarea, [data-mode="light"] select { background: rgba(255,255,255,.82); }
+[data-mode="light"] .script-grid > a:hover { box-shadow: 0 22px 55px rgba(30,45,75,.1); }
+@media (max-width: 767px) {
+  header > div { min-height: 3.75rem; }
+  .script-grid { gap: .8rem !important; }
+  .home-content-section { padding-inline: 1rem; }
+  .hero-title { letter-spacing: -.04em; }
+  .home-content-section .glass { min-width: 0; }
+  .ario-admin-shell > div { padding-inline: .65rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+[data-motion="off"] *, [data-motion="off"] *::before, [data-motion="off"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
