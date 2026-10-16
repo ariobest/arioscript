@@ -107,8 +107,8 @@ function AuthPage() {
   }
 
   return (
-    <div className="mx-auto flex max-w-md flex-col px-4 py-16">
-      <div className="glass fade-up rounded-2xl p-7">
+    <div className="ario-page ario-auth-page mx-auto flex max-w-md flex-col px-4 py-16">
+      <div className="ario-auth-card glass fade-up rounded-2xl p-7">
         <div className={`auth-cat-wrap ${passwordFocus ? "auth-cat-away" : ""}`} aria-hidden="true"><span className="auth-cat mx-auto h-16 w-16" style={{ WebkitMaskImage: "url(https://arioscript.lovable.app/__l5e/assets-v1/193455b7-1a87-4e65-950a-dbf7cc575bad/ario-logo.png)", maskImage: "url(https://arioscript.lovable.app/__l5e/assets-v1/193455b7-1a87-4e65-950a-dbf7cc575bad/ario-logo.png)", WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat", WebkitMaskPosition: "center", maskPosition: "center", WebkitMaskSize: "contain", maskSize: "contain" }} /></div>
         <h1 className="mt-4 text-center font-display text-xl font-bold">
           {mode === "signin" ? "Sign in to ARIO SCRIPTS" : "Create your account"}

@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Gamepad2, Eye } from "lucide-react";
 import { getGames } from "@/lib/queries";
 import { compact } from "@/lib/format";
+import { Skeleton } from "@/components/ui/skeleton";
+import { DataErrorState } from "@/components/site/ScriptCard";
 
 export const Route = createFileRoute("/games/")({
   head: () => ({
@@ -22,11 +24,10 @@ function Games() {
   const games = useQuery({ queryKey: ["games"], queryFn: getGames });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10">
-      <h1 className="font-display text-2xl font-bold sm:text-3xl">Games</h1>
-      <p className="mt-1 text-sm text-muted-foreground">{games.data?.length ?? 0} games in the database</p>
+    <div className="ario-page ario-games-page mx-auto max-w-7xl px-4 py-10">
+      <div className="ario-page-header"><span className="ario-page-kicker">LIBRARY / GAMES</span><h1 className="font-display text-2xl font-bold sm:text-3xl">Games</h1><p className="mt-2 text-sm text-muted-foreground">{games.data?.length ?? 0} games in the library</p></div>
 
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      {games.isError ? <DataErrorState title="Games couldn’t load" /> : games.isLoading ? <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" role="status" aria-label="Loading games">{Array.from({ length: 8 }, (_, i) => <div key={i} className="glass overflow-hidden rounded-2xl"><Skeleton className="aspect-[16/9] w-full rounded-none" /><div className="space-y-3 p-4"><Skeleton className="h-4 w-2/3" /><Skeleton className="h-3 w-1/2" /></div></div>)}</div> : <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {(games.data ?? []).map((g) => (
           <Link key={g.game} to="/games/$game" params={{ game: g.game }} className="glass card-hover overflow-hidden rounded-2xl">
             <div className="aspect-[16/9] bg-secondary">
@@ -45,7 +46,7 @@ function Games() {
             </div>
           </Link>
         ))}
-      </div>
+      </div>}
     </div>
   );
 }

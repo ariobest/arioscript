@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SCRIPT_SELECT } from "@/lib/queries";
 import { CodeViewer } from "@/components/site/CodeViewer";
+import { DataErrorState } from "@/components/site/ScriptCard";
+import { Skeleton } from "@/components/ui/skeleton";
 import { recordEvent } from "@/lib/events";
 import { useAuth } from "@/hooks/useAuth";
 import { compact, formatDate } from "@/lib/format";
@@ -90,13 +92,14 @@ function ScriptPage() {
   }, [script.data?.id, slug, qc]);
 
   if (script.isLoading) {
-    return <div className="mx-auto max-w-5xl px-4 py-20 text-center text-sm text-muted-foreground">Loading script…</div>;
+    return <div className="ario-page mx-auto max-w-5xl px-4 py-10" role="status" aria-label="Loading script"><div className="glass rounded-2xl p-5 sm:p-7"><Skeleton className="h-3 w-28" /><Skeleton className="mt-5 h-8 w-2/3" /><Skeleton className="mt-3 h-4 w-1/3" /><div className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]"><div className="space-y-4"><Skeleton className="h-44 w-full rounded-xl" /><Skeleton className="h-64 w-full rounded-xl" /></div><Skeleton className="h-56 w-full rounded-xl" /></div></div><span className="sr-only">Loading script details…</span></div>;
   }
+  if (script.isError) return <div className="mx-auto max-w-5xl px-4 py-10"><DataErrorState title="This script couldn’t load" message="The script details are temporarily unavailable. Try again in a moment." /></div>;
   const s = script.data;
   if (!s) {
     return (
-      <div className="mx-auto max-w-lg px-4 py-24 text-center">
-        <h1 className="font-display text-xl font-semibold">Script not found</h1>
+      <div className="ario-state-card ario-empty-state glass mx-auto my-16 flex max-w-lg flex-col items-center rounded-2xl px-6 py-12 text-center">
+        <span className="ario-state-icon"><span className="font-mono text-lg">404</span></span><h1 className="mt-4 font-display text-xl font-semibold">Script not found</h1><p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">This script may have been removed or the link may be incorrect.</p>
         <Link to="/scripts" className="btn btn-primary mt-6">Browse scripts</Link>
       </div>
     );
@@ -204,7 +207,7 @@ function ScriptPage() {
   const statusColor = s.status === "working" ? "text-[var(--success)]" : s.status === "patched" ? "text-destructive" : "text-[var(--warning)]";
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 pb-28 sm:py-8 sm:pb-8">
+    <div className="ario-page ario-script-detail mx-auto max-w-6xl px-4 py-6 pb-28 sm:py-8 sm:pb-8">
       <Link to="/scripts" className="mb-5 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary">
         <ArrowLeft size={13} /> Back to scripts
       </Link>

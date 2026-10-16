@@ -55,8 +55,8 @@ function AdminLogin() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 py-20">
-      <div className="glass fade-up rounded-2xl p-7">
+    <div className="ario-page ario-admin-login mx-auto max-w-md px-4 py-20">
+      <div className="ario-auth-card glass fade-up rounded-2xl p-7">
         <span className="mx-auto grid h-11 w-11 place-items-center rounded-2xl bg-primary/15 text-primary glow-ring">
           <Lock size={19} />
         </span>
@@ -88,7 +88,7 @@ function AdminLayout() {
 
   if (!isStaff) {
     return (
-      <div className="mx-auto max-w-md px-4 py-24 text-center">
+      <div className="ario-state-card glass mx-auto my-16 max-w-md rounded-2xl px-6 py-12 text-center">
         <Shield size={30} className="mx-auto text-destructive" />
         <h1 className="mt-3 font-display text-xl font-semibold">Access denied</h1>
         <p className="mt-2 text-sm text-muted-foreground">Your account ({profile?.username}) is not an administrator.</p>

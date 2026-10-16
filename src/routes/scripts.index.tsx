@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { getCategories, listScripts } from "@/lib/queries";
-import { ScriptGrid } from "@/components/site/ScriptCard";
+import { ScriptGrid, ScriptGridSkeleton, DataErrorState } from "@/components/site/ScriptCard";
 import type { Script } from "@/lib/types";
 
 type SearchParams = {
@@ -70,8 +70,8 @@ function Browse() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10">
-      <h1 className="font-display text-2xl font-bold sm:text-3xl">Browse scripts</h1>
+    <div className="ario-page ario-browse-page mx-auto max-w-7xl px-4 py-10">
+      <div className="ario-page-header"><span className="ario-page-kicker">LIBRARY / DISCOVER</span><h1 className="font-display text-2xl font-bold sm:text-3xl">Browse scripts</h1><p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">Explore the collection, narrow it down by game or category, and find the script you need.</p></div>
       <p className="mt-1 text-sm text-muted-foreground">
         {scripts.data?.length ?? 0} script{(scripts.data?.length ?? 0) === 1 ? "" : "s"} found
       </p>
@@ -92,7 +92,7 @@ function Browse() {
         />
       </form>
 
-      <div className="glass no-scrollbar mt-4 flex items-center gap-2 rounded-2xl p-3 max-sm:flex-nowrap max-sm:overflow-x-auto sm:flex-wrap">
+      <div className="ario-filter-bar glass no-scrollbar mt-4 flex items-center gap-2 rounded-2xl p-3 max-sm:flex-nowrap max-sm:overflow-x-auto sm:flex-wrap">
         <SlidersHorizontal size={15} className="text-primary" />
         {SORTS.map((s) => (
           <button
@@ -135,11 +135,7 @@ function Browse() {
       </div>
 
       <div className="mt-6">
-        {scripts.isLoading ? (
-          <div className="glass rounded-2xl p-10 text-center text-sm text-muted-foreground">Loading scripts…</div>
-        ) : (
-          <ScriptGrid scripts={(scripts.data ?? []) as Script[]} />
-        )}
+        {scripts.isLoading ? <ScriptGridSkeleton count={8} /> : scripts.isError ? <DataErrorState title="The script library is unavailable" /> : <ScriptGrid scripts={(scripts.data ?? []) as Script[]} />}
       </div>
     </div>
   );
