@@ -107,13 +107,13 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             </span>
           </Link>
 
-          <nav className="ml-4 hidden items-center gap-1 lg:flex">
+          <nav className="ario-primary-nav ml-4 hidden items-center gap-1 lg:flex">
             {NAV.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
-                className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                activeProps={{ className: "rounded-lg px-3 py-2 text-sm text-foreground bg-secondary" }}
+                className="ario-nav-link rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                activeProps={{ className: "ario-nav-link ario-nav-active rounded-lg px-3 py-2 text-sm text-foreground bg-secondary" }}
               >
                 {n.label}
               </Link>
@@ -186,7 +186,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
       <main className="flex-1">{settings?.maintenance_mode && !isStaff && !pathname.startsWith("/auth") && !pathname.startsWith("/admin") ? <div className="mx-auto max-w-xl px-4 py-28 text-center"><h1 className="text-2xl font-bold">{settings.site_name} is under maintenance</h1><p className="mt-3 text-muted-foreground">Please check back soon.</p></div> : children}</main>
 
-      <footer className="mt-16 border-t border-border py-10">
+      <footer className="ario-site-footer mt-16 border-t border-border py-10">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-5 px-4 text-center">
           <Link to="/" className="flex items-center gap-2">
             <span className="grid h-8 w-8 place-items-center rounded-xl bg-primary/15 text-primary">
@@ -219,7 +219,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       </footer>
       <div className="h-20" aria-hidden />
       <nav className="fixed inset-x-0 bottom-3 z-40 flex justify-center px-3" aria-label="Quick navigation">
-        <div className="glass flex w-full max-w-md items-center justify-between gap-1 rounded-2xl border border-border p-1.5 shadow-lg">
+        <div className="ario-quick-nav glass flex w-full max-w-md items-center justify-between gap-1 rounded-2xl border border-border p-1.5 shadow-lg">
           {[{ to: "/", label: "Home", icon: Terminal }, ...NAV.filter(n => n.to !== "/categories")].map(n => {
             const active = n.to === "/" ? pathname === "/" : pathname.startsWith(n.to);
             return (
