@@ -84,7 +84,7 @@ function Home() {
 
 
   return (
-    <div className="pb-10">
+    <div className="ario-homepage pb-10">
       {/* HERO */}
        <section className="mx-auto max-w-7xl px-4 pt-9 sm:pt-20" style={settings?.hero_image_url ? { backgroundImage: `linear-gradient(to bottom, transparent, var(--background)), url("${settings.hero_image_url.replace(/["\\]/g, "")}")`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}>
         <div className="fade-up mx-auto max-w-3xl text-center">
@@ -101,7 +101,7 @@ function Home() {
             {settings?.description ?? SITE_BRAND.description}
           </p>
 
-          <form onSubmit={search} className="relative mx-auto mt-8 grid max-w-xl grid-cols-[minmax(0,1fr)_auto] gap-2 sm:block">
+          <form onSubmit={search} role="search" aria-label="Search the script library" className="ario-hero-search relative mx-auto mt-8 grid max-w-xl grid-cols-[minmax(0,1fr)_auto] gap-2 sm:block">
             <Search size={18} className="absolute left-4 top-1/2 hidden -translate-y-1/2 text-muted-foreground sm:block" />
             <input
               value={q}
