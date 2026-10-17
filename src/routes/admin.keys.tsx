@@ -114,7 +114,7 @@ function AdminKeys() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="flex items-center gap-2 font-display text-2xl font-bold"><KeyRound className="text-primary" /> Keys</h1>
+        <h1 className="flex items-center gap-2 font-display text-2xl font-bold"><KeyRound className="text-primary" /> Key System</h1>
         {s && <Button variant={s.enabled ? "default" : "outline"} onClick={() => void saveSettings({ enabled: !s.enabled })}>Key system: {s.enabled ? "ON" : "OFF"}</Button>}
       </div>
 
@@ -197,6 +197,7 @@ function AdminKeys() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
@@ -231,7 +232,35 @@ function LoaderBuilder() {
     a.href = URL.createObjectURL(new Blob([code], { type: "text/plain" }));
     a.download = `ario-key-${style}.lua`; a.click();
   }
+  const [verifyInput, setVerifyInput] = useState("");
+  const [verifyResult, setVerifyResult] = useState<{ message: string; ok: boolean } | null>(null);
+  const [verifying, setVerifying] = useState(false);
+  async function verifyKey() {
+    const key = verifyInput.trim();
+    if (!key) { setVerifyResult({ message: "Enter a key to verify.", ok: false }); return; }
+    setVerifying(true); setVerifyResult(null);
+    try {
+      const response = await fetch(`${origin}/api/public/keys/validate?key=${encodeURIComponent(key)}`, { headers: { Accept: "application/json" } });
+      const body = await response.json().catch(() => null) as { valid?: boolean; message?: string; error?: string } | null;
+      setVerifyResult({ ok: response.ok && body?.valid === true, message: body?.valid === true ? "Key is valid and active." : body?.message || body?.error || "Key is invalid, expired, or inactive." });
+    } catch {
+      setVerifyResult({ ok: false, message: "Could not reach the validator. Check the API deployment and try again." });
+    } finally { setVerifying(false); }
+  }
+
   return (
+    <>
+    <div className="glass rounded-2xl p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div><h2 className="flex items-center gap-2 font-semibold"><ShieldCheck size={16} className="text-primary" /> Verify a key</h2><p className="mt-1 text-xs text-muted-foreground">Test a key against the live ARIO validator.</p></div>
+        <a className="btn btn-ghost inline-flex items-center gap-2" href={`${origin}/keys`} target="_blank" rel="noreferrer"><Link2 size={14}/> Open Get Key page</a>
+      </div>
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+        <input className="input-base min-w-0 flex-1 font-mono" value={verifyInput} onChange={e => { setVerifyInput(e.target.value); setVerifyResult(null); }} placeholder="ARIO-XXXXXXXX-XXXXXXXX-XXXXXXXX" autoComplete="off" />
+        <Button onClick={() => void verifyKey()} disabled={verifying || !verifyInput.trim()}><ShieldCheck size={14}/>{verifying ? "Checking…" : "Verify key"}</Button>
+      </div>
+      {verifyResult && <p role="status" className={`mt-3 rounded-xl border p-3 text-sm ${verifyResult.ok ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" : "border-destructive/30 bg-destructive/10 text-destructive"}`}>{verifyResult.message}</p>}
+    </div>
     <div className="glass rounded-2xl p-5">
       <h2 className="flex items-center gap-2 font-semibold"><Gamepad2 size={16} className="text-primary" /> Roblox key menus</h2>
       <p className="mt-1 text-xs text-muted-foreground">Pick a style and script. Players get a Get Key button, the key is checked with your site, then your script runs.</p>
