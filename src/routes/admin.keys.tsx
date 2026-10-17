@@ -28,7 +28,7 @@ function AdminKeys() {
   const [gen, setGen] = useState({ type: "free", count: 1, hours: 24, maxUses: "", notes: "", username: "" });
   const [historyOpen, setHistoryOpen] = useState(false);
 
-  const settings = useQuery({ queryKey: ["key_settings_admin"], enabled: isAdmin, queryFn: async () => (await supabase.from("key_settings").select("*").eq("id", 1).single()).data });
+  const settings = useQuery({ queryKey: ["key_settings_admin"], enabled: isAdmin, queryFn: async () => { const { data, error } = await supabase.from("key_settings").select("*").limit(1).single(); if (error) throw error; return data; } });
   const stats = useQuery({ queryKey: ["key_stats"], enabled: isAdmin, queryFn: async () => { const { data, error } = await supabase.rpc("admin_key_stats"); if (error) throw error; return data as unknown as Stats; } });
   const history = useQuery({ queryKey: ["key_usage_history"], enabled: isAdmin && historyOpen, queryFn: async () => { const { data, error } = await supabase.from("key_checks").select("id, ok, created_at").order("created_at", { ascending: false }).limit(100); if (error) throw error; return data ?? []; } });
 
@@ -53,7 +53,9 @@ function AdminKeys() {
   if (!isAdmin) return <p className="text-sm text-muted-foreground">Only administrators can manage keys.</p>;
 
   async function saveSettings(patch: Record<string, unknown>) {
-    const { error } = await supabase.from("key_settings").update({ ...patch, updated_at: new Date().toISOString() }).eq("id", 1);
+    const settingId = settings.data?.id;
+    if (!settingId) return toast.error("Key settings are not loaded yet");
+    const { error } = await supabase.from("key_settings").update({ ...patch, updated_at: new Date().toISOString() }).eq("id", settingId);
     if (error) return toast.error(error.message);
     toast.success("Key settings saved");
     void qc.invalidateQueries({ queryKey: ["key_settings_admin"] });
