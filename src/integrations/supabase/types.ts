@@ -229,9 +229,12 @@ export type Database = {
       license_keys: {
         Row: {
           active: boolean
+          activated_at: string | null
           created_at: string
           created_by: string | null
+          duration_hours: number | null
           expires_at: string | null
+          hardware_id: string | null
           id: string
           key: string
           key_type: string
@@ -243,9 +246,12 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          activated_at?: string | null
           created_at?: string
           created_by?: string | null
+          duration_hours?: number | null
           expires_at?: string | null
+          hardware_id?: string | null
           id?: string
           key: string
           key_type?: string
@@ -257,9 +263,12 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          activated_at?: string | null
           created_at?: string
           created_by?: string | null
+          duration_hours?: number | null
           expires_at?: string | null
+          hardware_id?: string | null
           id?: string
           key?: string
           key_type?: string
@@ -862,7 +871,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
-      validate_key: { Args: { _key: string }; Returns: Json }
+      validate_key: { Args: { _key: string; _hardware_id: string }; Returns: Json }
     }
     Enums: {
       app_role: "user" | "moderator" | "admin"
