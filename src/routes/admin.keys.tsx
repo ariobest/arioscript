@@ -197,7 +197,6 @@ function AdminKeys() {
         </div>
       </div>
     </div>
-    </>
   );
 }
 
@@ -290,5 +289,6 @@ function LoaderBuilder() {
         <Button variant="outline" onClick={download}><Download size={14} /> .lua file</Button>
       </div>
     </div>
+    </>
   );
 }
