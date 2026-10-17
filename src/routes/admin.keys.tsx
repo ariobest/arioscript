@@ -226,7 +226,8 @@ function LoaderBuilder() {
   async function testValidator() {
     setCheckingValidator(true); setValidatorStatus("");
     try {
-      const testUrl = effectiveValidator.includes("{key}") ? effectiveValidator.replaceAll("{key}", "ARIO-TEST-KEY") : effectiveValidator.includes("key=") ? effectiveValidator + "ARIO-TEST-KEY" : effectiveValidator;
+      let testUrl = effectiveValidator.includes("{key}") ? effectiveValidator.replaceAll("{key}", "ARIO-TEST-KEY") : effectiveValidator.includes("key=") ? effectiveValidator + "ARIO-TEST-KEY" : effectiveValidator + (effectiveValidator.includes("?") ? "&" : "?") + "key=ARIO-TEST-KEY";
+      testUrl += (testUrl.includes("?") ? "&" : "?") + "device_id=ARIO-ADMIN-VALIDATOR-TEST-DEVICE";
       const response = await fetch(testUrl, { method: "GET", headers: { Accept: "application/json, text/plain" } });
       const body = (await response.text()).slice(0, 180);
       setValidatorStatus(`HTTP ${response.status} ${response.statusText}${body ? ` — ${body}` : ""}`);
