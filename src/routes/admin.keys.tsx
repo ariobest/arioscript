@@ -15,7 +15,7 @@ export const Route = createFileRoute("/admin/keys")({
   component: AdminKeys,
 });
 
-type K = { id: string; key: string; key_type: string; user_id: string | null; expires_at: string | null; max_uses: number | null; uses: number; active: boolean; notes: string | null; created_at: string; profiles?: { username: string } | null };
+type K = { id: string; key: string; key_type: string; user_id: string | null; expires_at: string | null; activated_at: string | null; duration_hours: number | null; hardware_id: string | null; max_uses: number | null; uses: number; active: boolean; notes: string | null; created_at: string; profiles?: { username: string } | null };
 type Stats = Record<"total" | "active" | "expired" | "premium" | "lifetime" | "today" | "checks" | "failed", number>;
 
 function AdminKeys() {
@@ -111,7 +111,7 @@ function AdminKeys() {
 
   const s = settings.data;
   const st = stats.data;
-  const validateUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/api/public/keys/validate?key=`;
+  const validateUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/api/public/keys/validate`;
 
   return (
     <div className="space-y-6">
@@ -147,8 +147,14 @@ function AdminKeys() {
             <label>Free key hours<input className="input-base mt-1" type="number" defaultValue={s.free_hours} onBlur={e => void saveSettings({ free_hours: Number(e.target.value) })} /></label>
             <label>Premium hours<input className="input-base mt-1" type="number" defaultValue={s.premium_hours} onBlur={e => void saveSettings({ premium_hours: Number(e.target.value) })} /></label><label>Max active / user<input className="input-base mt-1" type="number" min={1} max={10} defaultValue={s.max_active_keys ?? 1} onBlur={e => void saveSettings({ max_active_keys: Math.min(10, Math.max(1, Number(e.target.value))) })} /></label>
           </div>}
-          <div className="mt-4 flex flex-wrap gap-2"><Button size="sm" variant="outline" onClick={() => void navigator.clipboard.writeText(validateUrl).then(() => toast.success("Validation URL copied"))}><Link2 size={14}/> Copy validation URL</Button><Button size="sm" variant="outline" onClick={() => setHistoryOpen(v => !v)}><History size={14}/> {historyOpen ? "Hide" : "View"} usage history</Button></div><p className="mt-4 text-xs text-muted-foreground">Check a key from your Lua script:</p>
-          <code className="mt-1 block break-all rounded-lg bg-background/50 p-2 font-mono text-xs">{`local ok = game:HttpGet("${validateUrl}" .. key)`}</code>
+          <div className="mt-4 flex flex-wrap gap-2"><Button size="sm" variant="outline" onClick={() => void navigator.clipboard.writeText(validateUrl).then(() => toast.success("Validation URL copied"))}><Link2 size={14}/> Copy validation URL</Button><Button size="sm" variant="outline" onClick={() => setHistoryOpen(v => !v)}><History size={14}/> {historyOpen ? "Hide" : "View"} usage history</Button></div><p className="mt-4 text-xs text-muted-foreground">Check a key from your Lua script (device-bound):</p>
+          <code className="mt-1 block break-all rounded-lg bg-background/50 p-2 font-mono text-xs">{`local Http = game:GetService("HttpService")
+local deviceId = game:GetService("RbxAnalyticsService"):GetClientId()
+local url = "${validateUrl}?key=" .. Http:UrlEncode(key) .. "&device_id=" .. Http:UrlEncode(deviceId)
+local result = Http:JSONDecode(game:HttpGet(url))
+if result.valid then
+  print("ARIO key valid")
+end`}</code>
           {historyOpen && <div className="mt-3 rounded-xl border border-border/60 bg-background/20 p-3"><div className="mb-2 flex items-center justify-between"><span className="text-xs font-semibold">Recent validation checks</span><span className="text-[10px] text-muted-foreground">Last 100</span></div><div className="grid max-h-40 grid-cols-2 gap-1.5 overflow-auto sm:grid-cols-4">{(history.data ?? []).map(h => <div key={h.id} className="rounded-lg border border-border/50 p-2 text-[10px]"><span className={h.ok ? "text-emerald-400" : "text-destructive"}>{h.ok ? "VALID" : "FAILED"}</span><span className="ml-2 text-muted-foreground">{new Date(h.created_at).toLocaleString()}</span></div>)}</div>{!history.isLoading && !(history.data ?? []).length && <p className="text-xs text-muted-foreground">No validation checks yet.</p>}</div>}
         </div>
       </div>
@@ -165,7 +171,7 @@ function AdminKeys() {
         <div className="flex flex-wrap gap-2">
           <div className="relative min-w-0 flex-1"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" /><input className="input-base !pl-9" value={q} onChange={e => setQ(e.target.value)} placeholder="Search key, owner, notes" /></div>
           <select className="input-base !w-auto" value={type} onChange={e => setType(e.target.value)}><option value="all">All types</option><option value="free">Free</option><option value="premium">Premium</option><option value="lifetime">Lifetime</option></select>
-          <select className="input-base !w-auto" value={status} onChange={e => setStatus(e.target.value)}><option value="all">All status</option><option value="active">Active</option><option value="expired">Expired</option><option value="revoked">Revoked</option><option value="used up">Used up</option></select>
+          <select className="input-base !w-auto" value={status} onChange={e => setStatus(e.target.value)}><option value="all">All status</option><option value="active">Active</option><option value="not activated">Not activated</option><option value="expired">Expired</option><option value="revoked">Revoked</option><option value="used up">Used up</option></select>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button size="sm" variant="outline" disabled={!sel.size} onClick={() => void bulk("revoke", [...sel])}><Ban size={14} /> Revoke ({sel.size})</Button>
@@ -185,7 +191,7 @@ function AdminKeys() {
               <td className="p-2 capitalize">{k.key_type}</td>
               <td className="p-2">{keyStatus(k)}</td>
               <td className="p-2">{k.profiles?.username ?? "—"}</td>
-              <td className="p-2 text-xs">{k.expires_at ? new Date(k.expires_at).toLocaleString() : "Never"}</td>
+              <td className="p-2 text-xs">{!k.activated_at && k.duration_hours ? `First verify · ${k.duration_hours}h` : k.expires_at ? new Date(k.expires_at).toLocaleString() : "Lifetime"}</td>
               <td className="p-2">{k.uses}{k.max_uses ? `/${k.max_uses}` : ""}</td>
               <td className="p-2 text-xs">{new Date(k.created_at).toLocaleDateString()}</td>
               <td className="p-2"><div className="flex gap-1">
