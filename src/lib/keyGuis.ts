@@ -24,6 +24,24 @@ local CONFIG = {
 }
 local Players, TweenService, UIS, Http = game:GetService("Players"), game:GetService("TweenService"), game:GetService("UserInputService"), game:GetService("HttpService")
 local player = Players.LocalPlayer
+local analytics = game:GetService("RbxAnalyticsService")
+local deviceOk, DEVICE_ID = pcall(function() return analytics:GetClientId() end)
+if not deviceOk or type(DEVICE_ID) ~= "string" or #DEVICE_ID < 16 then
+  warn("[ARIO] Cannot read a stable device identifier; key verification stopped.")
+  return
+end
+local function validationUrl(key)
+  local url = CONFIG.VALIDATE
+  if url:find("{key}", 1, true) then
+    url = url:gsub("{key}", Http:UrlEncode(key))
+  elseif url:find("key=", 1, true) then
+    url = url .. Http:UrlEncode(key)
+  else
+    url = url .. (url:find("?", 1, true) and "&" or "?") .. "key=" .. Http:UrlEncode(key)
+  end
+  local sep = url:find("?", 1, true) and "&" or "?"
+  return url .. sep .. "device_id=" .. Http:UrlEncode(DEVICE_ID)
+end
 local guiParent = (gethui and gethui()) or game:GetService("CoreGui")
 local function clean(k) return (tostring(k or ""):gsub("[%s\\"'\`]", "")):upper() end
 local function request(url)
@@ -38,7 +56,7 @@ end
 local function verify(key)
   key = clean(key)
   if not key:match("^ARIO%-%x%x%x%x%x%x%x%x%-%x%x%x%x%x%x%x%x%-%x%x%x%x%x%x%x%x$") then return false, "Wrong key format" end
-  local body = request(CONFIG.VALIDATE .. key)
+  local body = request(validationUrl(key))
   if not body then return false, "Can't reach server" end
   local ok, data = pcall(function() return Http:JSONDecode(body) end)
   if ok and type(data) == "table" and data.valid == true then return true, data end
