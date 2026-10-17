@@ -91,7 +91,7 @@ function KeyModal({ onClose }: { onClose: () => void }) {
   const [phase, setPhase] = useState<"starting" | "waiting" | "claiming" | "done" | "error">("starting");
   const [total, setTotal] = useState(20);
   const [left, setLeft] = useState(20);
-  const [result, setResult] = useState<{ key: string; key_type: string; expires_at: string | null } | null>(null);
+  const [result, setResult] = useState<{ key: string; key_type: string; expires_at: string | null; activated_at?: string | null; duration_hours?: number | null } | null>(null);
   const [err, setErr] = useState("");
 
   useEffect(() => {
@@ -139,7 +139,7 @@ function KeyModal({ onClose }: { onClose: () => void }) {
           <div className="mt-4 rounded-xl border border-border bg-background/50 p-4 text-center">
             <code className="break-all font-mono text-base font-semibold">{result.key}</code>
           </div>
-          <p className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground"><ShieldCheck size={14} className="text-primary" /> Active · {result.expires_at ? `expires ${new Date(result.expires_at).toLocaleString()}` : "never expires"}</p>
+          <p className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground"><ShieldCheck size={14} className="text-primary" /> Not activated · {result.duration_hours ? `timer starts on first verification (${result.duration_hours}h)` : "lifetime key"}</p>
           <Button className="mt-4 w-full" onClick={() => void copy(result.key)}><Copy size={16} /> Copy key</Button>
         </>}
         {phase === "error" && <p className="mt-3 text-sm text-destructive">{err}</p>}
