@@ -12,10 +12,10 @@ export const Route = createFileRoute("/keys")({
   component: KeysPage,
 });
 
-type MyKey = { id: string; key: string; key_type: string; expires_at: string | null; active: boolean; uses: number; max_uses: number | null };
+type MyKey = { id: string; key: string; key_type: string; expires_at: string | null; activated_at: string | null; duration_hours: number | null; active: boolean; uses: number; max_uses: number | null };
 
-export const keyStatus = (k: { active: boolean; expires_at: string | null; uses?: number; max_uses?: number | null }) =>
-  !k.active ? "Revoked" : k.expires_at && new Date(k.expires_at) <= new Date() ? "Expired" : k.max_uses && (k.uses ?? 0) >= k.max_uses ? "Used up" : "Active";
+export const keyStatus = (k: { active: boolean; expires_at: string | null; activated_at?: string | null; uses?: number; max_uses?: number | null }) =>
+  !k.active ? "Revoked" : k.expires_at && new Date(k.expires_at) <= new Date() ? "Expired" : k.max_uses && (k.uses ?? 0) >= k.max_uses ? "Used up" : k.activated_at === null ? "Not activated" : "Active";
 
 const TypeIcon = ({ t }: { t: string }) => t === "lifetime" ? <InfinityIcon size={14} /> : t === "premium" ? <Crown size={14} /> : <KeyRound size={14} />;
 
@@ -35,7 +35,7 @@ function KeysPage() {
     queryKey: ["my_keys", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase.from("license_keys").select("id,key,key_type,expires_at,active,uses,max_uses").eq("user_id", user!.id).order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("license_keys").select("id,key,key_type,expires_at,activated_at,duration_hours,active,uses,max_uses").eq("user_id", user!.id).order("created_at", { ascending: false });
       if (error) throw error;
       return data as MyKey[];
     },
@@ -75,7 +75,7 @@ function KeysPage() {
                 <span className="flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-xs font-semibold capitalize text-primary"><TypeIcon t={k.key_type} />{k.key_type}</span>
                 <code className="min-w-0 flex-1 truncate font-mono text-sm">{k.key}</code>
                 <span className={`text-xs ${st === "Active" ? "text-primary" : "text-muted-foreground"}`}>{st}</span>
-                <span className="text-xs text-muted-foreground">{k.expires_at ? `Expires ${new Date(k.expires_at).toLocaleString()}` : "Never expires"}</span>
+                <span className="text-xs text-muted-foreground">{!k.activated_at && k.duration_hours ? `Starts on first verification · ${k.duration_hours}h` : k.expires_at ? `Expires ${new Date(k.expires_at).toLocaleString()}` : "Lifetime key"}</span>
                 <Button size="sm" variant="outline" onClick={() => void copy(k.key)}><Copy size={14} /> Copy</Button>
               </div>;
             })}</div>}
