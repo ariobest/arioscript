@@ -114,18 +114,18 @@ function AdminKeys() {
   const validateUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/api/public/keys/validate`;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 sm:space-y-7">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="flex items-center gap-2 font-display text-2xl font-bold"><KeyRound className="text-primary" /> Key System</h1>
         {s && <Button variant={s.enabled ? "default" : "outline"} onClick={() => void saveSettings({ enabled: !s.enabled })}>Key system: {s.enabled ? "ON" : "OFF"}</Button>}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-4">
         {([["Total", st?.total], ["Active", st?.active], ["Expired", st?.expired], ["Premium", st?.premium], ["Lifetime", st?.lifetime], ["Generated today", st?.today], ["Key checks", st?.checks], ["Failed checks", st?.failed]] as const).map(([l, v]) =>
           <div key={l} className="glass admin-stat-tile rounded-xl p-4"><p className="text-xs text-muted-foreground">{l}</p><p className="mt-1 font-mono text-2xl font-semibold">{v ?? "—"}</p></div>)}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2">
         <div className="glass rounded-2xl p-5">
           <h2 className="font-semibold">Generate keys</h2>
           <div className="mt-3 grid grid-cols-2 gap-2">
@@ -164,6 +164,51 @@ end`}</code>
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${st.checks ? ((st.checks - st.failed) / st.checks) * 100 : 0}%` }} /></div>
         <p className="mt-2 text-xs text-muted-foreground">{st.checks - st.failed} accepted · {st.failed} refused</p>
       </div>}
+
+      <section className="glass space-y-4 rounded-2xl border border-primary/20 p-5 sm:p-6">
+        <div className="flex flex-wrap items-start gap-3">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary/15 text-primary"><ShieldCheck size={21}/></div>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-display text-lg font-semibold">Verification SDK & API</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Integration details for your loader. Keep verification server-side; never ship service-role credentials in a client or Lua script.</p>
+          </div>
+          <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-1 text-[11px] font-semibold text-amber-300">Endpoint needs live test</span>
+        </div>
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="rounded-xl border border-border/60 bg-background/30 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Verification endpoint</p>
+            <code className="mt-2 block break-all font-mono text-xs">{validateUrl}</code>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button size="sm" variant="outline" onClick={() => void navigator.clipboard.writeText(validateUrl).then(() => toast.success("Endpoint copied"))}><Copy size={14}/> Copy endpoint</Button>
+              <Button size="sm" variant="outline" onClick={() => window.open(validateUrl, "_blank", "noopener,noreferrer")}><Link2 size={14}/> Open endpoint</Button>
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">Opening this URL without a key should return a controlled JSON error. A successful HTTP response alone does not prove a key is valid.</p>
+          </div>
+          <div className="rounded-xl border border-border/60 bg-background/30 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Request contract</p>
+            <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-words rounded-lg bg-background/60 p-3 font-mono text-xs">{JSON.stringify({ method: "GET", query: { key: "YOUR_LICENSE_KEY", device_id: "CLIENT_DEVICE_ID" }, success: { valid: true }, failure: { valid: false, error: "invalid_key" } }, null, 2)}</pre>
+            <Button size="sm" variant="outline" onClick={() => void navigator.clipboard.writeText(JSON.stringify({ method: "GET", query: { key: "YOUR_LICENSE_KEY", device_id: "CLIENT_DEVICE_ID" }, success: { valid: true }, failure: { valid: false, error: "invalid_key" } }, null, 2)).then(() => toast.success("Request contract copied"))}><Copy size={14}/> Copy contract</Button>
+          </div>
+        </div>
+        <div className="rounded-xl border border-border/60 bg-background/30 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div><h3 className="font-semibold">Lua client example</h3><p className="mt-1 text-xs text-muted-foreground">Example only — the live endpoint must implement the contract above before protected loaders rely on it.</p></div>
+            <Button size="sm" variant="outline" onClick={() => void navigator.clipboard.writeText(`local HttpService = game:GetService("HttpService")\nlocal key = "YOUR_LICENSE_KEY"\nlocal deviceId = game:GetService("RbxAnalyticsService"):GetClientId()\nlocal url = ${JSON.stringify(validateUrl)} .. "?key=" .. HttpService:UrlEncode(key) .. "&device_id=" .. HttpService:UrlEncode(deviceId)\nlocal ok, response = pcall(function()\n  return HttpService:JSONDecode(game:HttpGet(url))\nend)\nif not ok or type(response) ~= "table" or response.valid ~= true then\n  warn("ARIO key verification failed")\n  return\nend\nprint("ARIO key verified")`).then(() => toast.success("Lua example copied"))}><Copy size={14}/> Copy Lua example</Button>
+          </div>
+          <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-lg bg-background/60 p-3 font-mono text-xs">{`local HttpService = game:GetService("HttpService")
+local key = "YOUR_LICENSE_KEY"
+local deviceId = game:GetService("RbxAnalyticsService"):GetClientId()
+local url = ${JSON.stringify(validateUrl)} .. "?key=" .. HttpService:UrlEncode(key) .. "&device_id=" .. HttpService:UrlEncode(deviceId)
+local ok, response = pcall(function()
+  return HttpService:JSONDecode(game:HttpGet(url))
+end)
+if not ok or type(response) ~= "table" or response.valid ~= true then
+  warn("ARIO key verification failed")
+  return
+end
+print("ARIO key verified")`}</pre>
+        </div>
+      </section>
 
       <LoaderBuilder />
 
