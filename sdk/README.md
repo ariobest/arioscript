@@ -1,34 +1,51 @@
-# ARIO SCRIPTS Key SDK
+# ARIO SCRIPTS Key SDK (Roblox Luau)
 
-This folder contains a minimal Lua client example for calling the ARIO key-verification API.
+This SDK uses the ARIO production Supabase project and the POST JSON contract. It never contains a service-role key.
 
-## Endpoint contract
+## Endpoint
 
-`GET /api/public/keys/validate?key=YOUR_KEY&device_id=YOUR_DEVICE_ID`
+`https://yxbzblbtzqioexszjjkc.supabase.co/functions/v1/ario-api?action=validate`
 
-Expected JSON:
+- Method: `POST`
+- Content-Type: `application/json`
+- Body: `{"key":"ARIO-A1-B2C3-D4","device_id":"stable-client-id","script_id":"optional-script-id"}`
+- Response: `{"valid":true,"code":"KEY_VALID","message":"Key verified","expires_at":null,"key_type":"premium","request_id":"..."}`
 
-- Valid: `{"valid":true}`
-- Invalid: `{"valid":false,"error":"invalid_key"}`
+The endpoint is an Edge Function route; do not assume `/api/public/keys/validate` is deployed unless a deployment explicitly maps it there.
 
-## Important deployment note
+## Roblox usage
 
-The Admin Key System screen displays the expected verification URL, but the website repository did not contain a matching `/api/public/keys/validate` route when this SDK was added. Deploy and test a server-side validation handler before using the SDK to gate protected code. The client sample is not a substitute for server-side key checks. Never expose Supabase service-role credentials in a Lua loader or browser bundle.
-
-## Example
+Enable **Allow HTTP Requests** in the experience's security settings. Put this module in a ModuleScript, or host its exact source where your intended environment can load it.
 
 ```lua
-local ArioKey = loadstring(game:HttpGet("YOUR_HOSTED_SDK_URL"))()
+local ArioKey = require(path.to.SDK)
 local verifier = ArioKey.new({
-    endpoint = "https://arioscript.lovable.app/api/public/keys/validate",
-    key = "YOUR_LICENSE_KEY",
+    Key = nil, -- use the lowercase options below
+    key = "ARIO-A1-B2C3-D4",
+    scriptId = "my-protected-script",
 })
-local valid, reason = verifier:Verify()
-if not valid then
-    warn("ARIO verification failed: " .. tostring(reason))
+
+local result = verifier:Verify()
+if not result.valid then
+    warn("ARIO verification failed: " .. tostring(result.code))
     return
 end
-print("ARIO key verified")
+
+-- Continue only after successful server verification.
 ```
 
-The SDK expects the endpoint to validate key status, expiry, usage limits, and device binding on the server and to return JSON consistently.
+For loadstring-compatible environments, the module must return the SDK table, so the caller can do:
+
+```lua
+local ArioKey = loadstring(game:HttpGet("YOUR_PUBLISHED_SDK_RAW_URL"))()
+local result = ArioKey.new({ key = "ARIO-A1-B2C3-D4", scriptId = "my-protected-script" }):Verify()
+if not result.valid then return end
+```
+
+## Device identifier limits
+
+The default uses Roblox's `RbxAnalyticsService:GetClientId()` when available. This is a client identifier, not tamper-proof hardware identity. Environments where that API is unavailable must provide a stable identifier through `deviceId`; do not invent a hardware fingerprint.
+
+## Important status
+
+The SDK fails closed on network errors, non-2xx HTTP responses, malformed JSON, or a response without a boolean `valid` field. The server-side validation RPC and the deployed Edge Function must both be updated before using this SDK in production. The SDK alone does not protect source code that is already shipped to the client.
