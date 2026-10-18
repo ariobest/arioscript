@@ -20,7 +20,6 @@ Enable **Allow HTTP Requests** in the experience's security settings. Put this m
 ```lua
 local ArioKey = require(path.to.SDK)
 local verifier = ArioKey.new({
-    Key = nil, -- use the lowercase options below
     key = "ARIO-A1-B2C3-D4",
     scriptId = "my-protected-script",
 })
